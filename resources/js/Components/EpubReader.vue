@@ -18,6 +18,8 @@ let rendition = null
 const emit = defineEmits(['update:percent'])
 const currentPage = ref(1)
 const totalPages = ref(1)
+const prevBtn = ref(null);
+const nextBtn = ref(null);
 
 function displayFirstContent() {
   book.ready.then(() => {
@@ -52,6 +54,16 @@ function handleRelocated(location) {
       totalPages.value = book.locations.length()
     }
   }
+}
+
+function handlePrevClick(event) {
+  prevPage();
+  event.currentTarget.blur();
+}
+
+function handleNextClick(event) {
+  nextPage();
+  event.currentTarget.blur();
 }
 
 onMounted(() => {
@@ -92,18 +104,41 @@ watch(() => props.url, (newUrl) => {
 </script>
 
 <template>
-  <div>
-    <div class="flex justify-between items-center mb-2">
-      <button class="btn btn-sm border border-green-600 text-green-600 hover:bg-green-50 px-3 py-1 rounded" @click="prevPage">
-        <font-awesome-icon icon="chevron-left" /> Previous
-      </button>
-      <span class="text-green-700 text-sm font-semibold">
-        Page {{ currentPage }} / {{ totalPages }}
-      </span>
-      <button class="btn btn-sm border border-green-600 text-green-600 hover:bg-green-50 px-3 py-1 rounded" @click="nextPage">
-        Next <font-awesome-icon icon="chevron-right" />
-      </button>
-    </div>
+  <div class="relative">
+    <!-- Left (Previous) Button -->
+    <button
+      ref="prevBtn"
+      class="absolute left-0 top-1/2 -translate-y-1/2 z-10
+             bg-white bg-opacity-80 hover:bg-green-100 text-green-700 font-bold
+             py-3 px-4 text-xl rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent
+             sm:px-3 sm:py-2 sm:text-base
+             -ml-6 sm:ml-0"
+      @click="handlePrevClick"
+      aria-label="Previous Page"
+    >
+      <font-awesome-icon icon="chevron-left" />
+    </button>
+
+    <!-- The viewer itself -->
     <div ref="viewer" class="border-2 border-green-600 rounded-xl overflow-hidden bg-green-50"></div>
+
+    <!-- Right (Next) Button -->
+    <button
+      ref="nextBtn"
+      class="absolute right-0 top-1/2 -translate-y-1/2 z-10
+             bg-white bg-opacity-80 hover:bg-green-100 text-green-700 font-bold
+             py-3 px-4 text-xl rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent
+             sm:px-3 sm:py-2 sm:text-base
+             -mr-6 sm:mr-0"
+      @click="handleNextClick"
+      aria-label="Next Page"
+    >
+      <font-awesome-icon icon="chevron-right" />
+    </button>
+
+    <!-- Page indicator -->
+    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white bg-opacity-80 px-3 py-1 rounded shadow text-green-700 text-sm font-semibold">
+      Page {{ currentPage }} / {{ totalPages }}
+    </div>
   </div>
 </template>

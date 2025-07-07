@@ -3,7 +3,7 @@ import UserLayout from '@/Layouts/UserLayout.vue';
 import { usePage, Head, Link, router } from '@inertiajs/vue3';
 import EpubReader from '@/Components/EpubReader.vue';
 import PdfReader from '@/Components/PdfReader.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faArrowLeft, faBookOpen, faUpRightFromSquare, faBookmark, faXmark, faFlag, faBook, faFile, faDownload, faUser, faBarcode, faCalendar, faBuilding, faLanguage, faTag, faCircle } from '@fortawesome/free-solid-svg-icons'
@@ -16,6 +16,7 @@ const book = props.book;
 const savedBookIds = ref(props.saved_books || []);
 const isSaved = computed(() => savedBookIds.value.includes(book.id));
 const showReader = ref(false);
+const readerSection = ref(null);
 
 const from = new URLSearchParams(window.location.search).get('from') || 'books';
 const getBackRoute = () => {
@@ -30,6 +31,16 @@ const getBackRoute = () => {
 
 function handleReadNow() {
   showReader.value = !showReader.value;
+  if (!showReader.value) return;
+  nextTick(() => {
+    setTimeout(() => {
+      if (readerSection.value) {
+        const offset = 100; // px, adjust as needed
+        const top = readerSection.value.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }, 200);
+  });
 }
 
 function saveBook() {
@@ -170,7 +181,7 @@ const isEpub = computed(() => fileType.value === 'epub');
         </div>
       </div>
 
-      <div v-if="showReader && book.ebook_file" class="mt-8">
+      <div v-if="showReader && book.ebook_file" class="mt-8" ref="readerSection">
         <PdfReader v-if="isPdf" :url="book.ebook_file" />
         <EpubReader v-else-if="isEpub" :url="book.ebook_file" />
 
