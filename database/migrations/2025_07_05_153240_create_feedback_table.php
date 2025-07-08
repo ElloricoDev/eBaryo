@@ -15,7 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->text('message');
+            $table->text('response')->nullable();
+            $table->boolean('notified')->default(false);
             $table->string('status')->default('pending');
+            $table->string('type')->default('general');
+            $table->foreignId('book_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamp('responded_at')->nullable();
             $table->timestamps();
         });

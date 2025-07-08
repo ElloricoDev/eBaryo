@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('middle_name')->nullable();
             $table->string('contact_number')->nullable();
             $table->string('address')->nullable();
+            $table->enum('student', ['yes', 'no'])->default('no');
             $table->string('role')->default('user');
             $table->string('email')->unique();
             $table->string('google_id')->nullable();

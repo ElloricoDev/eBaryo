@@ -19,7 +19,7 @@ return new class extends Migration
             $table->year('published_year')->nullable();
             $table->text('description')->nullable();
             $table->string('cover_image')->nullable();
-            $table->string('file_url');
+            $table->string('ebook_file');
             $table->unsignedBigInteger('category_id');
             $table->string('publisher')->nullable();
             $table->string('language')->nullable();

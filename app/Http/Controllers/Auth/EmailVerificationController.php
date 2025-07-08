@@ -15,9 +15,9 @@ class EmailVerificationController
         $user = Auth::user();
         $avatar = $user->avatar;
         if ($user->role === 'admin') {
-            $redirect = redirect()->route('admin.profile.index');
+            $redirect = redirect()->route('admin.profile.index', ['verified' => 1]);
         } else {
-            $redirect = redirect()->route('user.profile.index');
+            $redirect = redirect()->route('user.profile.index', ['verified' => 1]);
         }
         if ($avatar) {
             $redirect->with(['avatar' => $avatar]);

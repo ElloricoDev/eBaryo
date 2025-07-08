@@ -6,8 +6,9 @@ import VerifyEmail from './Partials/VerifyEmail.vue'
 import UserLayout from '@/Layouts/UserLayout.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUserCircle, faUser, faPhone, faLocationDot, faEnvelope, faCircleCheck, faGraduationCap, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
-library.add(faUserCircle, faUser, faPhone, faLocationDot, faEnvelope, faCircleCheck, faGraduationCap, faPenToSquare);
+import { faUserCircle, faUser, faPhone, faLocationDot, faEnvelope, faCircleCheck, faGraduationCap, faPenToSquare, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+library.add(faUserCircle, faUser, faPhone, faLocationDot, faEnvelope, faCircleCheck, faGraduationCap, faPenToSquare, faArrowLeft);
+import { onMounted } from 'vue';
 
 defineOptions({
   layout: UserLayout
@@ -15,10 +16,25 @@ defineOptions({
 
 const { props } = usePage()
 const user = props.user
+
+onMounted(() => {
+  if (window.location.search.includes('verified=1')) {
+    window.location.replace(window.location.pathname); // Remove query param and reload
+  }
+});
+
+function goBack() { window.history.back(); }
 </script>
 
 <template>
   <Head title="My Profile" />
+
+  <div>
+    <button @click="goBack" class="block sm:hidden mb-4 text-green-700 font-bold flex items-center gap-2">
+      <font-awesome-icon icon="arrow-left" class="text-lg" />
+      Back
+    </button>
+  </div>
 
   <div class="relative min-h-screen max-w-5xl mx-auto px-2 sm:px-4 py-4 sm:py-6 overflow-x-hidden">
     <!-- Animated Gradient Background -->

@@ -1,17 +1,21 @@
 <script setup>
-import { useForm, Head } from '@inertiajs/vue3';
+import { useForm, Head, usePage } from '@inertiajs/vue3';
 import UserLayout from '@/Layouts/UserLayout.vue';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCommentDots } from '@fortawesome/free-solid-svg-icons';
-library.add(faCommentDots);
+import { faCommentDots, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+library.add(faCommentDots, faArrowLeft);
 
 defineOptions({ layout: UserLayout });
 
 const form = useForm({
   message: ''
 });
+
+const { props } = usePage();
+const user = props.auth?.user || null;
+const isVerified = user && user.email_verified_at;
 
 function submit() {
   form.post(route('feedback.store'), {
@@ -27,10 +31,18 @@ function submit() {
     }
   });
 }
+
+function goBack() { window.history.back(); }
 </script>
 
 <template>
   <Head title="Submit Feedback" />
+  <div>
+    <button @click="goBack" class="block sm:hidden mb-4 text-green-700 font-bold flex items-center gap-2">
+      <font-awesome-icon icon="arrow-left" class="text-lg" />
+      Back
+    </button>
+  </div>
   <div class="relative min-h-screen max-w-4xl mx-auto px-2 sm:px-4 py-4 sm:py-6 overflow-x-hidden">
     <!-- Animated Gradient Background -->
     <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-green-50 to-white animate-gradient-move"></div>
@@ -57,11 +69,12 @@ function submit() {
           <!-- Submit Button -->
           <button
             type="submit"
-            :disabled="form.processing"
+            :disabled="form.processing || !isVerified"
             class="w-full bg-green-600 hover:bg-green-700 focus:bg-green-800 text-white py-2 rounded-md shadow-sm transition animate-pulse-cta focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50 font-semibold text-base"
           >
             Submit
           </button>
+          <div v-if="!isVerified" class="text-yellow-600 text-center mt-2">Please verify your email to submit feedback.</div>
 
           <!-- Flash Success Message -->
           <div

@@ -3,7 +3,7 @@ import UserLayout from '@/Layouts/UserLayout.vue'
 import { usePage, Head, router } from '@inertiajs/vue3'
 import EpubReader from '@/Components/EpubReader.vue'
 import PdfReader from '@/Components/PdfReader.vue'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faArrowLeft, faBook, faFile, faDownload } from '@fortawesome/free-solid-svg-icons'
@@ -43,6 +43,13 @@ const isPdf = computed(() => fileType.value === 'pdf')
 const isEpub = computed(() => fileType.value === 'epub')
 
 library.add(faArrowLeft, faBook, faFile, faDownload)
+
+onMounted(() => {
+  const el = document.getElementById('book-content');
+  if (el) {
+    el.scrollIntoView({ behavior: 'auto' });
+  }
+});
 </script>
 
 <template>
@@ -64,7 +71,7 @@ library.add(faArrowLeft, faBook, faFile, faDownload)
       </div>
 
       <!-- Reader Container -->
-      <div class="bg-white rounded-2xl border-2 border-green-700 p-2 sm:p-4 min-h-[70vh] sm:min-h-[80vh] shadow-md hover:shadow-xl transition-shadow">
+      <div class="bg-white rounded-2xl border-2 border-green-700 p-2 sm:p-4 min-h-[70vh] sm:min-h-[80vh] shadow-md hover:shadow-xl transition-shadow" id="book-content">
         <!-- PDF Reader -->
         <PdfReader
           v-if="isPdf"

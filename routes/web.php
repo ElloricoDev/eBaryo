@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\UserControllers\BookController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\BookReviewController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -33,17 +34,9 @@ Route::middleware('auth', 'user')->group(function () {
     Route::get('/books', [BookController::class, 'index'])->name('books.index');
     Route::get('/books/saved', [BookController::class, 'savedBooks'])->name('books.saved'); 
     Route::get('/books/{id}', [BookController::class, 'show'])->name('books.view');
-    Route::get('/books/{id}/read', [BookController::class, 'read'])->name('books.read');
     Route::post('/books/{id}/progress', [BookController::class, 'saveProgress'])->name('books.saveProgress');
     Route::post('/books/{id}/save', [BookController::class, 'saveBook'])->name('books.save');
     Route::post('/books/{id}/unsave', [BookController::class, 'unsaveBook'])->name('books.unsave');
-
-
-    //Feedback Routes
-    Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
-    Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
-    Route::get('/my-feedback', [FeedbackController::class, 'myFeedback'])->name('feedback.my');
-    Route::post('/books/{bookId}/report', [FeedbackController::class, 'reportBook'])->name('books.report');
 
     //File serving route for PDFs and other ebooks
     Route::get('/files/{filename}', function ($filename) {
@@ -81,6 +74,22 @@ Route::middleware('auth', 'user')->group(function () {
             'path' => $path
         ]);
     })->name('test.pdf')->where('filename', '.*');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Book Reviews
+    Route::get('/books/{book}/reviews', [BookReviewController::class, 'index'])->name('books.reviews.index');
+    Route::post('/books/{book}/reviews', [BookReviewController::class, 'store'])->name('books.reviews.store');
+    Route::delete('/reviews/{id}', [BookReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // Feedback Routes
+    Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
+    Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
+    Route::get('/my-feedback', [FeedbackController::class, 'myFeedback'])->name('feedback.my');
+    Route::post('/books/{bookId}/report', [FeedbackController::class, 'reportBook'])->name('books.report');
+
+    // Book Reading
+    Route::get('/books/{id}/read', [BookController::class, 'read'])->name('books.read');
 });
 
 Route::middleware(['auth'])->group(function () {

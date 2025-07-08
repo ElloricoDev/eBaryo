@@ -78,6 +78,7 @@ const unsaveBook = (book) => {
           :key="book.id"
           :book="{ ...book, from: 'books' }"
           :isSaved="safeSavedBookIds.includes(book.id)"
+          :auth="$page.props.auth"
           @save="saveBook"
           @unsave="unsaveBook"
         />

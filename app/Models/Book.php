@@ -32,4 +32,9 @@ class Book extends Model
     {
         return $this->belongsToMany(User::class, 'book_user')->withTimestamps();
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(\App\Models\BookReview::class);
+    }
 }
