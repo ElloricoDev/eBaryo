@@ -37,4 +37,8 @@ class Book extends Model
     {
         return $this->hasMany(\App\Models\BookReview::class);
     }
+
+    public function readingLogs(){
+        return $this->hasMany(ReadingLog::class);
+    }
 }
