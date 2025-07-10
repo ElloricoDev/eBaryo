@@ -53,13 +53,13 @@ const submit = () => {
                             class="w-full border rounded-md px-3 py-3 focus:outline-none focus:ring-2 focus:ring-green-300 peer bg-transparent placeholder-transparent"
                             :class="{ 'border-red-500': form.errors.user_name }"
                             autofocus
-                            placeholder="Full Name"
+                            placeholder=" "
                             aria-label="Full Name"
                         />
                         <label
                             for="name"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
-                            :class="{'-top-4 text-xs text-green-600 font-semibold': form.user_name}"
+                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-6 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
+                            :class="{'-top-6 text-xs text-green-600 font-semibold bg-white px-1': form.user_name && form.user_name.length > 0}"
                         >
                             <font-awesome-icon icon="person" /> Full Name
                         </label>
@@ -76,13 +76,13 @@ const submit = () => {
                             v-model="form.email"
                             class="w-full border rounded-md px-3 py-3 focus:outline-none focus:ring-2 focus:ring-green-300 peer bg-transparent placeholder-transparent"
                             :class="{ 'border-red-500': form.errors.email }"
-                            placeholder="Email address"
+                            placeholder=" "
                             aria-label="Email address"
                         />
                         <label
                             for="email"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
-                            :class="{'-top-4 text-xs text-green-600 font-semibold': form.email}"
+                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-6 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
+                            :class="{'-top-6 text-xs text-green-600 font-semibold bg-white px-1': form.email && form.email.length > 0}"
                         >
                             <font-awesome-icon icon="envelope" /> Email address
                         </label>
@@ -99,13 +99,13 @@ const submit = () => {
                             v-model="form.password"
                             class="w-full border rounded-md px-3 py-3 focus:outline-none focus:ring-2 focus:ring-green-300 peer bg-transparent placeholder-transparent"
                             :class="{ 'border-red-500': form.errors.password }"
-                            placeholder="Password"
+                            placeholder=" "
                             aria-label="Password"
                         />
                         <label
                             for="password"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
-                            :class="{'-top-4 text-xs text-green-600 font-semibold': form.password}"
+                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-6 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
+                            :class="{'-top-6 text-xs text-green-600 font-semibold bg-white px-1': form.password && form.password.length > 0}"
                         >
                             <font-awesome-icon icon="lock" /> Password
                         </label>
@@ -121,13 +121,13 @@ const submit = () => {
                             type="password"
                             v-model="form.password_confirmation"
                             class="w-full border rounded-md px-3 py-3 focus:outline-none focus:ring-2 focus:ring-green-300 peer bg-transparent placeholder-transparent"
-                            placeholder="Confirm Password"
+                            placeholder=" "
                             aria-label="Confirm Password"
                         />
                         <label
                             for="password_confirmation"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
-                            :class="{'-top-4 text-xs text-green-600 font-semibold': form.password_confirmation}"
+                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-6 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
+                            :class="{'-top-6 text-xs text-green-600 font-semibold bg-white px-1': form.password_confirmation && form.password_confirmation.length > 0}"
                         >
                             <font-awesome-icon icon="lock" /> Confirm Password
                         </label>
@@ -153,7 +153,7 @@ const submit = () => {
                             :href="route('google.redirect')"
                             class="w-full inline-flex justify-center items-center border border-green-600 text-green-600 py-2 px-4 rounded hover:bg-green-50 transition"
                         >
-                            <font-awesome-icon :icon="['fab', 'google']" class="mr-2"/> Sign in with
+                            <font-awesome-icon :icon="['fab', 'google']" class="mr-2 text-red-500"/> Sign in with
                             Google
                         </a>
                     </div>
