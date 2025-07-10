@@ -4,9 +4,9 @@ import { computed, ref } from 'vue';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faEye, faBookmark, faFlag, faXmarkCircle, faHourglassHalf, faXmark, faUser, faTag, faBuilding } from '@fortawesome/free-solid-svg-icons'
+import { faBook, faEye, faBookmark, faFlag, faXmarkCircle, faHourglassHalf, faXmark, faUser, faTag, faBuilding, faStar } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faBook, faEye, faBookmark, faFlag, faXmarkCircle, faHourglassHalf, faXmark, faUser, faTag, faBuilding)
+library.add(faBook, faEye, faBookmark, faFlag, faXmarkCircle, faHourglassHalf, faXmark, faUser, faTag, faBuilding, faStar)
 
 const props = defineProps({
   book: Object,
@@ -131,6 +131,10 @@ defineOptions({ inheritAttrs: false })
     </div>
     <div class="flex-1 flex flex-col px-1 pt-1 pb-1">
       <h5 class="text-green-800 font-extrabold text-xl mb-1 truncate text-center">{{ book.title }}</h5>
+      <!-- Show reading percent if available -->
+      <div v-if="typeof book.progress === 'number' && book.progress > 0" class="text-xs text-green-700 text-center font-semibold mb-1">
+        {{ Math.round(book.progress * 100) }}% read
+      </div>
       <!-- Ratings and Reviews -->
       <div class="flex items-center justify-center gap-1 mb-1">
         <template v-if="book.average_rating && book.reviews_count > 0">
@@ -163,41 +167,57 @@ defineOptions({ inheritAttrs: false })
           <span class="text-xs text-gray-400">No ratings yet</span>
         </template>
       </div>
+      <!-- Total Ratings and Total Reads Row -->
+      <div class="flex items-center justify-center gap-4 mb-1">
+        <div class="flex items-center gap-1 text-xs text-yellow-700" v-if="book.reviews_count > 0">
+          <font-awesome-icon icon="star" class="text-yellow-400" />
+          <span>{{ book.reviews_count }}</span>
+          <span class="text-xs text-gray-500">rating{{ book.reviews_count === 1 ? '' : 's' }}</span>
+        </div>
+        <div class="flex items-center gap-1 text-xs text-blue-800" v-if="book.read_count > 0">
+          <font-awesome-icon icon="eye" class="text-blue-500" />
+          <span>{{ book.read_count }}</span>
+          <span class="text-xs text-blue-600">read{{ book.read_count === 1 ? '' : 's' }}</span>
+        </div>
+      </div>
       <p class="text-xs text-center mb-1">
         <span class="text-green-600 font-medium"><font-awesome-icon icon="user" class="mr-1" />Author:</span>
         <span class="text-gray-500">{{ book.author || 'Unknown' }}</span>
       </p>
       <p class="text-xs text-center mb-1">
         <span class="text-green-600 font-medium"><font-awesome-icon icon="tag" class="mr-1" />Genre:</span>
-        <span class="text-gray-500">{{ book.category?.name || book.genre || 'N/A' }}</span>
+        <span class="text-gray-500">{{ book.category?.name || book.genre || 'Unknown' }}</span>
       </p>
       <p class="text-xs text-center mb-2">
         <span class="text-green-600 font-medium"><font-awesome-icon icon="building" class="mr-1" />Publisher:</span>
         <span class="text-gray-500">{{ book.publisher || 'N/A' }}</span>
       </p>
       <div class="border-t border-green-100 my-2"></div>
-      <div class="mt-auto flex flex-col gap-2">
-        <div class="flex gap-2 justify-center">
+      <div class="mt-auto flex flex-col gap-1">
+        <div class="flex gap-1 justify-center">
           <button
-            class="flex-1 flex items-center justify-center gap-1 px-3 py-1 bg-green-600 text-white rounded-lg font-semibold shadow hover:bg-green-700 focus:bg-green-800 animate-pulse-cta focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-200"
+            class="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs sm:px-3 sm:py-1 sm:text-sm bg-green-600 text-white rounded-lg font-semibold shadow hover:bg-green-700 focus:bg-green-800 animate-pulse-cta focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-200"
             @click="goToRead"
           >
             <font-awesome-icon icon="book" class="text-white text-lg" />
-            <span>Read</span>
+            <span>
+              <template v-if="typeof book.progress === 'number' && book.progress > 0 && book.progress < 1">Continue Read</template>
+              <template v-else>Read</template>
+            </span>
           </button>
           <Link
             :href="route('books.view', { id: book.id, from: book.from || 'books', returnTo: book.from || 'books' })"
-            class="flex-1 flex items-center justify-center gap-1 px-3 py-1 border border-green-600 text-green-700 rounded-lg font-semibold shadow hover:bg-green-50 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-200"
+            class="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs sm:px-3 sm:py-1 sm:text-sm border border-green-600 text-green-700 rounded-lg font-semibold shadow hover:bg-green-50 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-200"
             @click="() => saveScrollAndGoTo('view')"
           >
             <font-awesome-icon icon="eye" class="text-green-700 text-lg" />
             <span>View</span>
           </Link>
         </div>
-        <div class="flex gap-2 justify-center">
+        <div class="flex gap-1 justify-center">
           <button
             v-if="!isBookSaved"
-            class="flex-1 flex items-center justify-center gap-1 px-3 py-1 border border-green-600 text-green-700 rounded-lg font-semibold shadow hover:bg-green-50 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-200"
+            class="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs sm:px-3 sm:py-1 sm:text-sm border border-green-600 text-green-700 rounded-lg font-semibold shadow hover:bg-green-50 focus:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-200"
             @click="handleSave"
           >
             <font-awesome-icon icon="bookmark" class="text-green-700 text-lg" />
@@ -205,14 +225,14 @@ defineOptions({ inheritAttrs: false })
           </button>
           <button
             v-else
-            class="flex-1 flex items-center justify-center gap-1 px-3 py-1 border border-yellow-500 text-yellow-600 rounded-lg font-semibold shadow hover:bg-yellow-50 focus:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-colors duration-200"
+            class="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs sm:px-3 sm:py-1 sm:text-sm border border-yellow-500 text-yellow-600 rounded-lg font-semibold shadow hover:bg-yellow-50 focus:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-colors duration-200"
             @click="handleUnsave"
           >
             <font-awesome-icon icon="xmark" class="text-yellow-600 text-lg" />
             <span>Unsave</span>
           </button>
           <button
-            class="flex-1 flex items-center justify-center gap-1 px-3 py-1 border border-red-500 text-red-600 rounded-lg font-semibold shadow hover:bg-red-50 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors duration-200"
+            class="flex-1 flex items-center justify-center gap-1 px-2 py-1 text-xs sm:px-3 sm:py-1 sm:text-sm border border-red-500 text-red-600 rounded-lg font-semibold shadow hover:bg-red-50 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors duration-200"
             @click="handleReport"
           >
             <font-awesome-icon icon="flag" class="text-red-600 text-lg" />
@@ -220,6 +240,10 @@ defineOptions({ inheritAttrs: false })
           </button>
         </div>
       </div>
+    </div>
+    <!-- Move the footer slot here, always visible, with border for clarity -->
+    <div v-if="$slots.footer" class="border-t border-green-100 pt-2 mt-2 bg-green-50/60">
+      <slot name="footer" />
     </div>
   </div>
 

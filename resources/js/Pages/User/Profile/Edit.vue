@@ -75,29 +75,37 @@ function onAvatarChange(e) {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- User Name -->
           <div class="relative">
-            <input v-model="form.user_name" type="text" id="user_name" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder="User Name" />
-            <label for="user_name" class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"> <font-awesome-icon icon="user" /> User Name</label>
+            <input v-model="form.user_name" type="text" id="user_name" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder=" " />
+            <label for="user_name" class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+              :class="{ '-top-5 text-xs text-green-600 font-semibold bg-white px-1': form.user_name && form.user_name.length > 0 }"
+            > <font-awesome-icon icon="user" /> User Name</label>
             <div v-if="form.errors.user_name" class="text-red-500 text-sm mt-1">{{ form.errors.user_name }}</div>
           </div>
 
           <!-- First Name -->
           <div class="relative">
-            <input v-model="form.first_name" type="text" id="first_name" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder="First Name" />
-            <label for="first_name" class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"> <font-awesome-icon icon="user" /> First Name</label>
+            <input v-model="form.first_name" type="text" id="first_name" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder=" " />
+            <label for="first_name" class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+              :class="{ '-top-5 text-xs text-green-600 font-semibold bg-white px-1': form.first_name && form.first_name.length > 0 }"
+            > <font-awesome-icon icon="user" /> First Name</label>
             <div v-if="form.errors.first_name" class="text-red-500 text-sm mt-1">{{ form.errors.first_name }}</div>
           </div>
 
           <!-- Middle Name -->
           <div class="relative">
-            <input v-model="form.middle_name" type="text" id="middle_name" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder="Middle Name" />
-            <label for="middle_name" class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"> <font-awesome-icon icon="user" /> Middle Name</label>
+            <input v-model="form.middle_name" type="text" id="middle_name" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder=" " />
+            <label for="middle_name" class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+              :class="{ '-top-5 text-xs text-green-600 font-semibold bg-white px-1': form.middle_name && form.middle_name.length > 0 }"
+            > <font-awesome-icon icon="user" /> Middle Name</label>
             <div v-if="form.errors.middle_name" class="text-red-500 text-sm mt-1">{{ form.errors.middle_name }}</div>
           </div>
 
           <!-- Last Name -->
           <div class="relative">
-            <input v-model="form.last_name" type="text" id="last_name" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder="Last Name" />
-            <label for="last_name" class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"> <font-awesome-icon icon="user" /> Last Name</label>
+            <input v-model="form.last_name" type="text" id="last_name" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder=" " />
+            <label for="last_name" class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+              :class="{ '-top-5 text-xs text-green-600 font-semibold bg-white px-1': form.last_name && form.last_name.length > 0 }"
+            > <font-awesome-icon icon="user" /> Last Name</label>
             <div v-if="form.errors.last_name" class="text-red-500 text-sm mt-1">{{ form.errors.last_name }}</div>
           </div>
 
@@ -105,22 +113,28 @@ function onAvatarChange(e) {
 
           <!-- Contact Number -->
           <div class="relative">
-            <input v-model="form.contact_number" type="text" id="contact_number" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder="Contact Number" />
-            <label for="contact_number" class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"> <font-awesome-icon icon="phone" /> Contact Number</label>
+            <input v-model="form.contact_number" type="text" id="contact_number" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder=" " />
+            <label for="contact_number" class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+              :class="{ '-top-5 text-xs text-green-600 font-semibold bg-white px-1': form.contact_number && form.contact_number.length > 0 }"
+            > <font-awesome-icon icon="phone" /> Contact Number</label>
             <div v-if="form.errors.contact_number" class="text-red-500 text-sm mt-1">{{ form.errors.contact_number }}</div>
           </div>
 
           <!-- Address -->
           <div class="relative">
-            <input v-model="form.address" type="text" id="address" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder="Address" />
-            <label for="address" class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"> <font-awesome-icon icon="location-dot" /> Address</label>
+            <input v-model="form.address" type="text" id="address" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder=" " />
+            <label for="address" class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+              :class="{ '-top-5 text-xs text-green-600 font-semibold bg-white px-1': form.address && form.address.length > 0 }"
+            > <font-awesome-icon icon="location-dot" /> Address</label>
             <div v-if="form.errors.address" class="text-red-500 text-sm mt-1">{{ form.errors.address }}</div>
           </div>
 
           <!-- Email -->
           <div class="relative">
-            <input v-model="form.email" type="email" id="email" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder="Email" />
-            <label for="email" class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"> <font-awesome-icon icon="envelope" /> Email</label>
+            <input v-model="form.email" type="email" id="email" class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent" placeholder=" " />
+            <label for="email" class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+              :class="{ '-top-5 text-xs text-green-600 font-semibold bg-white px-1': form.email && form.email.length > 0 }"
+            > <font-awesome-icon icon="envelope" /> Email</label>
             <div v-if="form.errors.email" class="text-red-500 text-sm mt-1">{{ form.errors.email }}</div>
           </div>
 

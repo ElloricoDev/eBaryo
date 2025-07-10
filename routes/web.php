@@ -90,6 +90,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Book Reading
     Route::get('/books/{id}/read', [BookController::class, 'read'])->name('books.read');
+    Route::get('/user/profile/genres', [\App\Http\Controllers\UserControllers\GenreController::class, 'edit'])->name('user.profile.genres.edit');
+    Route::post('/user/profile/genres', [\App\Http\Controllers\UserControllers\GenreController::class, 'update'])->name('user.profile.genres.update');
+});
+
+// Genre selection routes should be accessible to unverified users
+Route::middleware(['auth'])->group(function () {
+    Route::get('/user/genres/select', [\App\Http\Controllers\UserControllers\GenreController::class, 'select'])->name('user.genres.select');
+    Route::post('/user/genres/select', [\App\Http\Controllers\UserControllers\GenreController::class, 'store'])->name('user.genres.store');
+    Route::post('/user/genres/skip', [\App\Http\Controllers\UserControllers\GenreController::class, 'skip'])->name('user.genres.skip');
 });
 
 Route::middleware(['auth'])->group(function () {

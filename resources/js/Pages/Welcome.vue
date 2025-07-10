@@ -51,9 +51,8 @@ onUnmounted(() => {
 <template>
   <Head title="Welcome" />
   <GuestLayout>
-    <div class="max-w-7xl mx-auto px-4 py-10 relative">
+    <div class=" px-4 py-10 relative">
       <!-- Animated Gradient Background -->
-      <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-green-50 to-white animate-gradient-move rounded-3xl shadow-xl"></div>
       <!-- Floating Book Icons -->
       <div class="pointer-events-none select-none">
         <font-awesome-icon v-for="book in floatingBooks" :key="book.id" :id="`floating-book-${book.id}`" icon="book" class="text-green-200 text-5xl opacity-60 absolute" :class="book.style" :style="{ transition: 'transform 0.3s', zIndex: 0 }" />

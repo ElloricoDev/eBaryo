@@ -27,6 +27,8 @@ const newReview = ref('');
 const submittingReview = ref(false);
 const user = props.auth?.user || null;
 const isVerified = computed(() => user && user.email_verified_at);
+const userReview = ref(null);
+const editingReview = ref(false);
 
 const from = new URLSearchParams(window.location.search).get('from') || 'books';
 const getBackRoute = () => {
@@ -167,30 +169,42 @@ async function fetchReviews() {
     reviews.value = data.reviews;
     averageRating.value = data.average_rating;
     reviewCount.value = data.review_count;
+    userReview.value = data.user_review;
+    if (userReview.value) {
+      newRating.value = userReview.value.rating;
+      newReview.value = userReview.value.review;
+      editingReview.value = false;
+    } else {
+      newRating.value = 0;
+      newReview.value = '';
+      editingReview.value = true;
+    }
   }
 }
 
 async function submitReview() {
-  if (!newRating.value) return alert('Please select a rating.');
-  submittingReview.value = true;
-  const res = await fetch(`/books/${book.id}/reviews`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content,
-    },
-    body: JSON.stringify({ rating: newRating.value, review: newReview.value }),
-  });
-  submittingReview.value = false;
-  if (res.ok) {
-    newRating.value = 0;
-    newReview.value = '';
-    await fetchReviews();
-    alert('Review submitted!');
-  } else {
-    const err = await res.json();
-    alert(err.message || 'Failed to submit review.');
+  if (!newRating.value) {
+    Swal.fire({ icon: 'error', title: 'Rating required', text: 'Please select a rating before submitting.' });
+    return;
   }
+  submittingReview.value = true;
+  router.post(route('books.reviews.store', { id: book.id }), {
+    rating: newRating.value,
+    review: newReview.value
+  }, {
+    preserveScroll: true,
+    onSuccess: () => {
+      fetchReviews();
+      Swal.fire({ icon: 'success', title: userReview.value ? 'Review updated!' : 'Review submitted!', timer: 1500, showConfirmButton: false });
+      editingReview.value = false;
+    },
+    onError: (errors) => {
+      Swal.fire({ icon: 'error', title: 'Failed to submit review', text: errors.review || errors.rating || 'Please try again.' });
+    },
+    onFinish: () => {
+      submittingReview.value = false;
+    }
+  });
 }
 
 onMounted(() => {
@@ -382,11 +396,14 @@ function goBack() {
         <div v-if="reviews.length" class="space-y-4 mb-6">
           <div v-for="review in reviews" :key="review.id" class="bg-green-50 rounded-lg p-4 shadow">
             <div class="flex items-center gap-2 mb-1">
-              <span class="font-semibold text-green-700">{{ review.user?.name || 'User' }}</span>
+              <span class="font-semibold text-green-700">{{ review.user?.user_name || 'User' }}</span>
               <span class="flex items-center gap-1">
                 <font-awesome-icon v-for="n in 5" :key="n" icon="star" :class="n <= review.rating ? 'text-yellow-400' : 'text-gray-300'" />
               </span>
-              <span class="text-xs text-gray-400 ml-auto">{{ new Date(review.created_at).toLocaleDateString() }}</span>
+              <span class="text-xs text-gray-400 ml-auto">
+                Posted: {{ new Date(review.created_at).toLocaleDateString() }}
+                <span v-if="review.updated_at && review.updated_at !== review.created_at"> | Updated: {{ new Date(review.updated_at).toLocaleDateString() }}</span>
+              </span>
             </div>
             <div class="text-gray-700">{{ review.review }}</div>
           </div>
@@ -394,17 +411,29 @@ function goBack() {
         <div v-else class="text-gray-400 mb-6">No reviews yet. Be the first to review this book!</div>
         <!-- Review Form -->
         <div v-if="isVerified" class="bg-white rounded-lg p-4 shadow border border-green-100">
-          <h4 class="font-semibold mb-2">Leave a Review</h4>
-          <div class="flex items-center gap-2 mb-2">
-            <span v-for="n in 5" :key="n" @click="newRating = n" class="cursor-pointer">
-              <font-awesome-icon icon="star" :class="n <= newRating ? 'text-yellow-400' : 'text-gray-300'" size="lg" />
-            </span>
-            <span class="ml-2 text-gray-600">{{ newRating ? `${newRating} / 5` : 'Select rating' }}</span>
+          <h4 class="font-semibold mb-2">{{ userReview && !editingReview ? 'Your Review' : (userReview ? 'Edit Your Review' : 'Leave a Review') }}</h4>
+          <div v-if="userReview && !editingReview">
+            <div class="flex items-center gap-2 mb-2">
+              <span v-for="n in 5" :key="n" class="cursor-pointer">
+                <font-awesome-icon icon="star" :class="n <= userReview.rating ? 'text-yellow-400' : 'text-gray-300'" size="lg" />
+              </span>
+              <span class="ml-2 text-gray-600">{{ userReview.rating }} / 5</span>
+            </div>
+            <div class="mb-2 text-gray-700">{{ userReview.review }}</div>
+            <button @click="editingReview = true" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 focus:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-400">Edit Review</button>
           </div>
-          <textarea v-model="newReview" rows="3" class="w-full border border-green-300 rounded shadow-sm focus:border-green-600 focus:ring-2 focus:ring-green-200 transition mb-2" placeholder="Write your review (optional)..."></textarea>
-          <button @click="submitReview" :disabled="submittingReview" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 focus:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50">
-            {{ submittingReview ? 'Submitting...' : 'Submit Review' }}
-          </button>
+          <div v-else>
+            <div class="flex items-center gap-2 mb-2">
+              <span v-for="n in 5" :key="n" @click="newRating = n" class="cursor-pointer">
+                <font-awesome-icon icon="star" :class="n <= newRating ? 'text-yellow-400' : 'text-gray-300'" size="lg" />
+              </span>
+              <span class="ml-2 text-gray-600">{{ newRating ? `${newRating} / 5` : 'Select rating' }}</span>
+            </div>
+            <textarea v-model="newReview" rows="3" class="w-full border border-green-300 rounded shadow-sm focus:border-green-600 focus:ring-2 focus:ring-green-200 transition mb-2" placeholder="Write your review (optional)..."></textarea>
+            <button @click="submitReview" :disabled="submittingReview" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 focus:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50">
+              {{ submittingReview ? (userReview ? 'Updating...' : 'Submitting...') : (userReview ? 'Update Review' : 'Submit Review') }}
+            </button>
+          </div>
         </div>
         <div v-else-if="user" class="text-yellow-600">Please verify your email to leave a review.</div>
         <div v-else class="text-gray-500">Please log in to leave a review.</div>

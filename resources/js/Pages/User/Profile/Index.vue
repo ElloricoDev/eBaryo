@@ -1,13 +1,13 @@
 <script setup>
-import { usePage, Link } from '@inertiajs/vue3'
+import { usePage, Link, router } from '@inertiajs/vue3'
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue'
 import DeleteAccountForm from './Partials/DeleteAccountForm.vue'
 import VerifyEmail from './Partials/VerifyEmail.vue'
 import UserLayout from '@/Layouts/UserLayout.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUserCircle, faUser, faPhone, faLocationDot, faEnvelope, faCircleCheck, faGraduationCap, faPenToSquare, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-library.add(faUserCircle, faUser, faPhone, faLocationDot, faEnvelope, faCircleCheck, faGraduationCap, faPenToSquare, faArrowLeft);
+import { faUserCircle, faUser, faPhone, faLocationDot, faEnvelope, faCircleCheck, faGraduationCap, faPenToSquare, faArrowLeft, faTag } from '@fortawesome/free-solid-svg-icons';
+library.add(faUserCircle, faUser, faPhone, faLocationDot, faEnvelope, faCircleCheck, faGraduationCap, faPenToSquare, faArrowLeft, faTag);
 import { onMounted } from 'vue';
 
 defineOptions({
@@ -16,6 +16,7 @@ defineOptions({
 
 const { props } = usePage()
 const user = props.user
+const genres = props.genres || []
 
 onMounted(() => {
   if (window.location.search.includes('verified=1')) {
@@ -23,7 +24,7 @@ onMounted(() => {
   }
 });
 
-function goBack() { window.history.back(); }
+function goBack() { router.visit(route('home')); }
 </script>
 
 <template>
@@ -38,7 +39,6 @@ function goBack() { window.history.back(); }
 
   <div class="relative min-h-screen max-w-5xl mx-auto px-2 sm:px-4 py-4 sm:py-6 overflow-x-hidden">
     <!-- Animated Gradient Background -->
-    <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-green-50 to-white animate-gradient-move"></div>
     <div class="animate-fade-in bg-white bg-opacity-90 rounded-2xl shadow-xl p-2 sm:p-6 mb-6">
       <h1 class="text-2xl font-bold text-green-700 mb-6 flex items-center gap-2">
         <font-awesome-icon icon="user-circle" /> User Profile
@@ -61,6 +61,12 @@ function goBack() { window.history.back(); }
 
       <div class="space-y-2 text-gray-700">
         <p><span class="font-semibold text-green-700"><font-awesome-icon icon="user" /> User Name:</span> {{ user.user_name || 'N/A' }}</p>
+        <div class="border-t border-green-100 my-2"></div>
+        <p><span class="font-semibold text-green-700"><font-awesome-icon icon="tag" /> Interests:</span>
+          <span v-if="genres.length">{{ genres.join(', ') }}</span>
+          <span v-else class="text-gray-400">No interests selected.</span>
+          <Link :href="route('user.profile.genres.edit')" class="ml-2 text-green-600 underline hover:text-green-800">Edit</Link>
+        </p>
         <div class="border-t border-green-100 my-2"></div>
         <p><span class="font-semibold text-green-700"><font-awesome-icon icon="user" /> First Name:</span> {{ user.first_name || 'N/A' }}</p>
         <p><span class="font-semibold text-green-700"><font-awesome-icon icon="user" /> Middle Name:</span> {{ user.middle_name || 'N/A' }}</p>

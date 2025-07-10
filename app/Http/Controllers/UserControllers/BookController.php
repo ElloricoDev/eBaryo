@@ -17,6 +17,26 @@ class BookController extends Controller
         $books = Book::with('category')->where('status', 'active')->latest()->get();
         $user = Auth::user();
         $savedBookIds = $user ? $user->savedBooks()->pluck('book_id')->toArray() : [];
+
+        // Attach ratings and read count
+        $bookIds = $books->pluck('id');
+        $reviewCounts = \App\Models\BookReview::whereIn('book_id', $bookIds)
+            ->selectRaw('book_id, COUNT(*) as count, AVG(rating) as avg_rating')
+            ->groupBy('book_id')
+            ->get()
+            ->keyBy('book_id');
+        $readCounts = \App\Models\ReadingLog::whereIn('book_id', $bookIds)
+            ->selectRaw('book_id, COUNT(*) as count')
+            ->groupBy('book_id')
+            ->get()
+            ->pluck('count', 'book_id');
+        $books->transform(function($book) use ($reviewCounts, $readCounts) {
+            $book->average_rating = isset($reviewCounts[$book->id]) ? round($reviewCounts[$book->id]->avg_rating, 2) : null;
+            $book->reviews_count = isset($reviewCounts[$book->id]) ? $reviewCounts[$book->id]->count : 0;
+            $book->read_count = isset($readCounts[$book->id]) ? $readCounts[$book->id] : 0;
+            return $book;
+        });
+
         return inertia('User/Books/Books', [
             'books' => $books,
             'saved_books' => $savedBookIds
@@ -102,6 +122,26 @@ class BookController extends Controller
         }
         $books = $user->savedBooks()->with('category')->where('status', 'active')->get();
         $savedBookIds = $user->savedBooks()->where('status', 'active')->pluck('book_id')->toArray();
+
+        // Attach ratings and read count
+        $bookIds = $books->pluck('id');
+        $reviewCounts = \App\Models\BookReview::whereIn('book_id', $bookIds)
+            ->selectRaw('book_id, COUNT(*) as count, AVG(rating) as avg_rating')
+            ->groupBy('book_id')
+            ->get()
+            ->keyBy('book_id');
+        $readCounts = \App\Models\ReadingLog::whereIn('book_id', $bookIds)
+            ->selectRaw('book_id, COUNT(*) as count')
+            ->groupBy('book_id')
+            ->get()
+            ->pluck('count', 'book_id');
+        $books->transform(function($book) use ($reviewCounts, $readCounts) {
+            $book->average_rating = isset($reviewCounts[$book->id]) ? round($reviewCounts[$book->id]->avg_rating, 2) : null;
+            $book->reviews_count = isset($reviewCounts[$book->id]) ? $reviewCounts[$book->id]->count : 0;
+            $book->read_count = isset($readCounts[$book->id]) ? $readCounts[$book->id] : 0;
+            return $book;
+        });
+
         return inertia('User/Books/Saved', [
             'books' => $books,
             'saved_books' => $savedBookIds

@@ -71,4 +71,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\ReadingLog::class);
     }
+
+    public function genres()
+    {
+        return $this->belongsToMany(\App\Models\Category::class, 'user_genres', 'user_id', 'category_id')->withTimestamps();
+    }
 }

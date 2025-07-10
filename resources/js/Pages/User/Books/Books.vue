@@ -3,6 +3,11 @@ import UserLayout from '@/Layouts/UserLayout.vue'
 import { usePage, router, Head } from '@inertiajs/vue3'
 import BookCard from '@/Components/BookCard.vue'
 import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+
+library.add(faArrowLeft)
 
 defineOptions({ layout: UserLayout })
 const { props } = usePage()
@@ -62,16 +67,22 @@ const unsaveBook = (book) => {
     }
   })
 }
+
+function goBack() { window.history.back(); }
 </script>
 
 <template>
   <Head title="All Books" />
   <div>
+    <button @click="goBack" class="block sm:hidden mb-4 text-green-700 font-bold flex items-center gap-2">
+      <font-awesome-icon icon="arrow-left" class="text-lg" />
+      Back
+    </button>
     <h1 class="text-green-700 font-bold text-2xl flex items-center gap-2 mb-6">
       <i class="bi bi-journals"></i> All Books
     </h1>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-2 gap-3 px-1 pb-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 sm:gap-6 sm:px-0">
       <template v-if="filteredBooks.length > 0">
         <BookCard
           v-for="book in filteredBooks"
@@ -81,7 +92,10 @@ const unsaveBook = (book) => {
           :auth="$page.props.auth"
           @save="saveBook"
           @unsave="unsaveBook"
-        />
+          class="w-full max-w-[180px] mx-auto sm:max-w-[220px] sm:min-w-[200px]"
+        >
+          
+        </BookCard>
       </template>
       <template v-else>
         <div class="col-span-full text-center text-gray-500 py-10">

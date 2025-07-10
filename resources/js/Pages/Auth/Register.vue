@@ -31,11 +31,11 @@ const submit = () => {
 <template>
     <Head title="Register" />
     <GuestLayout>
-        <div class="flex flex-col items-center justify-center px-4 relative overflow-hidden">
+        <div class="flex flex-col items-center justify-center">
             <!-- Animated Gradient Background -->
             <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-200 via-green-50 to-white animate-gradient-move"></div>
             <div
-                class="w-full max-w-md bg-white border-2 border-green-600 rounded-2xl shadow-md p-6 mt-2 transition duration-200 hover:shadow-lg hover:border-green-700 animate-slide-up"
+                class="w-[350px] bg-white border-2 border-green-600 rounded-2xl shadow-md p-6 mt-2 transition duration-200 hover:shadow-lg hover:border-green-700 animate-slide-up"
             >
                 <h1
                     class="text-center text-green-700 text-2xl font-semibold mb-6"

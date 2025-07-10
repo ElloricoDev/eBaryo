@@ -119,7 +119,7 @@ library.add(faBook, faHouse, faInfoCircle, faStar, faCommentDots, faRightToBrack
     <div class="h-16"></div>
 
     <!-- Page Content -->
-    <main class="flex-grow container mx-auto px-4 py-6">
+    <main class="flex-grow mx-auto px-4 py-6">
       <slot />
     </main>
 

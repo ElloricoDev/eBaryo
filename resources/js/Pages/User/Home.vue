@@ -5,14 +5,15 @@ import BookCard from '@/Components/BookCard.vue';
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faPlayCircle, faSearch, faHome, faStar, faFire, faChartLine, faTrophy, faThumbsUp, faBookOpen, faBookmark, faUser, faCommentDots } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlayCircle, faSearch, faHome, faStar, faFire, faChartLine, faTrophy, faThumbsUp, faBookOpen, faBookmark, faUser, faCommentDots);
+import { faPlayCircle, faSearch, faHome, faStar, faFire, faChartLine, faTrophy, faThumbsUp, faBookOpen, faBookmark, faUser, faCommentDots, faEye } from '@fortawesome/free-solid-svg-icons';
+library.add(faPlayCircle, faSearch, faHome, faStar, faFire, faChartLine, faTrophy, faThumbsUp, faBookOpen, faBookmark, faUser, faCommentDots, faEye);
 
 const { props } = usePage();
 const books = props.books || [];
 const savedBookIds = ref(Array.isArray(props.saved_books) ? props.saved_books : []);
 const continueReading = props.continueReading || null;
 const search = ref('');
+const continueReadingList = props.continueReadingList || [];
 
 const user = props.auth?.user || {};
 
@@ -86,6 +87,12 @@ function restoreScrollIfNeeded() {
   }
 }
 
+const highestRatedBooks = computed(() => {
+  return (props.highestRatedBooks || []).filter(
+    book => typeof book.average_rating === 'number' && book.reviews_count > 0
+  );
+});
+
 onMounted(() => {
   window.addEventListener('user-search', handleSearch);
   restoreScrollIfNeeded();
@@ -103,6 +110,25 @@ onUnmounted(() => {
   <Head title="Home" />
   <UserLayout>
     <!-- Welcome Message & Quick Links -->
+    <div
+      v-if="continueReading && continueReading.book"
+      class="bg-green-100 border-2 border-green-600 rounded-xl flex justify-between items-center p-4 mb-6 shadow-lg animate-slide-down"
+    >
+      <div>
+        <strong class="text-green-700">Continue Reading:</strong>
+        {{ continueReading.book.title }}
+        <span v-if="continueReading.last_percent" class="text-green-800 ml-1">
+          ({{ Math.round(continueReading.last_percent * 100) }}% read)
+        </span>
+      </div>
+      <Link
+        :href="route('books.read', { id: continueReading.book.id })"
+        class="inline-flex items-center bg-green-600 hover:bg-green-700 focus:bg-green-800 text-white text-sm font-medium px-3 py-1.5 rounded-md shadow-md animate-pulse-cta transition focus:outline-none focus:ring-2 focus:ring-green-400"
+        aria-label="Resume reading"
+      >
+        <font-awesome-icon icon="play-circle" class="mr-2" /> Resume
+      </Link>
+    </div>
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
       <div>
         <h2 class="text-2xl font-bold text-green-700 mb-1">Welcome back, {{ user.first_name || user.user_name || 'User' }}!</h2>
@@ -142,6 +168,33 @@ onUnmounted(() => {
         <span class="text-gray-600">Reviews Written</span>
       </div>
     </div>
+    <!-- Continue Reading List -->
+    <div v-if="continueReadingList.length" class="mb-8 border-2 border-green-400 bg-green-50 rounded-xl shadow-lg p-4">
+      <div class="flex items-center mb-3">
+        <font-awesome-icon icon="play-circle" class="text-green-600 text-xl mr-2" />
+        <h3 class="text-lg sm:text-xl font-bold text-green-700 mr-2">Continue Reading</h3>
+        <span class="bg-green-400 text-white text-xs font-bold px-2 py-1 rounded-full ml-2">In Progress</span>
+      </div>
+      <div class="section-scroll-row hide-scrollbar">
+        <BookCard
+          v-for="log in continueReadingList"
+          :key="log.id"
+          :book="{...log.book, from: 'continue', highlightProgress: true, progress: log.last_percent}"
+          :isSaved="savedBookIds.includes(log.book.id)"
+          :auth="$page.props.auth"
+          @save="saveBook"
+          @unsave="unsaveBook"
+          class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
+        >
+          <template #footer>
+            <div class="flex items-center justify-between w-full">
+              <div class="text-xs text-green-700 font-semibold">{{ Math.round((log.last_percent || 0) * 100) }}% read</div>
+              <Link :href="route('books.read', { id: log.book.id })" class="ml-2 text-green-600 hover:underline font-bold">Continue Read</Link>
+            </div>
+          </template>
+        </BookCard>
+      </div>
+    </div>
 
     <!-- Recommended Books -->
     <div class="mb-8 border-2 border-yellow-400 bg-yellow-50 rounded-xl shadow-lg p-4">
@@ -152,13 +205,14 @@ onUnmounted(() => {
       </div>
       <div class="section-scroll-row hide-scrollbar">
         <BookCard
-          v-for="book in recommendedBooks"
+          v-for="book in $page.props.recommendedBooks"
           :key="book.id"
           :book="{...book, from: 'home', highlightRating: true}"
           :isSaved="savedBookIds.includes(book.id)"
           :auth="$page.props.auth"
           @save="saveBook"
           @unsave="unsaveBook"
+          class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
         />
       </div>
     </div>
@@ -230,7 +284,17 @@ onUnmounted(() => {
           @save="saveBook"
           @unsave="unsaveBook"
           class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
-        />
+        >
+          <template #footer>
+            <div class="flex items-center justify-between w-full">
+              <div class="flex items-center gap-1 text-sm font-bold text-blue-800" title="Total times this book has been read by all users">
+                <font-awesome-icon icon="eye" class="text-blue-500" />
+                <span>{{ book.read_count }}</span>
+                <span class="text-xs font-normal text-blue-600">read{{ book.read_count === 1 ? '' : 's' }}</span>
+              </div>
+            </div>
+          </template>
+        </BookCard>
       </div>
     </div>
     <!-- Highest Ratings -->
@@ -240,63 +304,31 @@ onUnmounted(() => {
         <h3 class="text-xl font-bold text-green-700">Highest Ratings</h3>
       </div>
       <div class="section-scroll-row hide-scrollbar">
-        <BookCard
-          v-for="book in $page.props.highestRatedBooks"
-          :key="book.id"
-          :book="{...book, from: 'highestrated'}"
-          :isSaved="savedBookIds.includes(book.id)"
-          :auth="$page.props.auth"
-          @save="saveBook"
-          @unsave="unsaveBook"
-          class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
-        />
+        <template v-if="highestRatedBooks.length > 0">
+          <BookCard
+            v-for="book in highestRatedBooks"
+            :key="book.id"
+            :book="{...book, from: 'highestrated'}"
+            :isSaved="savedBookIds.includes(book.id)"
+            :auth="$page.props.auth"
+            @save="saveBook"
+            @unsave="unsaveBook"
+            class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
+          />
+        </template>
+        <template v-else>
+          <div class="col-span-full text-center text-gray-500 py-12 w-full">
+            <font-awesome-icon icon="star" class="text-yellow-400 text-3xl mb-2" />
+            <div>No highly rated books yet.</div>
+          </div>
+        </template>
       </div>
     </div>
 
     <!-- Animated Gradient Background -->
     <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-green-50 to-white animate-gradient-move"></div>
     <!-- Continue Reading -->
-    <div
-      v-if="continueReading && continueReading.book"
-      class="bg-green-100 border-2 border-green-600 rounded-xl flex justify-between items-center p-4 mb-6 shadow-lg animate-slide-down"
-    >
-      <div>
-        <strong class="text-green-700">Continue Reading:</strong>
-        {{ continueReading.book.title }}
-        <span v-if="continueReading.last_percent" class="text-green-800 ml-1">
-          ({{ Math.round(continueReading.last_percent * 100) }}% read)
-        </span>
-      </div>
-      <Link
-        :href="route('books.read', { id: continueReading.book.id })"
-        class="inline-flex items-center bg-green-600 hover:bg-green-700 focus:bg-green-800 text-white text-sm font-medium px-3 py-1.5 rounded-md shadow-md animate-pulse-cta transition focus:outline-none focus:ring-2 focus:ring-green-400"
-        aria-label="Resume reading"
-      >
-        <font-awesome-icon icon="play-circle" class="mr-2" /> Resume
-      </Link>
-    </div>
 
-    <!-- Book Grid -->
-    <div class="section-scroll-row hide-scrollbar animate-fade-in">
-      <template v-if="filteredBooks.length > 0">
-        <BookCard
-          v-for="book in filteredBooks"
-          :key="book.id"
-          :book="{...book, from: 'home'}"
-          :isSaved="savedBookIds.includes(book.id)"
-          :auth="$page.props.auth"
-          @save="saveBook"
-          @unsave="unsaveBook"
-          class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
-        />
-      </template>
-      <template v-else>
-        <div class="col-span-full text-center text-gray-500 py-12 animate-fade-in">
-          <font-awesome-icon icon="search" class="text-green-600 text-3xl mb-2" />
-          <div>No results found.</div>
-        </div>
-      </template>
-    </div>
   </UserLayout>
 </template>
 

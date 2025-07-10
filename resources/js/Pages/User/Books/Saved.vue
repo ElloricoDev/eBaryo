@@ -25,7 +25,13 @@ const unsaveBook = (book) => {
   })
 }
 
-function goBack() { window.history.back(); }
+function goBack() {
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.location.href = route('books.index');
+  }
+}
 </script>
 
 <template>
@@ -37,13 +43,12 @@ function goBack() { window.history.back(); }
     </button>
     <div class="relative min-h-screen overflow-x-hidden">
       <!-- Animated Gradient Background -->
-      <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-green-50 to-white animate-gradient-move"></div>
-      <div class="animate-fade-in bg-white bg-opacity-90 rounded-2xl shadow-xl p-4 sm:p-6 max-w-6xl mx-auto mt-4">
         <h1 class="text-green-700 font-bold text-2xl flex items-center gap-2 mb-6">
           <font-awesome-icon icon="bookmark" class="text-green-600 text-3xl" /> Saved Books
         </h1>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 animate-fade-in">
+        
+        
+        <div class="grid grid-cols-2 gap-3 px-1 pb-6 sm:grid-cols-2 lg:grid-cols-5 sm:gap-6 sm:px-0 mt-4 animate-fade-in">
           <template v-if="books.length > 0">
             <BookCard
               v-for="book in books"
@@ -52,7 +57,10 @@ function goBack() { window.history.back(); }
               :isSaved="true"
               :auth="$page.props.auth"
               @unsave="unsaveBook"
-            />
+              class="w-full max-w-[180px] mx-auto sm:max-w-[220px] sm:min-w-[200px]"
+            >
+              
+            </BookCard>
           </template>
           <template v-else>
             <div class="col-span-full flex flex-col items-center justify-center text-center text-gray-500 py-10 animate-fade-in">
@@ -63,7 +71,6 @@ function goBack() { window.history.back(); }
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <style scoped>

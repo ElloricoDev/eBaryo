@@ -13,10 +13,15 @@ class BookReviewController extends Controller
     public function index($bookId)
     {
         $book = Book::with('reviews.user')->findOrFail($bookId);
+        $userReview = null;
+        if (auth()->check()) {
+            $userReview = $book->reviews()->where('user_id', auth()->id())->first();
+        }
         return response()->json([
             'reviews' => $book->reviews()->with('user')->latest()->get(),
             'average_rating' => round($book->reviews()->avg('rating'), 2),
             'review_count' => $book->reviews()->count(),
+            'user_review' => $userReview,
         ]);
     }
 
@@ -28,13 +33,18 @@ class BookReviewController extends Controller
             'review' => 'nullable|string|max:2000',
         ]);
         $book = Book::findOrFail($bookId);
-        $review = BookReview::create([
-            'book_id' => $book->id,
-            'user_id' => Auth::id(),
-            'rating' => $request->rating,
-            'review' => $request->review,
-        ]);
-        return response()->json(['message' => 'Review submitted!', 'review' => $review->load('user')]);
+        // Only one review per user per book
+        $review = BookReview::updateOrCreate(
+            [
+                'book_id' => $book->id,
+                'user_id' => Auth::id(),
+            ],
+            [
+                'rating' => $request->rating,
+                'review' => $request->review,
+            ]
+        );
+        return back()->with('success', 'Review submitted!');
     }
 
     // Optionally: Delete a review

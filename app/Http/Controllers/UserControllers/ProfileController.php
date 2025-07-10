@@ -10,8 +10,11 @@ class ProfileController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+        $genres = $user->genres()->pluck('name')->toArray();
         return inertia('User/Profile/Index', [
-            'user' => Auth::user(),
+            'user' => $user,
+            'genres' => $genres,
         ]);
     }
 

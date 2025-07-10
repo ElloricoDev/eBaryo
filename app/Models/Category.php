@@ -18,4 +18,9 @@ class Category extends Model
     {
         return $this->hasMany(Book::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(\App\Models\User::class, 'user_genres', 'category_id', 'user_id')->withTimestamps();
+    }
 } 

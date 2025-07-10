@@ -5,8 +5,8 @@ import Swal from 'sweetalert2';
 import { onMounted } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCommentDots, faCircle, faInbox } from '@fortawesome/free-solid-svg-icons';
-library.add(faCommentDots, faCircle, faInbox);
+import { faCommentDots, faCircle, faInbox, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+library.add(faCommentDots, faCircle, faInbox, faArrowLeft);
 
 defineOptions({ layout: UserLayout });
 
@@ -34,11 +34,17 @@ function formatDate(dateStr) {
     timeStyle: 'short',
   }).format(date);
 }
+
+function goBack() { window.history.back(); }
 </script>
 
 <template>
   <Head title="My Feedback" />
-  <div class="relative min-h-screen max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-6 overflow-x-hidden">
+  <div class="relative min-h-screen">
+    <button @click="goBack" class="block sm:hidden mb-4 text-green-700 font-bold flex items-center gap-2">
+      <font-awesome-icon icon="arrow-left" class="text-lg" />
+      Back
+    </button>
     <!-- Animated Gradient Background -->
     <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-green-50 to-white animate-gradient-move"></div>
     <div class="animate-fade-in bg-white bg-opacity-90 rounded-2xl shadow-xl p-2 sm:p-6">
