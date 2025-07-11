@@ -1,5 +1,6 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3'
+import { Inertia } from '@inertiajs/inertia'
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -10,6 +11,7 @@ library.add(faBook, faList, faSearch, faCaretDown, faUser, faUserCircle, faUserE
 const { props } = usePage()
 const user = props.auth?.user || {}
 const searchQuery = ref('')
+const newResponsesCount = props.newResponsesCount || 0;
 
 const submitSearch = () => {
   window.dispatchEvent(new CustomEvent('user-search', { detail: searchQuery.value }))
@@ -35,6 +37,12 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
   document.addEventListener('mousedown', handleClickOutside)
+  if (window.Echo && user.id) {
+    window.Echo.private('user-feedback.' + user.id)
+      .listen('FeedbackUpdated', (e) => {
+        Inertia.reload({ only: ['newResponsesCount'] })
+      });
+  }
 })
 
 onBeforeUnmount(() => {
@@ -60,7 +68,7 @@ const closeDropdown = () => {
     <div v-if="toggle" class="fixed inset-0 z-50 bg-black bg-opacity-40 backdrop-blur-sm md:hidden" @click="toggle = false"></div>
     <!-- Animated Gradient Background -->
     <!-- Navbar -->
-    <nav class="bg-green-600 shadow-lg border-b border-green-700 fixed top-0 left-0 w-full z-40">
+    <nav class="bg-gradient-to-r from-green-700 via-green-600 to-green-500 shadow-lg border-b border-green-700 fixed top-0 left-0 w-full z-40">
       <div class=" mx-auto px-4 flex flex-wrap items-center justify-between h-16">
         <!-- Brand -->
         <Link class="text-white font-bold flex items-center gap-2 text-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300" :href="route('home')">
@@ -94,7 +102,7 @@ const closeDropdown = () => {
           <div class="relative md:ml-4" ref="dropdownRef">
             <button
               @mousedown.stop="toggleDropdown = !toggleDropdown"
-              class="flex items-center gap-2 text-white px-4 py-2 bg-green-700 rounded hover:bg-green-800 w-full md:w-auto focus:outline-none focus:ring-2 focus:ring-green-300"
+              class="flex items-center gap-2 text-white px-4 py-2 bg-green-700 rounded hover:bg-green-800 w-full md:w-auto focus:outline-none focus:ring-2 focus:ring-green-300 relative"
               type="button"
             >
               <img
@@ -111,6 +119,7 @@ const closeDropdown = () => {
               />
               <span class="max-w-[7rem] truncate text-left" :title="user.user_name || 'User'">{{ user.user_name || 'User' }}</span>
               <font-awesome-icon icon="caret-down" class="ml-1" />
+              <span v-if="newResponsesCount > 0" class="absolute top-1 right-1 block h-2 w-2 rounded-full ring-2 ring-white bg-red-600"></span>
             </button>
             <!-- Dropdown menu -->
             <ul
@@ -124,7 +133,14 @@ const closeDropdown = () => {
               <li><Link @click="closeDropdown" class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200" :href="route('books.saved')"><font-awesome-icon icon="bookmark" class="mr-2" /> Saved Books</Link></li>
               <li><hr /></li>
               <li><Link @click="closeDropdown" class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200" :href="route('feedback.create')"><font-awesome-icon icon="comment-dots" class="mr-2" /> Feedback</Link></li>
-              <li><Link @click="closeDropdown" class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200" :href="route('feedback.my')"><font-awesome-icon icon="list-check" class="mr-2" /> My Feedback</Link></li>
+              <li>
+                <Link @click="closeDropdown" class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200 flex items-center gap-2 relative" :href="route('feedback.my')">
+                  <font-awesome-icon icon="list-check" class="mr-2" /> My Feedback
+                  <span v-if="newResponsesCount > 0" class="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                    {{ newResponsesCount }}
+                  </span>
+                </Link>
+              </li>
               <li><hr /></li>
               <li>
                 <Link @click="closeDropdown" class="block px-4 py-2 text-red-600 hover:bg-red-100 focus:bg-red-200" :href="route('logout')" method="post">
@@ -190,8 +206,11 @@ const closeDropdown = () => {
             </Link>
           </li>
           <li>
-            <Link @mousedown="toggle = false" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 flex items-center gap-2" :href="route('feedback.my')">
+            <Link @mousedown="toggle = false" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 flex items-center gap-2 relative" :href="route('feedback.my')">
               <font-awesome-icon icon="list-check" class="mr-2" /> My Feedback
+              <span v-if="newResponsesCount > 0" class="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                {{ newResponsesCount }}
+              </span>
             </Link>
           </li>
           <li>

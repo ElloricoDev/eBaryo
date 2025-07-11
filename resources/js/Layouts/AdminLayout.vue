@@ -1,5 +1,6 @@
 <script setup>
 import { usePage, Link } from '@inertiajs/vue3'
+import { Inertia } from '@inertiajs/inertia'
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -7,6 +8,7 @@ import { faTachometerAlt, faUsers, faBook, faTags, faComments, faUser, faCog, fa
 
 const { props, url } = usePage()
 const user = props.auth?.user || {}
+const pendingFeedbackCount = props.pendingFeedbackCount || 0;
 const showDropdown = ref(false)
 
 const dropdownRef = ref(null)
@@ -19,6 +21,12 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  if (window.Echo && user.role === 'admin') {
+    window.Echo.channel('admin-feedback')
+      .listen('FeedbackUpdated', (e) => {
+        Inertia.reload({ only: ['pendingFeedbackCount'] })
+      });
+  }
 })
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
@@ -88,11 +96,14 @@ library.add(faTachometerAlt, faUsers, faBook, faTags, faComments, faUser, faCog,
         </li>
         <li>
           <Link
-            class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2"
+            class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2 relative"
             :class="{ 'bg-green-700 font-semibold': isActive('/admin/feedback') }"
             :href="route('admin.feedback.index')"
           >
             <font-awesome-icon icon="comments" /> Feedback
+            <span v-if="pendingFeedbackCount > 0" class="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+              {{ pendingFeedbackCount }}
+            </span>
           </Link>
         </li>
       </ul>
@@ -118,7 +129,7 @@ library.add(faTachometerAlt, faUsers, faBook, faTags, faComments, faUser, faCog,
         <div class="relative" ref="dropdownRef">
           <button
             @click="toggleDropdown"
-            class="flex items-center bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+            class="flex items-center bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition relative"
           >
             <img
               v-if="user.avatar"

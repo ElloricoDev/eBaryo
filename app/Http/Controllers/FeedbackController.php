@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Feedback;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use App\Events\FeedbackUpdated;
 
 class FeedbackController extends Controller
 {
@@ -19,11 +20,13 @@ class FeedbackController extends Controller
         $request->validate([
             'message' => 'required|string|max:2000',
         ]);
-        Feedback::create([
+        $feedback = Feedback::create([
             'user_id' => auth()->id(),
             'message' => $request->message,
             'status' => 'pending',
         ]);
+        // Broadcast to admin
+        event(new FeedbackUpdated(null, 'admin'));
         return redirect()->route('feedback.create')->with('success', 'Thank you for your feedback!');
     }
 
@@ -33,6 +36,10 @@ class FeedbackController extends Controller
         $newResponses = $feedbacks->where('status', 'responded')->where('notified', false);
         // Mark as notified
         Feedback::whereIn('id', $newResponses->pluck('id'))->update(['notified' => true]);
+        // Broadcast to user (in case of real-time update)
+        if ($newResponses->count() > 0) {
+            event(new FeedbackUpdated(auth()->id(), 'user'));
+        }
         return Inertia::render('User/MyFeedback', [
             'feedbacks' => $feedbacks,
             'hasNewResponses' => $newResponses->count() > 0,

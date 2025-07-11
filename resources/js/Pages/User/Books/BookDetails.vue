@@ -258,10 +258,9 @@ function goBack() {
 
 <template>
   <Head :title="book.title" />
-  <div class="relative min-h-screen max-w-6xl mx-auto py-6 px-4 overflow-x-hidden">
+  <div class="relative min-h-screen  mx-auto  px-4 overflow-x-hidden">
     <!-- Animated Gradient Background -->
-    <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-green-50 to-white animate-gradient-move"></div>
-    <div class="animate-fade-in bg-white bg-opacity-90 rounded-2xl shadow-xl p-6">
+    <div class="animate-fade-in bg-opacity-90 rounded-2xl shadow-xl p-6">
       <div class="mb-4">
         <button @click="goBack" class="block sm:hidden mb-4 text-green-700 font-bold flex items-center gap-2">
           <font-awesome-icon icon="arrow-left" class="text-lg" />
