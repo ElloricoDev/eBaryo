@@ -4,7 +4,6 @@ import { usePage, router, Head, Link } from "@inertiajs/vue3";
 import BookSection from "@/Components/BookSection.vue";
 import ContinueReadingSection from "@/Components/ContinueReadingSection.vue";
 import { ref, onMounted, onUnmounted, computed } from "vue";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
     faPlayCircle,
@@ -54,24 +53,13 @@ const user = props.auth?.user || {};
 
 
 
-// Quick stats
-const booksRead = computed(() =>
-    props.reading_logs ? props.reading_logs.length : 0
-);
-const booksSaved = computed(() =>
-    Array.isArray(props.saved_books) ? props.saved_books.length : 0
-);
-const reviewsWritten = computed(() =>
-    props.reviews ? props.reviews.length : 0
-);
-
-// Recommended books (random 3 for now) - using props directly
+// Recommended books 
 const recommendedBooksFromProps = computed(() => {
     if (!books.length) return [];
-    return books.slice(0, 3);
+    return books.slice(0, 10); // Show more recommended books
 });
 
-// Recent activity (last 3 reading logs)
+// Recent activity
 const recentActivity = computed(() => {
     if (!props.reading_logs) return [];
     return props.reading_logs.slice(0, 3);
@@ -148,27 +136,70 @@ function restoreScrollIfNeeded() {
 
 // Book data computed properties
 const newBooks = computed(() => {
-    return props.newBooks || [];
+    return (props.newBooks || []).slice(0, 40); // Show up to 40 new books
 });
 
 const recommendedBooks = computed(() => {
-    return props.recommendedBooks || [];
+    return (props.recommendedBooks || []).slice(0, 40); // Show up to 40 recommended books
 });
 
 const hotBooks = computed(() => {
-    return props.hotBooks || [];
+    return (props.hotBooks || []).slice(0, 40); // Show up to 40 hot books
 });
 
 const mostReadBooks = computed(() => {
-    return props.mostReadBooks || [];
+    return (props.mostReadBooks || []).slice(0, 40); // Show up to 40 most read books
 });
 
 const highestRatedBooks = computed(() => {
-    return (props.highestRatedBooks || []).filter(
-        (book) =>
-            typeof book.average_rating === "number" && book.reviews_count > 0
-    );
+    return (props.highestRatedBooks || [])
+        .filter((book) => typeof book.average_rating === "number" && book.reviews_count > 0)
+        .slice(0, 40); // Show up to 40 highest rated books
 });
+
+const continueReadingSectionRef = ref(null);
+
+const scrollContinueReading = (direction) => {
+    const section = continueReadingSectionRef.value;
+    if (section && section.$el && section.$el.querySelector('.continue-reading-list')) {
+        const list = section.$el.querySelector('.continue-reading-list');
+        const scrollAmount = 300; // Adjust as needed
+        if (direction === 'prev') {
+            list.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        } else if (direction === 'next') {
+            list.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    }
+};
+
+// Pagination state for each section
+const booksPerPage = 4;
+const sectionPages = {
+    recommended: ref(0),
+    new: ref(0),
+    hot: ref(0),
+    mostread: ref(0),
+    highestrated: ref(0),
+};
+
+function paginatedBooks(list, section) {
+    const page = sectionPages[section].value;
+    const start = page * booksPerPage;
+    return list.slice(start, start + booksPerPage);
+}
+
+function nextSectionPage(section, totalBooks) {
+    const maxPage = Math.floor((totalBooks - 1) / booksPerPage);
+    if (sectionPages[section].value < maxPage) {
+        sectionPages[section].value++;
+    }
+}
+
+function prevSectionPage(section) {
+    if (sectionPages[section].value > 0) {
+        sectionPages[section].value--;
+    }
+}
 
 onMounted(() => {
     window.addEventListener("user-search", handleSearch);
@@ -186,228 +217,220 @@ onUnmounted(() => {
 <template>
     <Head title="Home" />
     <UserLayout>
-        <!-- Welcome Message & Quick Links -->
-        <div
-            v-if="continueReading && continueReading.book"
-            class="bg-green-100 border-2 border-green-600 rounded-xl flex justify-between items-center p-4 mb-6 shadow-lg animate-slide-down"
-        >
-            <div>
-                <strong class="text-green-700">Continue Reading:</strong>
-                {{ continueReading.book.title }}
-                <span
-                    v-if="continueReading.last_percent"
-                    class="text-green-800 ml-1"
-                >
-                    ({{ Math.round(continueReading.last_percent * 100) }}% read)
-                </span>
-            </div>
-            <Link
-                :href="route('books.read', { id: continueReading.book.id })"
-                class="inline-flex items-center bg-green-600 hover:bg-green-700 focus:bg-green-800 text-white text-sm font-medium px-3 py-1.5 rounded-md shadow-md animate-pulse-cta transition focus:outline-none focus:ring-2 focus:ring-green-400"
-                aria-label="Resume reading"
+        <div class="relative">
+            <button
+                class="absolute left-2 bottom-14 z-10
+                       bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold
+                       py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent
+                       sm:left-2 sm:top-1/2 sm:bottom-auto sm:py-3 sm:px-4 sm:text-xl
+                       transition-all duration-200"
+                aria-label="Previous Page"
+                tabindex="0"
+                @click="scrollContinueReading('prev')"
             >
-                <font-awesome-icon icon="play-circle" class="mr-2" /> Resume
-            </Link>
+                <font-awesome-icon icon="chevron-left" />
+            </button>
+            <!-- Continue Reading Section -->
+            <ContinueReadingSection
+                ref="continueReadingSectionRef"
+                :continueReadingList="continueReadingList"
+                :savedBookIds="savedBookIds"
+                :auth="$page.props.auth"
+                @save="saveBook"
+                @unsave="unsaveBook"
+            />
+            <button
+                class="absolute right-2 bottom-14 z-10
+                       bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold
+                       py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent
+                       sm:right-2 sm:top-1/2 sm:bottom-auto sm:py-3 sm:px-4 sm:text-xl
+                       transition-all duration-200"
+                aria-label="Next Page"
+                tabindex="0"
+                @click="scrollContinueReading('next')"
+            >
+                <font-awesome-icon icon="chevron-right" />
+            </button>
         </div>
-        <div
-            class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6"
-        >
-            <div>
-                <h2 class="text-2xl font-bold text-green-700 mb-1">
-                    Welcome back,
-                    {{ user.first_name || user.user_name || "User" }}!
-                </h2>
-                <div class="text-gray-600 text-sm">
-                    Happy reading at eBaryo Library 📚
-                </div>
-            </div>
-            <div
-                class="flex flex-col md:flex-row gap-2 flex-wrap justify-center text-center md:justify-start md:text-left"
-            >
-                <Link
-                    :href="route('user.profile.index')"
-                    class="w-full md:w-auto flex justify-center items-center gap-2 bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 focus:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-400"
-                >
-                    <font-awesome-icon icon="user" class="text-white text-lg" />
-                    Profile
-                </Link>
-                <Link
-                    :href="route('feedback.create')"
-                    class="w-full md:w-auto flex justify-center items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 focus:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                >
-                    <font-awesome-icon
-                        icon="comment-dots"
-                        class="text-white text-lg"
-                    />
-                    Feedback
-                </Link>
-                <Link
-                    :href="route('books.saved')"
-                    class="w-full md:w-auto flex justify-center items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded shadow hover:bg-yellow-600 focus:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                >
-                    <font-awesome-icon
-                        icon="bookmark"
-                        class="text-white text-lg"
-                    />
-                    Saved Books
-                </Link>
-            </div>
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <div
-                class="bg-white border border-green-200 rounded-lg p-4 flex flex-col items-center shadow"
-            >
-                <font-awesome-icon
-                    icon="book-open"
-                    class="text-green-700 text-2xl mb-1"
-                />
-                <span class="text-3xl font-bold text-green-700">{{
-                    booksRead
-                }}</span>
-                <span class="text-gray-600">Books Read</span>
-            </div>
-            <div
-                class="bg-white border border-green-200 rounded-lg p-4 flex flex-col items-center shadow"
-            >
-                <font-awesome-icon
-                    icon="bookmark"
-                    class="text-yellow-600 text-2xl mb-1"
-                />
-                <span class="text-3xl font-bold text-yellow-600">{{
-                    booksSaved
-                }}</span>
-                <span class="text-gray-600">Books Saved</span>
-            </div>
-            <div
-                class="bg-white border border-green-200 rounded-lg p-4 flex flex-col items-center shadow"
-            >
-                <font-awesome-icon
-                    icon="star"
-                    class="text-blue-600 text-2xl mb-1"
-                />
-                <span class="text-3xl font-bold text-blue-600">{{
-                    reviewsWritten
-                }}</span>
-                <span class="text-gray-600">Reviews Written</span>
-            </div>
-        </div>
-        <!-- Recent Activity -->
-        <div class="mb-8">
-            <h3 class="text-xl font-bold text-green-700 mb-3">
-                Recent Activity
-            </h3>
-            <div v-if="recentActivity.length" class="space-y-2">
-                <div
-                    v-for="log in recentActivity"
-                    :key="log.id"
-                    class="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-3 shadow"
-                >
-                    <span class="font-semibold text-green-700">{{
-                        log.book?.title || "Book"
-                    }}</span>
-                    <span class="text-gray-500 text-sm"
-                        >Read at:
-                        {{ new Date(log.read_at).toLocaleString() }}</span
-                    >
-                    <span
-                        v-if="log.last_percent"
-                        class="text-xs text-green-600 ml-auto"
-                        >Progress:
-                        {{ Math.round(log.last_percent * 100) }}%</span
-                    >
-                </div>
-            </div>
-            <div v-else class="text-gray-400">No recent activity yet.</div>
-        </div>
-        <!-- Continue Reading Section -->
-        <ContinueReadingSection
-            :continueReadingList="continueReadingList"
-            :savedBookIds="savedBookIds"
-            :auth="$page.props.auth"
-            @save="saveBook"
-            @unsave="unsaveBook"
-        />
+       
 
         <!-- Recommended Books Section -->
-        <BookSection
-            title="Recommended for You"
-            icon="thumbs-up"
-            :books="recommendedBooks"
-            sectionType="home"
-            :savedBookIds="savedBookIds"
-            :auth="$page.props.auth"
-            badgeText="Top Picks"
-            badgeColor="bg-yellow-400"
-            borderColor="border-yellow-400"
-            bgColor="bg-yellow-50"
-            iconColor="text-yellow-600"
-            titleColor="text-yellow-700"
-            emptyMessage="No recommendations available yet. Check back later for personalized picks!"
-            emptyIcon="thumbs-up"
-            @save="saveBook"
-            @unsave="unsaveBook"
-        />
-
+        <div class="relative">
+            <button
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                aria-label="Previous Recommended Books"
+                tabindex="0"
+                @click="prevSectionPage('recommended')"
+                :disabled="sectionPages.recommended === 0"
+            >
+                <font-awesome-icon icon="chevron-left" />
+            </button>
+            <BookSection
+                title="Recommended for You"
+                icon="thumbs-up"
+                :books="paginatedBooks(recommendedBooks, 'recommended')"
+                sectionType="home"
+                :savedBookIds="savedBookIds"
+                :auth="$page.props.auth"
+                badgeText="Top Picks"
+                badgeColor="bg-yellow-400"
+                borderColor="border-yellow-400"
+                bgColor="bg-yellow-50"
+                iconColor="text-yellow-600"
+                titleColor="text-yellow-700"
+                emptyMessage="No recommendations available yet. Check back later for personalized picks!"
+                emptyIcon="thumbs-up"
+                @save="saveBook"
+                @unsave="unsaveBook"
+            />
+            <button
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                aria-label="Next Recommended Books"
+                tabindex="0"
+                @click="nextSectionPage('recommended', recommendedBooks.length)"
+                :disabled="(sectionPages.recommended + 1) * booksPerPage >= recommendedBooks.length"
+            >
+                <font-awesome-icon icon="chevron-right" />
+            </button>
+        </div>
         <!-- New Books Section -->
-        <BookSection
-            title="New Books"
-            icon="star"
-            :books="newBooks"
-            sectionType="new"
-            :savedBookIds="savedBookIds"
-            :auth="$page.props.auth"
-            emptyMessage="No new books available at the moment. Check back soon for fresh additions!"
-            emptyIcon="star"
-            @save="saveBook"
-            @unsave="unsaveBook"
-        />
+        <div class="relative">
+            <button
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                aria-label="Previous New Books"
+                tabindex="0"
+                @click="prevSectionPage('new')"
+                :disabled="sectionPages.new === 0"
+            >
+                <font-awesome-icon icon="chevron-left" />
+            </button>
+            <BookSection
+                title="New Books"
+                icon="star"
+                :books="paginatedBooks(newBooks, 'new')"
+                sectionType="new"
+                :savedBookIds="savedBookIds"
+                :auth="$page.props.auth"
+                emptyMessage="No new books available at the moment. Check back soon for fresh additions!"
+                emptyIcon="star"
+                @save="saveBook"
+                @unsave="unsaveBook"
+            />
+            <button
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                aria-label="Next New Books"
+                tabindex="0"
+                @click="nextSectionPage('new', newBooks.length)"
+                :disabled="(sectionPages.new + 1) * booksPerPage >= newBooks.length"
+            >
+                <font-awesome-icon icon="chevron-right" />
+            </button>
+        </div>
         <!-- Hot Books Section -->
-        <BookSection
-            title="Hot Books"
-            icon="fire"
-            :books="hotBooks"
-            sectionType="hot"
-            :savedBookIds="savedBookIds"
-            :auth="$page.props.auth"
-            emptyMessage="No trending books right now. Start reading to see what's popular!"
-            emptyIcon="fire"
-            iconColor="text-red-500"
-            titleColor="text-green-700"
-            @save="saveBook"
-            @unsave="unsaveBook"
-        />
+        <div class="relative">
+            <button
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                aria-label="Previous Hot Books"
+                tabindex="0"
+                @click="prevSectionPage('hot')"
+                :disabled="sectionPages.hot === 0"
+            >
+                <font-awesome-icon icon="chevron-left" />
+            </button>
+            <BookSection
+                title="Hot Books"
+                icon="fire"
+                :books="paginatedBooks(hotBooks, 'hot')"
+                sectionType="hot"
+                :savedBookIds="savedBookIds"
+                :auth="$page.props.auth"
+                emptyMessage="No trending books right now. Start reading to see what's popular!"
+                emptyIcon="fire"
+                iconColor="text-red-500"
+                titleColor="text-green-700"
+                @save="saveBook"
+                @unsave="unsaveBook"
+            />
+            <button
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                aria-label="Next Hot Books"
+                tabindex="0"
+                @click="nextSectionPage('hot', hotBooks.length)"
+                :disabled="(sectionPages.hot + 1) * booksPerPage >= hotBooks.length"
+            >
+                <font-awesome-icon icon="chevron-right" />
+            </button>
+        </div>
         <!-- Most Read Books Section -->
-        <BookSection
-            title="Most Read Books"
-            icon="chart-line"
-            :books="mostReadBooks"
-            sectionType="mostread"
-            :savedBookIds="savedBookIds"
-            :auth="$page.props.auth"
-            emptyMessage="No reading statistics available yet. Be the first to read a book!"
-            emptyIcon="chart-line"
-            iconColor="text-blue-600"
-            titleColor="text-green-700"
-            @save="saveBook"
-            @unsave="unsaveBook"
-        />
+        <div class="relative">
+            <button
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                aria-label="Previous Most Read Books"
+                tabindex="0"
+                @click="prevSectionPage('mostread')"
+                :disabled="sectionPages.mostread === 0"
+            >
+                <font-awesome-icon icon="chevron-left" />
+            </button>
+            <BookSection
+                title="Most Read Books"
+                icon="chart-line"
+                :books="paginatedBooks(mostReadBooks, 'mostread')"
+                sectionType="mostread"
+                :savedBookIds="savedBookIds"
+                :auth="$page.props.auth"
+                emptyMessage="No reading statistics available yet. Be the first to read a book!"
+                emptyIcon="chart-line"
+                iconColor="text-blue-600"
+                titleColor="text-green-700"
+                @save="saveBook"
+                @unsave="unsaveBook"
+            />
+            <button
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                aria-label="Next Most Read Books"
+                tabindex="0"
+                @click="nextSectionPage('mostread', mostReadBooks.length)"
+                :disabled="(sectionPages.mostread + 1) * booksPerPage >= mostReadBooks.length"
+            >
+                <font-awesome-icon icon="chevron-right" />
+            </button>
+        </div>
         <!-- Highest Ratings Section -->
-        <BookSection
-            title="Highest Ratings"
-            icon="trophy"
-            :books="highestRatedBooks"
-            sectionType="highestrated"
-            :savedBookIds="savedBookIds"
-            :auth="$page.props.auth"
-            emptyMessage="No highly rated books yet."
-            emptyIcon="trophy"
-            iconColor="text-yellow-600"
-            titleColor="text-green-700"
-            @save="saveBook"
-            @unsave="unsaveBook"
-        />
+        <div class="relative">
+            <button
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                aria-label="Previous Highest Rated Books"
+                tabindex="0"
+                @click="prevSectionPage('highestrated')"
+                :disabled="sectionPages.highestrated === 0"
+            >
+                <font-awesome-icon icon="chevron-left" />
+            </button>
+            <BookSection
+                title="Highest Ratings"
+                icon="trophy"
+                :books="paginatedBooks(highestRatedBooks, 'highestrated')"
+                sectionType="highestrated"
+                :savedBookIds="savedBookIds"
+                :auth="$page.props.auth"
+                emptyMessage="No highly rated books yet."
+                emptyIcon="trophy"
+                iconColor="text-yellow-600"
+                titleColor="text-green-700"
+                @save="saveBook"
+                @unsave="unsaveBook"
+            />
+            <button
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                aria-label="Next Highest Rated Books"
+                tabindex="0"
+                @click="nextSectionPage('highestrated', highestRatedBooks.length)"
+                :disabled="(sectionPages.highestrated + 1) * booksPerPage >= highestRatedBooks.length"
+            >
+                <font-awesome-icon icon="chevron-right" />
+            </button>
+        </div>
 
         <!-- Animated Gradient Background -->
         <div

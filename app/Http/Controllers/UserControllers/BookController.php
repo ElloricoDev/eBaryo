@@ -48,6 +48,15 @@ class BookController extends Controller
         $book = Book::with('category')->where('status', 'active')->findOrFail($id);
         $user = Auth::user();
         $savedBookIds = $user ? $user->savedBooks()->pluck('book_id')->toArray() : [];
+        // Add reading progress
+        $progress = null;
+        if ($user) {
+            $log = \App\Models\ReadingLog::where('user_id', $user->id)->where('book_id', $id)->first();
+            if ($log) {
+                $progress = $log->last_percent;
+            }
+        }
+        $book->progress = $progress;
         return inertia('User/Books/BookDetails', [
             'book' => $book,
             'saved_books' => $savedBookIds
@@ -65,9 +74,10 @@ class BookController extends Controller
                 $lastPercent = $log->last_percent;
             }
         }
-        return inertia('User/Books/ReadBook', [
+        return inertia('User/Books/EpubReader', [
             'book' => $book,
-            'lastPercent' => $lastPercent
+            'lastPercent' => $lastPercent,
+            'url' => $book->ebook_file,
         ]);
     }
 

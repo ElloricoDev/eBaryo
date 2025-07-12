@@ -66,7 +66,7 @@ const emit = defineEmits(['save', 'unsave']);
 
 // Pagination state
 const currentPage = ref(0);
-const booksPerPage = 5;
+const booksPerPage = 8;
 
 // Paginated books
 const paginatedBooks = computed(() => {

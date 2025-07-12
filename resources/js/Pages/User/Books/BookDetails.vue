@@ -1,13 +1,15 @@
 <script setup>
 import UserLayout from '@/Layouts/UserLayout.vue';
 import { usePage, Head, Link, router } from '@inertiajs/vue3';
-import EpubReader from '@/Components/EpubReader.vue';
+import EpubReader from '@/Pages/User/Books/EpubReader.vue';
 import PdfReader from '@/Components/PdfReader.vue';
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faArrowLeft, faBookOpen, faUpRightFromSquare, faBookmark, faXmark, faFlag, faBook, faFile, faDownload, faUser, faBarcode, faCalendar, faBuilding, faLanguage, faTag, faCircle, faArrowUp, faStar } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2';
+import StarRating from '@/Components/StarRating.vue';
+import ReportModal from '@/Components/ReportModal.vue';
 
 library.add(faArrowLeft, faBookOpen, faUpRightFromSquare, faBookmark, faXmark, faFlag, faBook, faFile, faDownload, faUser, faBarcode, faCalendar, faBuilding, faLanguage, faTag, faCircle, faArrowUp, faStar)
 
@@ -265,6 +267,10 @@ function goBack() {
     window.history.back();
   }
 }
+
+function goToEpubReader() {
+  router.visit(route('books.read', { id: book.id, from: 'details' }), { preserveScroll: true });
+}
 </script>
 
 <template>
@@ -287,32 +293,22 @@ function goBack() {
           <img
             :src="book.cover_image || '/images/default.svg'"
             :alt="book.title"
-            class="w-full rounded-xl border-2 border-green-600 bg-green-50 mb-4 shadow"
+            class="book-details-cover mb-4 shadow"
           />
 
           <div class="space-y-2">
-            <button v-if="book.ebook_file && isVerified" @click="handleReadNow" class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 focus:bg-green-800 text-white font-semibold px-4 py-2 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-green-400 animate-pulse-cta">
+            <button v-if="book.ebook_file && isVerified" @click="goToEpubReader" class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 focus:bg-green-800 text-white font-semibold px-4 py-2 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-green-400 animate-pulse-cta">
               <font-awesome-icon icon="book-open" class="h-5 w-5" />
-              {{ showReader ? 'Hide Reader' : 'Read Now' }}
+              <span>
+                <template v-if="book.progress && book.progress > 0 && book.progress < 1">Continue Reading</template>
+                <template v-else>Start Reading</template>
+              </span>
             </button>
             <button v-if="book.ebook_file && user && !isVerified" disabled class="w-full flex items-center justify-center gap-2 bg-gray-300 text-gray-500 font-semibold px-4 py-2 rounded-lg shadow cursor-not-allowed">
               <font-awesome-icon icon="book-open" class="h-5 w-5" />
               Verify your email to read
             </button>
-
-            <Link
-              v-if="book.ebook_file && isVerified"
-              :href="route('books.read', { id: book.id, from: 'details' })"
-              class="w-full flex items-center justify-center gap-2 border border-green-600 text-green-700 hover:bg-green-50 focus:bg-green-100 font-semibold px-4 py-2 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-green-400"
-            >
-              <font-awesome-icon icon="up-right-from-square" class="h-5 w-5" />
-              Open in Full Screen
-            </Link>
-            <button v-if="book.ebook_file && user && !isVerified" disabled class="w-full flex items-center justify-center gap-2 border border-gray-300 text-gray-500 font-semibold px-4 py-2 rounded-lg shadow cursor-not-allowed">
-              <font-awesome-icon icon="up-right-from-square" class="h-5 w-5" />
-              Verify your email to open
-            </button>
-
+            <!-- Removed Open in Full Screen Link -->
             <button
               v-if="!isSaved"
               @click="saveBook"
@@ -321,7 +317,6 @@ function goBack() {
               <font-awesome-icon icon="bookmark" class="h-5 w-5" />
               Save
             </button>
-
             <button
               v-else
               @click="unsaveBook"
@@ -331,7 +326,6 @@ function goBack() {
               <font-awesome-icon icon="xmark" class="h-4 w-4 text-yellow-600" />
               Unsave
             </button>
-
             <button @click="reportBook" class="w-full flex items-center justify-center gap-2 border border-red-500 text-red-600 hover:bg-red-50 focus:bg-red-100 font-semibold px-4 py-2 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-red-400">
               <font-awesome-icon icon="flag" class="h-5 w-5" />
               Report
@@ -397,10 +391,13 @@ function goBack() {
           <font-awesome-icon icon="star" class="text-yellow-400" />
           Ratings & Reviews
         </h3>
-        <div class="flex items-center gap-4 mb-2">
-          <span class="text-2xl font-bold text-yellow-500">{{ averageRating || '0.0' }}</span>
-          <span class="text-gray-600">/ 5.0</span>
-          <span class="text-gray-500">({{ reviewCount }} review{{ reviewCount === 1 ? '' : 's' }})</span>
+        <div v-if="book.average_rating && book.reviews_count > 0">
+          <StarRating :rating="book.average_rating" :highlight="true" />
+          <span class="text-sm text-gray-700 font-semibold ml-1">{{ book.average_rating }}</span>
+          <span class="text-xs text-gray-500 ml-1">({{ book.reviews_count }} review{{ book.reviews_count > 1 ? 's' : '' }})</span>
+        </div>
+        <div v-else>
+          <span class="text-xs text-gray-400">No ratings yet</span>
         </div>
         <!-- Review List -->
         <div v-if="reviews.length" class="space-y-4 mb-6">
@@ -460,54 +457,17 @@ function goBack() {
     </div>
   </div>
 
-  <!-- Report Modal -->
-  <teleport to="body">
-    <div v-if="showReportModal" class="fixed inset-0 z-[9999] flex items-center justify-center">
-      <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-sm transition-all duration-300 pointer-events-auto"></div>
-      <div class="relative animate-fade-in bg-white bg-opacity-95 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden z-10 pointer-events-auto">
-        <!-- Animated Gradient Background -->
-        <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-50 via-white to-green-100 animate-gradient-move"></div>
-        <div class="bg-green-600 text-white px-4 py-3 rounded-t-2xl flex justify-between items-center">
-          <h5 class="font-bold"><font-awesome-icon icon="flag" /> Report Book</h5>
-          <button class="text-white focus:outline-none focus:ring-2 focus:ring-white rounded" @click="closeReportModal">&times;</button>
-        </div>
-        <div class="border-t border-green-100"></div>
-        <div class="p-4">
-          <p class="text-sm text-gray-600 mb-4">Provide a reason for reporting "<strong>{{ book.title }}</strong>":</p>
-
-          <label class="block text-green-700 font-semibold mb-1">Reason <span class="text-red-500">*</span></label>
-          <select v-model="reportReason" class="w-full border border-green-300 rounded shadow-sm mb-3 focus:border-green-600 focus:ring-2 focus:ring-green-200 transition">
-            <option value="">Select a reason</option>
-            <option value="Inappropriate content">Inappropriate content</option>
-            <option value="Copyright violation">Copyright violation</option>
-            <option value="Poor quality">Poor quality</option>
-            <option value="Broken file">Broken file</option>
-            <option value="Wrong category">Wrong category</option>
-            <option value="Spam">Spam</option>
-            <option value="Other">Other</option>
-          </select>
-
-          <label class="block text-green-700 font-semibold mb-1">Additional Details</label>
-          <textarea v-model="reportDescription" rows="3" class="w-full border border-green-300 rounded shadow-sm focus:border-green-600 focus:ring-2 focus:ring-green-200 transition" placeholder="Any additional info..."></textarea>
-          <div class="text-sm text-gray-500 mt-1">{{ reportDescription.length }}/1000 characters</div>
-        </div>
-        <div class="px-4 py-3 border-t flex justify-end gap-2 bg-white bg-opacity-80">
-          <button class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-400" @click="closeReportModal">
-            <font-awesome-icon icon="xmark-circle" /> Cancel
-          </button>
-          <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50 flex items-center gap-2" @click="submitReport" :disabled="isSubmittingReport || !reportReason.trim()">
-            <font-awesome-icon v-if="isSubmittingReport" icon="hourglass-half" />
-            <font-awesome-icon v-else icon="flag" />
-            <span v-if="isSubmittingReport">
-              <svg class="inline w-4 h-4 animate-spin mr-1" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
-              Submitting...
-            </span>
-            <span v-else>Submit Report</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </teleport>
+  <ReportModal
+    :show="showReportModal"
+    :book="book"
+    :reason="reportReason"
+    :description="reportDescription"
+    :loading="isSubmittingReport"
+    @close="closeReportModal"
+    @submit="submitReport"
+    @update:reason="val => reportReason = val"
+    @update:description="val => reportDescription = val"
+  />
 </template>
 
 <style scoped>
@@ -537,5 +497,16 @@ function goBack() {
 input:focus, button:focus, a:focus {
   outline: 2px solid #34d399;
   outline-offset: 2px;
+}
+.book-details-cover {
+  width: 250px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 0.75rem;
+  border: 2px solid #16a34a;
+  background: #f0fdf4;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 </style>

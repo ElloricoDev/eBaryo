@@ -21,12 +21,6 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
-  if (window.Echo && user.role === 'admin') {
-    window.Echo.channel('admin-feedback')
-      .listen('FeedbackUpdated', (e) => {
-        Inertia.reload({ only: ['pendingFeedbackCount'] })
-      });
-  }
 })
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
