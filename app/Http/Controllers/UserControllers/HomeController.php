@@ -41,10 +41,9 @@ class HomeController extends Controller
                 ->get();
         }
 
-        // New Books (latest 5)
+        // New Books (all active books, ordered by latest)
         $newBooks = Book::with('category')->where('status', 'active')
             ->orderByDesc('created_at')
-            ->take(5)
             ->get();
 
         // Hot Books (most read in last 7 days)
@@ -52,7 +51,6 @@ class HomeController extends Controller
             ->selectRaw('book_id, COUNT(*) as read_count')
             ->groupBy('book_id')
             ->orderByDesc('read_count')
-            ->take(5)
             ->pluck('book_id');
         $hotBooks = Book::with('category')->whereIn('id', $hotBookIds)->get();
 
@@ -67,7 +65,6 @@ class HomeController extends Controller
         $highestRatedBooks = Book::with('category')->whereHas('reviews')
             ->withAvg('reviews', 'rating')
             ->orderByDesc('reviews_avg_rating')
-            ->take(5)
             ->get();
         // Only keep books with the highest rating value
         $topRating = $highestRatedBooks->first() ? $highestRatedBooks->first()->reviews_avg_rating : null;
@@ -105,7 +102,6 @@ class HomeController extends Controller
                 ->whereNotNull('category_id')
                 ->whereNotIn('id', $excludeBookIds)
                 ->inRandomOrder()
-                ->take(3)
                 ->get();
             // Filter out any books whose category is not in the selected genres (paranoia check)
             $recommendedBooks = $recommendedBooks->filter(function($book) use ($genreIds) {
@@ -116,7 +112,6 @@ class HomeController extends Controller
         if ($recommendedBooks->isEmpty()) {
             $recommendedBooks = Book::with('category')->where('status', 'active')
                 ->orderByDesc('created_at')
-                ->take(3)
                 ->get();
         }
         $recommendedBooks = $attachRatings($recommendedBooks);

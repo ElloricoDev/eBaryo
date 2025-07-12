@@ -33,7 +33,13 @@ const editingReview = ref(false);
 const from = new URLSearchParams(window.location.search).get('from') || 'books';
 const getBackRoute = () => {
   switch (from) {
-    case 'home': return route('home');
+    case 'home': 
+    case 'new': 
+    case 'hot': 
+    case 'mostread': 
+    case 'highestrated': 
+    case 'continue': 
+      return route('home');
     case 'saved': return route('books.saved');
     case 'books':
     case 'details':
@@ -232,6 +238,11 @@ const returnTo = params.get('returnTo');
 
 const routeMap = {
   home: 'home',
+  new: 'home',
+  hot: 'home',
+  mostread: 'home',
+  highestrated: 'home',
+  continue: 'home',
   saved: 'books.saved',
   feedback: 'feedback.create',
   profile: 'user.profile.index',

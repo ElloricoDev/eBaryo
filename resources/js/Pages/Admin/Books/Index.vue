@@ -14,7 +14,7 @@ library.add(faBook, faPlus, faFunnelDollar, faSearch, faXmarkCircle, faHashtag, 
 defineOptions({ layout: AdminLayout });
 
 const { props } = usePage();
-const books = props.books || [];
+const books = props.books || { data: [] };
 const filters = props.filters || {};
 
 const statusFilter = ref(filters.status || '');
@@ -38,16 +38,16 @@ const handleDelete = (id) => {
 
 const filterBooks = () => {
   router.get(route('admin.books.index'), { status: statusFilter.value }, {
-    preserveState: true,
-    preserveScroll: true,
+    preserveState: false,
+    preserveScroll: false,
   });
 };
 
 const clearFilters = () => {
   statusFilter.value = '';
   router.get(route('admin.books.index'), {}, {
-    preserveState: true,
-    preserveScroll: true,
+    preserveState: false,
+    preserveScroll: false,
   });
 };
 
@@ -117,7 +117,7 @@ const toggleStatus = (id) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="book in books" :key="book.id" class="border-t">
+          <tr v-for="book in books.data" :key="book.id" class="border-t">
             <td class="px-4 py-2">{{ book.id }}</td>
             <td class="px-4 py-2">{{ book.title }}</td>
             <td class="px-4 py-2">{{ book.author }}</td>
@@ -146,11 +146,68 @@ const toggleStatus = (id) => {
               </button>
             </td>
           </tr>
-          <tr v-if="books.length === 0">
+          <tr v-if="books.data.length === 0">
             <td colspan="6" class="text-center text-gray-500 py-6">No books found.</td>
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Pagination -->
+    <div v-if="books.links && books.links.length > 3" class="mt-6 flex justify-center">
+      <nav class="flex items-center space-x-2">
+        <!-- Previous Page -->
+        <Link 
+          v-if="books.prev_page_url"
+          :href="books.prev_page_url"
+          class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+        >
+          Previous
+        </Link>
+        <span 
+          v-else
+          class="px-3 py-2 text-sm font-medium text-gray-300 bg-white border border-gray-200 rounded-md cursor-not-allowed"
+        >
+          Previous
+        </span>
+
+        <!-- Page Numbers -->
+        <template v-for="(link, index) in books.links" :key="index">
+          <Link 
+            v-if="link.url && !link.active && link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;'"
+            :href="link.url"
+            class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            {{ link.label }}
+          </Link>
+          <span 
+            v-else-if="link.active"
+            class="px-3 py-2 text-sm font-medium text-white bg-green-600 border border-green-600 rounded-md"
+          >
+            {{ link.label }}
+          </span>
+        </template>
+
+        <!-- Next Page -->
+        <Link 
+          v-if="books.next_page_url"
+          :href="books.next_page_url"
+          class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+        >
+          Next
+        </Link>
+        <span 
+          v-else
+          class="px-3 py-2 text-sm font-medium text-gray-300 bg-white border border-gray-200 rounded-md cursor-not-allowed"
+        >
+          Next
+        </span>
+      </nav>
+    </div>
+
+    <!-- Pagination Info -->
+    <div v-if="books.total" class="mt-4 text-center text-sm text-gray-600">
+      Showing {{ books.from }} to {{ books.to }} of {{ books.total }} results
     </div>
   </div>
 </template>

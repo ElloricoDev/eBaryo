@@ -17,7 +17,7 @@ class BookController extends Controller
             $query->where('status', $request->status);
         }
         
-        $books = $query->get();
+        $books = $query->paginate(10);
 
         return inertia('Admin/Books/Index', [
             'books' => $books,

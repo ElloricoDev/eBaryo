@@ -41,6 +41,22 @@ onMounted(() => {
   animationFrame = requestAnimationFrame(animateBooks)
   window.addEventListener('scroll', handleScroll)
   handleScroll()
+
+  // Smooth scroll to hash if present in URL
+  if (window.location.hash) {
+    const target = document.querySelector(window.location.hash)
+    if (target) {
+      setTimeout(() => {
+        const navbarHeight = 64;
+        const elementPosition = target.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - navbarHeight;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }, 100); // Wait for DOM render
+    }
+  }
 })
 onUnmounted(() => {
   cancelAnimationFrame(animationFrame)
@@ -51,8 +67,7 @@ onUnmounted(() => {
 <template>
   <Head title="Welcome" />
   <GuestLayout>
-    <div class=" px-4 py-10 relative">
-      <!-- Animated Gradient Background -->
+    <section class="px-4 py-2 relative" id="home">
       <!-- Floating Book Icons -->
       <div class="pointer-events-none select-none">
         <font-awesome-icon v-for="book in floatingBooks" :key="book.id" :id="`floating-book-${book.id}`" icon="book" class="text-green-200 text-5xl opacity-60 absolute" :class="book.style" :style="{ transition: 'transform 0.3s', zIndex: 0 }" />
@@ -173,8 +188,8 @@ onUnmounted(() => {
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg>
         </button>
       </transition>
-    </div>
-  </GuestLayout>
+          </section>
+    </GuestLayout>
 </template>
 
 <style scoped>

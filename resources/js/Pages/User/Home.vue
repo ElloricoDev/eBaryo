@@ -1,7 +1,8 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { usePage, router, Head, Link } from "@inertiajs/vue3";
-import BookCard from "@/Components/BookCard.vue";
+import BookSection from "@/Components/BookSection.vue";
+import ContinueReadingSection from "@/Components/ContinueReadingSection.vue";
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -19,6 +20,8 @@ import {
     faUser,
     faCommentDots,
     faEye,
+    faChevronLeft,
+    faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 library.add(
     faPlayCircle,
@@ -33,7 +36,9 @@ library.add(
     faBookmark,
     faUser,
     faCommentDots,
-    faEye
+    faEye,
+    faChevronLeft,
+    faChevronRight
 );
 
 const { props } = usePage();
@@ -47,6 +52,8 @@ const continueReadingList = props.continueReadingList || [];
 
 const user = props.auth?.user || {};
 
+
+
 // Quick stats
 const booksRead = computed(() =>
     props.reading_logs ? props.reading_logs.length : 0
@@ -58,8 +65,8 @@ const reviewsWritten = computed(() =>
     props.reviews ? props.reviews.length : 0
 );
 
-// Recommended books (random 3 for now)
-const recommendedBooks = computed(() => {
+// Recommended books (random 3 for now) - using props directly
+const recommendedBooksFromProps = computed(() => {
     if (!books.length) return [];
     return books.slice(0, 3);
 });
@@ -138,6 +145,23 @@ function restoreScrollIfNeeded() {
         }
     }
 }
+
+// Book data computed properties
+const newBooks = computed(() => {
+    return props.newBooks || [];
+});
+
+const recommendedBooks = computed(() => {
+    return props.recommendedBooks || [];
+});
+
+const hotBooks = computed(() => {
+    return props.hotBooks || [];
+});
+
+const mostReadBooks = computed(() => {
+    return props.mostReadBooks || [];
+});
 
 const highestRatedBooks = computed(() => {
     return (props.highestRatedBooks || []).filter(
@@ -297,213 +321,93 @@ onUnmounted(() => {
             </div>
             <div v-else class="text-gray-400">No recent activity yet.</div>
         </div>
-        <!-- Continue Reading List -->
-        <div
-            v-if="continueReadingList.length"
-            class="mb-8 border-2 border-green-400 bg-green-50 rounded-xl shadow-lg p-4"
-        >
-            <div class="flex items-center mb-3">
-                <font-awesome-icon
-                    icon="play-circle"
-                    class="text-green-600 text-xl mr-2"
-                />
-                <h3 class="text-lg sm:text-xl font-bold text-green-700 mr-2">
-                    Continue Reading
-                </h3>
-                <span
-                    class="bg-green-400 text-white text-xs font-bold px-2 py-1 rounded-full ml-2"
-                    >In Progress</span
-                >
-            </div>
-            <div class="section-scroll-row hide-scrollbar">
-                <BookCard
-                    v-for="log in continueReadingList"
-                    :key="log.id"
-                    :book="{
-                        ...log.book,
-                        from: 'continue',
-                        highlightProgress: true,
-                        progress: log.last_percent,
-                    }"
-                    :isSaved="savedBookIds.includes(log.book.id)"
-                    :auth="$page.props.auth"
-                    @save="saveBook"
-                    @unsave="unsaveBook"
-                    class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
-                >
-                    <template #footer>
-                        <div class="flex items-center justify-between w-full">
-                            <div class="text-xs text-green-700 font-semibold">
-                                {{ Math.round((log.last_percent || 0) * 100) }}%
-                                read
-                            </div>
-                            <Link
-                                :href="route('books.read', { id: log.book.id })"
-                                class="ml-2 text-green-600 hover:underline font-bold"
-                                >Continue Read</Link
-                            >
-                        </div>
-                    </template>
-                </BookCard>
-            </div>
-        </div>
+        <!-- Continue Reading Section -->
+        <ContinueReadingSection
+            :continueReadingList="continueReadingList"
+            :savedBookIds="savedBookIds"
+            :auth="$page.props.auth"
+            @save="saveBook"
+            @unsave="unsaveBook"
+        />
 
-        <!-- Recommended Books -->
-        <div
-            class="mb-8 border-2 border-yellow-400 bg-yellow-50 rounded-xl shadow-lg p-4"
-        >
-            <div class="flex items-center mb-3">
-                <font-awesome-icon
-                    icon="thumbs-up"
-                    class="text-yellow-600 text-xl mr-2"
-                />
-                <h3 class="text-lg sm:text-xl font-bold text-yellow-700 mr-2">
-                    Recommended for You
-                </h3>
-                <span
-                    class="bg-yellow-400 text-white text-xs font-bold px-2 py-1 rounded-full ml-2"
-                    >Top Picks</span
-                >
-            </div>
-            <div class="section-scroll-row hide-scrollbar">
-                <BookCard
-                    v-for="book in $page.props.recommendedBooks"
-                    :key="book.id"
-                    :book="{ ...book, from: 'home', highlightRating: true }"
-                    :isSaved="savedBookIds.includes(book.id)"
-                    :auth="$page.props.auth"
-                    @save="saveBook"
-                    @unsave="unsaveBook"
-                    class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
-                />
-            </div>
-        </div>
+        <!-- Recommended Books Section -->
+        <BookSection
+            title="Recommended for You"
+            icon="thumbs-up"
+            :books="recommendedBooks"
+            sectionType="home"
+            :savedBookIds="savedBookIds"
+            :auth="$page.props.auth"
+            badgeText="Top Picks"
+            badgeColor="bg-yellow-400"
+            borderColor="border-yellow-400"
+            bgColor="bg-yellow-50"
+            iconColor="text-yellow-600"
+            titleColor="text-yellow-700"
+            emptyMessage="No recommendations available yet. Check back later for personalized picks!"
+            emptyIcon="thumbs-up"
+            @save="saveBook"
+            @unsave="unsaveBook"
+        />
 
-        <!-- New Books -->
-        <div class="mb-8">
-            <div class="flex items-center mb-3">
-                <font-awesome-icon
-                    icon="star"
-                    class="text-green-600 text-xl mr-2"
-                />
-                <h3 class="text-xl font-bold text-green-700">New Books</h3>
-            </div>
-            <div class="section-scroll-row hide-scrollbar">
-                <BookCard
-                    v-for="book in $page.props.newBooks"
-                    :key="book.id"
-                    :book="{ ...book, from: 'new' }"
-                    :isSaved="savedBookIds.includes(book.id)"
-                    :auth="$page.props.auth"
-                    @save="saveBook"
-                    @unsave="unsaveBook"
-                    class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
-                />
-            </div>
-        </div>
-        <!-- Hot Books -->
-        <div class="mb-8">
-            <div class="flex items-center mb-3">
-                <font-awesome-icon
-                    icon="fire"
-                    class="text-red-500 text-xl mr-2"
-                />
-                <h3 class="text-xl font-bold text-green-700">Hot Books</h3>
-            </div>
-            <div class="section-scroll-row hide-scrollbar">
-                <BookCard
-                    v-for="book in $page.props.hotBooks"
-                    :key="book.id"
-                    :book="{ ...book, from: 'hot' }"
-                    :isSaved="savedBookIds.includes(book.id)"
-                    :auth="$page.props.auth"
-                    @save="saveBook"
-                    @unsave="unsaveBook"
-                    class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
-                />
-            </div>
-        </div>
-        <!-- Most Read Books -->
-        <div class="mb-8">
-            <div class="flex items-center mb-3">
-                <font-awesome-icon
-                    icon="chart-line"
-                    class="text-blue-600 text-xl mr-2"
-                />
-                <h3 class="text-xl font-bold text-green-700">
-                    Most Read Books
-                </h3>
-            </div>
-            <div class="section-scroll-row hide-scrollbar">
-                <BookCard
-                    v-for="book in $page.props.mostReadBooks"
-                    :key="book.id"
-                    :book="{ ...book, from: 'mostread' }"
-                    :isSaved="savedBookIds.includes(book.id)"
-                    :auth="$page.props.auth"
-                    @save="saveBook"
-                    @unsave="unsaveBook"
-                    class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
-                >
-                    <template #footer>
-                        <div class="flex items-center justify-between w-full">
-                            <div
-                                class="flex items-center gap-1 text-sm font-bold text-blue-800"
-                                title="Total times this book has been read by all users"
-                            >
-                                <font-awesome-icon
-                                    icon="eye"
-                                    class="text-blue-500"
-                                />
-                                <span>{{ book.read_count }}</span>
-                                <span class="text-xs font-normal text-blue-600"
-                                    >read{{
-                                        book.read_count === 1 ? "" : "s"
-                                    }}</span
-                                >
-                            </div>
-                        </div>
-                    </template>
-                </BookCard>
-            </div>
-        </div>
-        <!-- Highest Ratings -->
-        <div class="mb-8">
-            <div class="flex items-center mb-3">
-                <font-awesome-icon
-                    icon="trophy"
-                    class="text-yellow-600 text-xl mr-2"
-                />
-                <h3 class="text-xl font-bold text-green-700">
-                    Highest Ratings
-                </h3>
-            </div>
-            <div class="section-scroll-row hide-scrollbar">
-                <template v-if="highestRatedBooks.length > 0">
-                    <BookCard
-                        v-for="book in highestRatedBooks"
-                        :key="book.id"
-                        :book="{ ...book, from: 'highestrated' }"
-                        :isSaved="savedBookIds.includes(book.id)"
-                        :auth="$page.props.auth"
-                        @save="saveBook"
-                        @unsave="unsaveBook"
-                        class="min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
-                    />
-                </template>
-                <template v-else>
-                    <div
-                        class="col-span-full text-center text-gray-500 py-12 w-full"
-                    >
-                        <font-awesome-icon
-                            icon="star"
-                            class="text-yellow-400 text-3xl mb-2"
-                        />
-                        <div>No highly rated books yet.</div>
-                    </div>
-                </template>
-            </div>
-        </div>
+        <!-- New Books Section -->
+        <BookSection
+            title="New Books"
+            icon="star"
+            :books="newBooks"
+            sectionType="new"
+            :savedBookIds="savedBookIds"
+            :auth="$page.props.auth"
+            emptyMessage="No new books available at the moment. Check back soon for fresh additions!"
+            emptyIcon="star"
+            @save="saveBook"
+            @unsave="unsaveBook"
+        />
+        <!-- Hot Books Section -->
+        <BookSection
+            title="Hot Books"
+            icon="fire"
+            :books="hotBooks"
+            sectionType="hot"
+            :savedBookIds="savedBookIds"
+            :auth="$page.props.auth"
+            emptyMessage="No trending books right now. Start reading to see what's popular!"
+            emptyIcon="fire"
+            iconColor="text-red-500"
+            titleColor="text-green-700"
+            @save="saveBook"
+            @unsave="unsaveBook"
+        />
+        <!-- Most Read Books Section -->
+        <BookSection
+            title="Most Read Books"
+            icon="chart-line"
+            :books="mostReadBooks"
+            sectionType="mostread"
+            :savedBookIds="savedBookIds"
+            :auth="$page.props.auth"
+            emptyMessage="No reading statistics available yet. Be the first to read a book!"
+            emptyIcon="chart-line"
+            iconColor="text-blue-600"
+            titleColor="text-green-700"
+            @save="saveBook"
+            @unsave="unsaveBook"
+        />
+        <!-- Highest Ratings Section -->
+        <BookSection
+            title="Highest Ratings"
+            icon="trophy"
+            :books="highestRatedBooks"
+            sectionType="highestrated"
+            :savedBookIds="savedBookIds"
+            :auth="$page.props.auth"
+            emptyMessage="No highly rated books yet."
+            emptyIcon="trophy"
+            iconColor="text-yellow-600"
+            titleColor="text-green-700"
+            @save="saveBook"
+            @unsave="unsaveBook"
+        />
 
         <!-- Animated Gradient Background -->
         <div
@@ -571,25 +475,5 @@ button:focus,
     outline: 2px solid #34d399;
     outline-offset: 2px;
 }
-.hide-scrollbar {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
-}
-.hide-scrollbar::-webkit-scrollbar {
-    display: none; /* Chrome/Safari/Webkit */
-}
-.section-scroll-row {
-    display: flex;
-    overflow-x: auto;
-    gap: 1.25rem; /* gap-4 */
-    padding-left: 0.5rem; /* px-2 */
-    padding-right: 0.5rem;
-    padding-bottom: 0.5rem;
-}
-@media (min-width: 640px) {
-    .section-scroll-row {
-        padding-left: 1rem; /* px-4 */
-        padding-right: 1rem;
-    }
-}
+
 </style>

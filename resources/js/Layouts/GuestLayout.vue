@@ -1,5 +1,5 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 import { ref, watch } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -17,13 +17,32 @@ watch(toggle, (val) => {
   }
 })
 
+// Smooth scroll function with route check
+const smoothScroll = (targetId) => {
+  const isWelcome = window.location.pathname === '/' || window.location.pathname === '/welcome';
+  if (isWelcome) {
+    const target = document.querySelector(targetId)
+    if (target) {
+      const navbarHeight = 64; // h-16 in Tailwind = 4rem = 64px
+      const elementPosition = target.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - navbarHeight;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  } else {
+    router.visit(`/${targetId}`)
+  }
+}
+
 library.add(faBook, faHouse, faInfoCircle, faStar, faCommentDots, faRightToBracket, faCopyright, faUserCircle, faXmark, faFacebook, faTwitter, faInstagram)
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col bg-gray-100">
     <!-- Navbar -->
-    <nav class="bg-gradient-to-r from-green-700 via-green-600 to-green-500 shadow-lg border-b fixed w-full z-50">
+    <nav class="bg-gradient-to-r from-green-700 via-green-600 to-green-500 shadow-lg border-b fixed w-full z-40">
       <div class="container mx-auto px-4 flex flex-wrap items-center justify-between h-16">
         <Link class="text-white font-bold flex items-center gap-2 text-lg transition-transform hover:scale-105" :href="route('welcome')">
           <font-awesome-icon icon="book" class="text-2xl" /> <span>eBaryo Library</span>
@@ -44,24 +63,24 @@ library.add(faBook, faHouse, faInfoCircle, faStar, faCommentDots, faRightToBrack
           class="hidden md:flex gap-4 items-center"
         >
           <li>
-            <Link class="text-white px-3 py-2 rounded-md hover:bg-green-700 transition" :href="route('welcome')">
+            <button class="text-white px-3 py-2 rounded-md hover:bg-green-700 transition" @click="smoothScroll('#home')">
               <font-awesome-icon icon="house" /> Home
-            </Link>
+            </button>
           </li>
           <li>
-            <a href="#about" class="text-white px-3 py-2 rounded-md hover:bg-green-700 transition">
+            <button @click="smoothScroll('#about')" class="text-white px-3 py-2 rounded-md hover:bg-green-700 transition">
               <font-awesome-icon icon="info-circle" /> About
-            </a>
+            </button>
           </li>
           <li>
-            <a href="#features" class="text-white px-3 py-2 rounded-md hover:bg-green-700 transition">
+            <button @click="smoothScroll('#features')" class="text-white px-3 py-2 rounded-md hover:bg-green-700 transition">
               <font-awesome-icon icon="star" /> Features
-            </a>
+            </button>
           </li>
           <li>
-            <a href="#testimonials" class="text-white px-3 py-2 rounded-md hover:bg-green-700 transition">
+            <button @click="smoothScroll('#testimonials')" class="text-white px-3 py-2 rounded-md hover:bg-green-700 transition">
               <font-awesome-icon icon="comment-dots" /> Testimonials
-            </a>
+            </button>
           </li>
           <li>
             <Link class="text-white px-3 py-2 rounded-md hover:bg-green-700 transition" :href="route('login')">
@@ -74,10 +93,10 @@ library.add(faBook, faHouse, faInfoCircle, faStar, faCommentDots, faRightToBrack
 
     <!-- Mobile Sidebar & Overlay -->
     <transition name="fade">
-      <div v-if="toggle" class="fixed inset-0 z-40 bg-black bg-opacity-40 backdrop-blur-sm md:hidden transition-all duration-300" @click="toggle = false"></div>
+      <div v-if="toggle" class="fixed inset-0 z-50 bg-black bg-opacity-40 backdrop-blur-sm transition-all duration-300 md:hidden" @click="toggle = false"></div>
     </transition>
     <transition name="slide">
-      <aside v-if="toggle" class="fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-50 flex flex-col md:hidden transition-transform duration-300 rounded-l-2xl">
+      <aside v-if="toggle" class="fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-60 flex flex-col md:hidden transition-transform duration-300 rounded-l-2xl" style="z-index:60;">
         <div class="flex flex-col items-center gap-2 px-4 h-28 border-b justify-center bg-gradient-to-r from-green-100 to-green-50">
           <font-awesome-icon icon="user-circle" class="text-4xl text-green-600 mb-1" />
           <span class="font-semibold text-green-700 text-base">Welcome, Guest!</span>
@@ -87,24 +106,24 @@ library.add(faBook, faHouse, faInfoCircle, faStar, faCommentDots, faRightToBrack
         </div>
         <ul class="flex flex-col gap-2 p-4 mt-2">
           <li>
-            <Link @click="toggle = false" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400" :href="route('welcome')">
+            <button @click="() => { smoothScroll('#home'); toggle = false; }" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400 w-full text-left">
               <font-awesome-icon icon="house" /> Home
-            </Link>
+            </button>
           </li>
           <li>
-            <a @click="toggle = false" href="#about" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400">
+            <button @click="() => { smoothScroll('#about'); toggle = false; }" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400 w-full text-left">
               <font-awesome-icon icon="info-circle" /> About
-            </a>
+            </button>
           </li>
           <li>
-            <a @click="toggle = false" href="#features" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400">
+            <button @click="() => { smoothScroll('#features'); toggle = false; }" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400 w-full text-left">
               <font-awesome-icon icon="star" /> Features
-            </a>
+            </button>
           </li>
           <li>
-            <a @click="toggle = false" href="#testimonials" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400">
+            <button @click="() => { smoothScroll('#testimonials'); toggle = false; }" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400 w-full text-left">
               <font-awesome-icon icon="comment-dots" /> Testimonials
-            </a>
+            </button>
           </li>
           <li>
             <Link @click="toggle = false" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400" :href="route('login')">

@@ -32,9 +32,10 @@ function skip() {
       </div>
       <div class="flex justify-between mt-6">
         <button type="button" @click="skip" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Skip</button>
+        <div class="text-sm text-gray-600">Selected: {{ form.genres.length }} genres</div>
         <button type="submit"
-          :disabled="form.genres.length < 3"
-          :class="[ 'px-4 py-2 rounded', form.genres.length < 3 ? 'bg-green-300 text-white cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700' ]"
+          :disabled="form.genres.length === 0"
+          :class="[ 'px-4 py-2 rounded', form.genres.length === 0 ? 'bg-green-300 text-white cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700' ]"
         >Save</button>
       </div>
     </form>

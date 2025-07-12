@@ -5,6 +5,7 @@ use App\Http\Controllers\UserControllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\UserControllers\BookController;
 use App\Http\Controllers\FeedbackController;
@@ -101,22 +102,28 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/user/genres/skip', [\App\Http\Controllers\UserControllers\GenreController::class, 'skip'])->name('user.genres.skip');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/email/verify', function () {
-        return view('auth.verify-email');
-    })->name('verification.notice');
+// Email verification routes - standard Laravel approach
+Route::get('/email/verify', function () {
+    $user = Auth::user();
+    
+    // Redirect users to their respective profile pages where they can verify email
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.profile.index')
+            ->with('message', 'Please verify your email address using the form below.');
+    } else {
+        return redirect()->route('user.profile.index')
+            ->with('message', 'Please verify your email address using the form below.');
+    }
+})->name('verification.notice')->middleware('auth');
 
-    Route::get('/email/verify/{id}/{hash}', EmailVerificationController::class)
-        ->middleware(['signed'])->name('verification.verify');
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, '__invoke'])
+    ->middleware(['auth', 'signed'])
+    ->name('verification.verify');
 
-    Route::post('/email/verification-notification', function () {
-        Auth::user()->sendEmailVerificationNotification();
-        return back()->with('message', 'Verification link sent!');
-    })->middleware(['throttle:6,1'])->name('verification.send');
-});
-
-
-
+Route::post('/email/verification-notification', function () {
+    request()->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';
