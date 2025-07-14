@@ -33,7 +33,7 @@ Route::middleware('auth', 'user')->group(function () {
 
     //Book Routes
     Route::get('/books', [BookController::class, 'index'])->name('books.index');
-    Route::get('/books/saved', [BookController::class, 'savedBooks'])->name('books.saved'); 
+    Route::get('/books/saved', [BookController::class, 'savedBooks'])->name('books.saved');
     Route::get('/books/{id}', [BookController::class, 'show'])->name('books.view');
     Route::post('/books/{id}/progress', [BookController::class, 'saveProgress'])->name('books.saveProgress');
     Route::post('/books/{id}/save', [BookController::class, 'saveBook'])->name('books.save');
@@ -42,14 +42,14 @@ Route::middleware('auth', 'user')->group(function () {
     //File serving route for PDFs and other ebooks
     Route::get('/files/{filename}', function ($filename) {
         $path = storage_path('app/public/ebooks/' . $filename);
-        
+
         if (!file_exists($path)) {
             abort(404);
         }
-        
+
         $file = file_get_contents($path);
         $type = mime_content_type($path);
-        
+
         return response($file, 200, [
             'Content-Type' => $type,
             'Content-Disposition' => 'inline; filename="' . $filename . '"',
@@ -59,15 +59,15 @@ Route::middleware('auth', 'user')->group(function () {
             'Cache-Control' => 'public, max-age=3600',
         ]);
     })->name('files.serve')->where('filename', '.*');
-    
+
     // Test route to check if files are accessible
     Route::get('/test-pdf/{filename}', function ($filename) {
         $path = storage_path('app/public/ebooks/' . $filename);
-        
+
         if (!file_exists($path)) {
             return response()->json(['error' => 'File not found'], 404);
         }
-        
+
         return response()->json([
             'exists' => true,
             'size' => filesize($path),
@@ -106,7 +106,7 @@ Route::middleware(['auth'])->group(function () {
 // Email verification routes - standard Laravel approach
 Route::get('/email/verify', function () {
     $user = Auth::user();
-    
+
     // Redirect users to their respective profile pages where they can verify email
     if ($user->role === 'admin') {
         return redirect()->route('admin.profile.index')

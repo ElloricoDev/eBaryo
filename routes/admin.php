@@ -39,12 +39,12 @@ Route::middleware('auth', 'admin')->group(function () {
             Route::put('/update/{id}', 'update')->name('update');
             Route::delete('/delete/{id}', 'destroy')->name('destroy');
         });
-    
+
     //Admin Books Management Routes
     Route::controller(BookController::class)
         ->prefix('admin/books')
         ->name('admin.books.')
-        ->group(function() {
+        ->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/store', 'store')->name('store');
@@ -54,12 +54,12 @@ Route::middleware('auth', 'admin')->group(function () {
             Route::delete('/delete/{id}', 'destroy')->name('destroy');
             Route::get('/{id}', 'show')->name('show');
         });
-    
+
     //Admin Category Management Routes
     Route::controller(CategoryController::class)
         ->prefix('admin/category')
         ->name('admin.categories.')
-        ->group(function(){
+        ->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/store', 'store')->name('store');
@@ -87,5 +87,4 @@ Route::middleware('auth', 'admin')->group(function () {
             Route::put('/respond/{id}', 'respond')->name('respond');
             Route::put('/response/{id}', 'update')->name('update');
         });
-
 });

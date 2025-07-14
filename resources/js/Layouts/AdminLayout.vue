@@ -1,6 +1,5 @@
 <script setup>
 import { usePage, Link } from "@inertiajs/vue3";
-import { Inertia } from "@inertiajs/inertia";
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -40,7 +39,6 @@ const toggleDropdown = () => {
     showDropdown.value = !showDropdown.value;
 };
 
-const currentUrl = computed(() => url.value || "");
 const isActive = (path) => {
     const currentPath = window.location.pathname.replace(/\/$/, "");
     const normalizedPath = path.replace(/\/$/, "");
@@ -65,7 +63,6 @@ library.add(
 
 <template>
     <div class="flex">
-        <!-- Sidebar -->
         <nav
             class="bg-green-600 text-white w-[250px] h-screen p-5 fixed top-0 left-0 z-50 shadow-lg"
         >
@@ -145,13 +142,10 @@ library.add(
             </ul>
         </nav>
 
-        <!-- Main Content -->
         <div class="ml-[250px] w-full min-h-screen flex flex-col">
-            <!-- Header -->
             <header
                 class="bg-white flex justify-between items-center px-6 h-[60px] shadow border-b sticky top-0 z-40"
             >
-                <!-- Search bar -->
                 <div class="w-1/2 flex">
                     <input
                         type="text"
@@ -165,7 +159,6 @@ library.add(
                     </button>
                 </div>
 
-                <!-- Profile Dropdown -->
                 <div class="relative" ref="dropdownRef">
                     <button
                         @click="toggleDropdown"
@@ -222,7 +215,6 @@ library.add(
                 </div>
             </header>
 
-            <!-- Page Content -->
             <main class="p-6 flex-grow">
                 <slot />
             </main>

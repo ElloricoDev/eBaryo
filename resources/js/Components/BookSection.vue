@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
+import { ref, onMounted, onUnmounted, nextTick } from "vue";
 import BookCard from "@/Components/BookCard.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -64,7 +64,6 @@ const props = defineProps({
 
 const emit = defineEmits(["save", "unsave"]);
 
-// --- Scroll button logic ---
 const scrollRowRef = ref(null);
 const hasPrev = ref(false);
 const hasNext = ref(false);
@@ -79,7 +78,7 @@ const updateScrollButtons = () => {
 const scrollByAmount = (amount) => {
     const el = scrollRowRef.value;
     if (!el) return;
-    el.scrollBy({ left: amount, behavior: 'smooth' });
+    el.scrollBy({ left: amount, behavior: "smooth" });
 };
 
 const handleScroll = () => {
@@ -90,43 +89,15 @@ onMounted(() => {
     nextTick(() => {
         updateScrollButtons();
         if (scrollRowRef.value) {
-            scrollRowRef.value.addEventListener('scroll', handleScroll);
+            scrollRowRef.value.addEventListener("scroll", handleScroll);
         }
     });
 });
 onUnmounted(() => {
     if (scrollRowRef.value) {
-        scrollRowRef.value.removeEventListener('scroll', handleScroll);
+        scrollRowRef.value.removeEventListener("scroll", handleScroll);
     }
 });
-
-// Pagination state (for legacy button pagination, can be removed if not needed)
-// const currentPage = ref(0);
-// const booksPerPage = 8;
-// const paginatedBooks = computed(() => {
-//     const startIndex = currentPage.value * booksPerPage;
-//     const endIndex = startIndex + booksPerPage;
-//     return props.books.slice(startIndex, endIndex);
-// });
-// const totalPages = computed(() => {
-//     return Math.ceil(props.books.length / booksPerPage);
-// });
-// const hasNextPage = computed(() => {
-//     return currentPage.value < totalPages.value - 1;
-// });
-// const hasPreviousPage = computed(() => {
-//     return currentPage.value > 0;
-// });
-// const nextPage = () => {
-//     if (hasNextPage.value) {
-//         currentPage.value++;
-//     }
-// };
-// const previousPage = () => {
-//     if (hasPreviousPage.value) {
-//         currentPage.value--;
-//     }
-// };
 
 const saveBook = (book) => {
     emit("save", book);
@@ -145,7 +116,6 @@ const unsaveBook = (book) => {
                 : 'mb-8 relative'
         "
     >
-        <!-- Section Header -->
         <div class="flex items-center mb-3">
             <font-awesome-icon
                 :icon="icon"
@@ -164,9 +134,7 @@ const unsaveBook = (book) => {
             </span>
         </div>
 
-        <!-- Books Section -->
         <div v-if="books.length > 0" class="relative">
-            <!-- Previous Button -->
             <button
                 v-if="hasPrev"
                 class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
@@ -176,8 +144,10 @@ const unsaveBook = (book) => {
             >
                 <font-awesome-icon icon="chevron-left" />
             </button>
-            <!-- Books Grid -->
-            <div ref="scrollRowRef" class="section-scroll-row hide-scrollbar md:gap-6">
+            <div
+                ref="scrollRowRef"
+                class="section-scroll-row hide-scrollbar md:gap-6"
+            >
                 <BookCard
                     v-for="book in books"
                     :key="book.id"
@@ -188,7 +158,6 @@ const unsaveBook = (book) => {
                     @unsave="unsaveBook"
                     class="mx-2 flex flex-col items-center min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
                 >
-                    <!-- Custom footer for most read books -->
                     <template v-if="sectionType === 'mostread'" #footer>
                         <div class="flex items-center justify-between w-full">
                             <div
@@ -210,7 +179,6 @@ const unsaveBook = (book) => {
                     </template>
                 </BookCard>
             </div>
-            <!-- Next Button -->
             <button
                 v-if="hasNext"
                 class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
@@ -222,7 +190,6 @@ const unsaveBook = (book) => {
             </button>
         </div>
 
-        <!-- Empty State -->
         <div v-else class="text-center text-gray-500 py-8">
             <font-awesome-icon
                 :icon="emptyIcon"
@@ -237,23 +204,18 @@ const unsaveBook = (book) => {
 <style scoped>
 .hide-scrollbar {
     scrollbar-width: none;
-    /* Firefox */
     -ms-overflow-style: none;
-    /* IE 10+ */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
-    /* Chrome/Safari/Webkit */
 }
 
 .section-scroll-row {
     display: flex;
     overflow-x: auto;
     gap: 0.5rem;
-    /* gap-2 */
     padding-left: 0.75rem;
-    /* px-3 for mobile */
     padding-right: 0.75rem;
     padding-bottom: 0.5rem;
     scroll-behavior: smooth;
@@ -264,9 +226,7 @@ const unsaveBook = (book) => {
 @media (min-width: 640px) {
     .section-scroll-row {
         gap: 1rem;
-        /* gap-4 */
         padding-left: 2.5rem;
-        /* px-10 for button space on desktop */
         padding-right: 2.5rem;
     }
 }

@@ -1,6 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
-import { useForm, router, Link, usePage } from '@inertiajs/vue3';
+import { useForm, router, usePage } from '@inertiajs/vue3';
 import UserLayout from '@/Layouts/UserLayout.vue';
 import Swal from 'sweetalert2';
 

@@ -1,5 +1,5 @@
 <script setup>
-import { Link, router } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -22,7 +22,6 @@ import {
 
 const toggle = ref(false);
 
-// Prevent background scroll when sidebar is open
 watch(toggle, (val) => {
     if (val) {
         document.body.classList.add("overflow-hidden");
@@ -31,7 +30,6 @@ watch(toggle, (val) => {
     }
 });
 
-// Smooth scroll function with route check
 const smoothScroll = (targetId) => {
     const isWelcome =
         window.location.pathname === "/" ||
@@ -39,7 +37,7 @@ const smoothScroll = (targetId) => {
     if (isWelcome) {
         const target = document.querySelector(targetId);
         if (target) {
-            const navbarHeight = 64; // h-16 in Tailwind = 4rem = 64px
+            const navbarHeight = 64;
             const elementPosition =
                 target.getBoundingClientRect().top + window.pageYOffset;
             const offsetPosition = elementPosition - navbarHeight;
@@ -71,7 +69,6 @@ library.add(
 
 <template>
     <div class="min-h-screen flex flex-col bg-gray-100">
-        <!-- Navbar -->
         <nav
             class="bg-gradient-to-r from-green-700 via-green-600 to-green-500 shadow-lg border-b fixed w-full z-40"
         >
@@ -111,7 +108,6 @@ library.add(
                     ></span>
                 </button>
 
-                <!-- Desktop Nav -->
                 <ul class="hidden md:flex gap-4 items-center">
                     <li>
                         <button
@@ -158,7 +154,6 @@ library.add(
             </div>
         </nav>
 
-        <!-- Mobile Sidebar & Overlay -->
         <transition name="fade">
             <div
                 v-if="toggle"
@@ -257,15 +252,12 @@ library.add(
             </aside>
         </transition>
 
-        <!-- Spacer for fixed navbar -->
         <div class="h-16"></div>
 
-        <!-- Page Content -->
         <main class="flex-grow mx-auto px-4">
             <slot />
         </main>
 
-        <!-- Footer -->
         <footer
             class="bg-green-600 text-white text-center py-3 mt-auto shadow-sm border-t border-green-700"
         >
@@ -303,7 +295,6 @@ library.add(
 </template>
 
 <style scoped>
-/* Optional: Font smoothing and base adjustments */
 html,
 body {
     height: 100%;

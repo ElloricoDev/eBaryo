@@ -1,6 +1,6 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
-import { usePage, router, Head, Link } from "@inertiajs/vue3";
+import { usePage, router } from "@inertiajs/vue3";
 import BookSection from "@/Components/BookSection.vue";
 import ContinueReadingSection from "@/Components/ContinueReadingSection.vue";
 import { ref, onMounted, onUnmounted, computed } from "vue";
@@ -45,36 +45,8 @@ const books = props.books || [];
 const savedBookIds = ref(
     Array.isArray(props.saved_books) ? props.saved_books : []
 );
-const continueReading = props.continueReading || null;
 const search = ref("");
 const continueReadingList = props.continueReadingList || [];
-
-const user = props.auth?.user || {};
-
-// Recommended books
-const recommendedBooksFromProps = computed(() => {
-    if (!books.length) return [];
-    return books.slice(0, 10); // Show more recommended books
-});
-
-// Recent activity
-const recentActivity = computed(() => {
-    if (!props.reading_logs) return [];
-    return props.reading_logs.slice(0, 3);
-});
-
-const filteredBooks = computed(() => {
-    if (!search.value) return books;
-    return books.filter(
-        (book) =>
-            (book.title &&
-                book.title
-                    .toLowerCase()
-                    .includes(search.value.toLowerCase())) ||
-            (book.author &&
-                book.author.toLowerCase().includes(search.value.toLowerCase()))
-    );
-});
 
 const handleSearch = (e) => {
     search.value = e.detail;
@@ -132,21 +104,20 @@ function restoreScrollIfNeeded() {
     }
 }
 
-// Book data computed properties
 const newBooks = computed(() => {
-    return (props.newBooks || []).slice(0, 40); // Show up to 40 new books
+    return (props.newBooks || []).slice(0, 40);
 });
 
 const recommendedBooks = computed(() => {
-    return (props.recommendedBooks || []).slice(0, 40); // Show up to 40 recommended books
+    return (props.recommendedBooks || []).slice(0, 40);
 });
 
 const hotBooks = computed(() => {
-    return (props.hotBooks || []).slice(0, 40); // Show up to 40 hot books
+    return (props.hotBooks || []).slice(0, 40);
 });
 
 const mostReadBooks = computed(() => {
-    return (props.mostReadBooks || []).slice(0, 40); // Show up to 40 most read books
+    return (props.mostReadBooks || []).slice(0, 40);
 });
 
 const highestRatedBooks = computed(() => {
@@ -156,7 +127,7 @@ const highestRatedBooks = computed(() => {
                 typeof book.average_rating === "number" &&
                 book.reviews_count > 0
         )
-        .slice(0, 40); // Show up to 40 highest rated books
+        .slice(0, 40);
 });
 
 const continueReadingSectionRef = ref(null);
@@ -169,7 +140,7 @@ const scrollContinueReading = (direction) => {
         section.$el.querySelector(".continue-reading-list")
     ) {
         const list = section.$el.querySelector(".continue-reading-list");
-        const scrollAmount = 300; // Adjust as needed
+        const scrollAmount = 300;
         if (direction === "prev") {
             list.scrollBy({ left: -scrollAmount, behavior: "smooth" });
         } else if (direction === "next") {
@@ -178,7 +149,6 @@ const scrollContinueReading = (direction) => {
     }
 };
 
-// Pagination state for each section
 const booksPerPage = 4;
 const sectionPages = {
     recommended: ref(0),
@@ -192,19 +162,6 @@ function paginatedBooks(list, section) {
     const page = sectionPages[section].value;
     const start = page * booksPerPage;
     return list.slice(start, start + booksPerPage);
-}
-
-function nextSectionPage(section, totalBooks) {
-    const maxPage = Math.floor((totalBooks - 1) / booksPerPage);
-    if (sectionPages[section].value < maxPage) {
-        sectionPages[section].value++;
-    }
-}
-
-function prevSectionPage(section) {
-    if (sectionPages[section].value > 0) {
-        sectionPages[section].value--;
-    }
 }
 
 onMounted(() => {
@@ -224,7 +181,6 @@ onUnmounted(() => {
     <Head title="Home" />
     <UserLayout>
         <div class="relative">
-            <!-- Continue Reading Section -->
             <ContinueReadingSection
                 ref="continueReadingSectionRef"
                 :continueReadingList="continueReadingList"
@@ -235,7 +191,6 @@ onUnmounted(() => {
             />
         </div>
 
-        <!-- Recommended Books Section -->
         <div class="relative">
             <BookSection
                 title="Recommended for You"
@@ -256,7 +211,6 @@ onUnmounted(() => {
                 @unsave="unsaveBook"
             />
         </div>
-        <!-- New Books Section -->
         <div class="relative">
             <BookSection
                 title="New Books for This Month"
@@ -271,7 +225,6 @@ onUnmounted(() => {
                 @unsave="unsaveBook"
             />
         </div>
-        <!-- Hot Books Section -->
         <div class="relative">
             <BookSection
                 title="Hot Books"
@@ -288,7 +241,6 @@ onUnmounted(() => {
                 @unsave="unsaveBook"
             />
         </div>
-        <!-- Most Read Books Section -->
         <div class="relative">
             <BookSection
                 title="Most Read Books"
@@ -305,7 +257,6 @@ onUnmounted(() => {
                 @unsave="unsaveBook"
             />
         </div>
-        <!-- Highest Ratings Section -->
         <div class="relative">
             <BookSection
                 title="Highest Ratings"

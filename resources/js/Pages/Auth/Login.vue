@@ -44,110 +44,169 @@ const submit = () => {
 </script>
 
 <template>
-
     <Head title="Login" />
     <GuestLayout>
         <div class="flex flex-col items-center justify-center">
             <div
-                class="w-[350px] bg-white border-2 border-green-600 rounded-2xl shadow-md p-6 mt-2 transition duration-200 hover:shadow-lg hover:border-green-700 animate-slide-up">
-                <h1 class="text-center text-green-700 text-2xl font-semibold mb-6">
+                class="w-[350px] bg-white border-2 border-green-600 rounded-2xl shadow-md p-6 mt-2 transition duration-200 hover:shadow-lg hover:border-green-700 animate-slide-up"
+            >
+                <h1
+                    class="text-center text-green-700 text-2xl font-semibold mb-6"
+                >
                     <font-awesome-icon icon="right-to-bracket" class="mr-2" />
                     Login
                 </h1>
                 <form @submit.prevent="submit" class="space-y-5">
-                    <!-- Email -->
                     <div class="relative">
-                        <input id="email" type="email" v-model="form.email"
+                        <input
+                            id="email"
+                            type="email"
+                            v-model="form.email"
                             class="w-full border rounded-md px-3 py-3 focus:outline-none focus:ring-2 focus:ring-green-300 peer bg-transparent placeholder-transparent"
-                            :class="{ 'border-red-500': form.errors.email }" autofocus placeholder=" "
-                            aria-label="Email" />
-                        <label for="email"
+                            :class="{ 'border-red-500': form.errors.email }"
+                            autofocus
+                            placeholder=" "
+                            aria-label="Email"
+                        />
+                        <label
+                            for="email"
                             class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-6 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
                             :class="{
-                                '-top-6 text-xs text-green-600 font-semibold bg-white px-1': form.email && form.email.length > 0,
-                            }">
+                                '-top-6 text-xs text-green-600 font-semibold bg-white px-1':
+                                    form.email && form.email.length > 0,
+                            }"
+                        >
                             <font-awesome-icon icon="person" /> Email
                         </label>
-                        <div v-if="form.errors.email" class="text-sm text-red-600 mt-1">
+                        <div
+                            v-if="form.errors.email"
+                            class="text-sm text-red-600 mt-1"
+                        >
                             {{ form.errors.email }}
                         </div>
                     </div>
-                    <!-- Password -->
                     <div class="relative">
-                        <input :type="showPassword ? 'text' : 'password'" id="password" v-model="form.password"
+                        <input
+                            :type="showPassword ? 'text' : 'password'"
+                            id="password"
+                            v-model="form.password"
                             class="w-full border rounded-md px-3 py-3 focus:outline-none focus:ring-2 focus:ring-green-300 peer bg-transparent placeholder-transparent"
-                            :class="{ 'border-red-500': form.errors.password }" placeholder=" " aria-label="Password" />
-                        <label for="password"
+                            :class="{ 'border-red-500': form.errors.password }"
+                            placeholder=" "
+                            aria-label="Password"
+                        />
+                        <label
+                            for="password"
                             class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-6 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
                             :class="{
-                                '-top-6 text-xs text-green-600 font-semibold bg-white px-1': form.password && form.password.length > 0,
-                            }">
+                                '-top-6 text-xs text-green-600 font-semibold bg-white px-1':
+                                    form.password && form.password.length > 0,
+                            }"
+                        >
                             <font-awesome-icon icon="lock" /> Password
                         </label>
-                        <button type="button" @click="showPassword = !showPassword" tabindex="-1"
+                        <button
+                            type="button"
+                            @click="showPassword = !showPassword"
+                            tabindex="-1"
                             class="absolute right-3 top-3 text-green-400 hover:text-green-600 focus:outline-none"
-                            :aria-label="showPassword ? 'Hide password' : 'Show password'
-                                ">
-                            <font-awesome-icon :icon="showPassword ? 'eye-slash' : 'eye'" />
+                            :aria-label="
+                                showPassword ? 'Hide password' : 'Show password'
+                            "
+                        >
+                            <font-awesome-icon
+                                :icon="showPassword ? 'eye-slash' : 'eye'"
+                            />
                         </button>
-                        <div v-if="form.errors.password" class="text-sm text-red-600 mt-1">
+                        <div
+                            v-if="form.errors.password"
+                            class="text-sm text-red-600 mt-1"
+                        >
                             {{ form.errors.password }}
                         </div>
                         <div class="text-right mt-2">
-                            <Link :href="route('password.request')" class="text-green-700 text-sm hover:underline">
-                            <font-awesome-icon icon="envelope" /> Forgot
-                            password?
+                            <Link
+                                :href="route('password.request')"
+                                class="text-green-700 text-sm hover:underline"
+                            >
+                                <font-awesome-icon icon="envelope" /> Forgot
+                                password?
                             </Link>
                         </div>
                     </div>
-                    <!-- Remember Me -->
                     <div class="flex items-center gap-2">
-                        <input id="remember" type="checkbox" v-model="form.remember"
-                            class="border-green-500 text-green-600 focus:ring-green-500 rounded" />
-                        <label for="remember" class="text-green-700 text-sm">Remember Me</label>
+                        <input
+                            id="remember"
+                            type="checkbox"
+                            v-model="form.remember"
+                            class="border-green-500 text-green-600 focus:ring-green-500 rounded"
+                        />
+                        <label for="remember" class="text-green-700 text-sm"
+                            >Remember Me</label
+                        >
                     </div>
-                    <!-- Submit Button -->
                     <div>
-                        <button type="submit" :disabled="form.processing"
+                        <button
+                            type="submit"
+                            :disabled="form.processing"
                             class="w-full bg-green-600 text-white py-2 px-4 rounded shadow-sm hover:bg-green-700 focus:bg-green-800 transition disabled:opacity-50 animate-pulse-cta focus:outline-none focus:ring-2 focus:ring-green-400 flex items-center justify-center gap-2"
-                            aria-label="Login">
+                            aria-label="Login"
+                        >
                             <span v-if="!form.processing">
                                 <font-awesome-icon icon="right-to-bracket" />
                                 Login
                             </span>
                             <span v-else>
-                                <svg class="animate-spin h-5 w-5 mr-2 inline-block text-white"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                <svg
+                                    class="animate-spin h-5 w-5 mr-2 inline-block text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        class="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        stroke-width="4"
+                                    ></circle>
+                                    <path
+                                        class="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                    ></path>
                                 </svg>
                                 Logging in...
                             </span>
                         </button>
                     </div>
-                    <!-- Divider -->
                     <div class="flex items-center my-2">
                         <div class="flex-grow border-t border-green-200"></div>
                         <span class="mx-2 text-gray-400 text-xs">or</span>
                         <div class="flex-grow border-t border-green-200"></div>
                     </div>
-                    <!-- Google Login -->
                     <div>
-                        <a :href="route('google.redirect')"
+                        <a
+                            :href="route('google.redirect')"
                             class="w-full inline-flex justify-center items-center border border-green-600 text-green-600 py-2 px-4 rounded hover:bg-green-50 focus:bg-green-100 transition focus:outline-none focus:ring-2 focus:ring-green-400"
-                            aria-label="Login with Google">
-                            <font-awesome-icon :icon="['fab', 'google']" class="mr-2 text-red-500" />
+                            aria-label="Login with Google"
+                        >
+                            <font-awesome-icon
+                                :icon="['fab', 'google']"
+                                class="mr-2 text-red-500"
+                            />
                             Login with Google
                         </a>
                     </div>
                 </form>
-                <!-- Register Link -->
                 <div class="text-center mt-6">
                     <p class="text-gray-600">Don't have an account?</p>
-                    <Link :href="route('register')" class="text-green-700 hover:underline mt-2 inline-block">
-                    <font-awesome-icon icon="user-plus" /> Register
+                    <Link
+                        :href="route('register')"
+                        class="text-green-700 hover:underline mt-2 inline-block"
+                    >
+                        <font-awesome-icon icon="user-plus" /> Register
                     </Link>
                 </div>
             </div>
@@ -206,7 +265,6 @@ const submit = () => {
 }
 
 @keyframes pulse-cta {
-
     0%,
     100% {
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);

@@ -1,5 +1,5 @@
 <script setup>
-import { Link, usePage } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import { Inertia } from "@inertiajs/inertia";
 import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -100,7 +100,6 @@ watch(searchQuery, (val) => {
 const toggle = ref(false);
 const toggleDropdown = ref(false);
 
-// Custom click-outside handler for dropdown
 const dropdownRef = ref(null);
 
 const handleClickOutside = (event) => {
@@ -144,22 +143,18 @@ const closeBrowseDropdown = () => {
 
 <template>
     <div class="min-h-screen flex flex-col relative overflow-hidden">
-        <!-- Mobile Sidebar & Overlay (moved above navbar for full coverage) -->
         <div
             v-if="toggle"
             class="fixed inset-0 z-50 bg-black bg-opacity-40 backdrop-blur-sm md:hidden"
             @click="toggle = false"
         ></div>
-        <!-- Navbar -->
         <nav
             class="bg-gradient-to-r from-green-700 via-green-600 to-green-500 shadow-lg border-b border-green-700 fixed top-0 left-0 w-full z-40"
         >
             <div
                 class="mx-auto px-4 flex flex-wrap items-center justify-between h-16"
             >
-                <!-- Brand and Browse Books Dropdown Group -->
                 <div class="flex items-center gap-2">
-                    <!-- Brand -->
                     <Link
                         class="text-white font-bold flex items-center gap-2 text-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300"
                         :href="route('home')"
@@ -167,7 +162,6 @@ const closeBrowseDropdown = () => {
                         <font-awesome-icon icon="book" class="text-2xl" />
                         <span>eBaryo</span>
                     </Link>
-                    <!-- Browse Books Dropdown (desktop) -->
                     <div class="relative hidden md:block">
                         <button
                             @mousedown.stop="browseDropdown = !browseDropdown"
@@ -205,18 +199,15 @@ const closeBrowseDropdown = () => {
                         </ul>
                     </div>
                 </div>
-                <!-- Toggle for mobile -->
                 <button
                     @click="toggle = true"
                     class="md:hidden text-white focus:outline-none focus:ring-2 focus:ring-green-300"
                 >
                     <font-awesome-icon icon="list" class="text-2xl" />
                 </button>
-                <!-- Desktop Navbar content -->
                 <div
                     class="hidden md:flex md:items-center md:justify-between md:w-auto mt-4 md:mt-0 w-full"
                 >
-                    <!-- Search -->
                     <form
                         class="flex mx-auto md:mx-0 max-w-md w-full"
                         @submit.prevent="submitSearch"
@@ -234,7 +225,6 @@ const closeBrowseDropdown = () => {
                             <font-awesome-icon icon="search" />
                         </button>
                     </form>
-                    <!-- Dropdown -->
                     <div class="relative md:ml-4" ref="dropdownRef">
                         <button
                             @mousedown.stop="toggleDropdown = !toggleDropdown"
@@ -264,7 +254,6 @@ const closeBrowseDropdown = () => {
                                 class="absolute top-1 right-1 block h-2 w-2 rounded-full ring-2 ring-white bg-red-600"
                             ></span>
                         </button>
-                        <!-- Dropdown menu -->
                         <ul
                             v-show="toggleDropdown"
                             class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border z-50 overflow-hidden"
@@ -378,9 +367,7 @@ const closeBrowseDropdown = () => {
                     </button>
                 </div>
                 <ul class="flex flex-col gap-2 p-4">
-                    <li>
-                        <!-- Browse Books Dropdown for mobile -->
-                    </li>
+                    <li></li>
                     <li>
                         <form
                             class="flex max-w-md w-full mb-2"
@@ -516,13 +503,10 @@ const closeBrowseDropdown = () => {
                 </ul>
             </aside>
         </transition>
-        <!-- Spacer for fixed navbar (matches navbar height) -->
         <div class="h-16 md:h-16"></div>
-        <!-- Page Content -->
         <main class="flex-grow px-4 py-6">
             <slot />
         </main>
-        <!-- Footer -->
         <footer
             class="bg-green-600 text-white text-center py-3 mt-auto shadow-sm border-t border-green-700"
         >
