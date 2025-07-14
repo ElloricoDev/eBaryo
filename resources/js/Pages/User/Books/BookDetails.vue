@@ -1,7 +1,7 @@
 <script setup>
 import UserLayout from '@/Layouts/UserLayout.vue';
 import { usePage, router } from '@inertiajs/vue3';
-import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faArrowLeft, faBookOpen, faUpRightFromSquare, faBookmark, faXmark, faFlag, faBook, faFile, faDownload, faUser, faBarcode, faCalendar, faBuilding, faLanguage, faTag, faCircle, faArrowUp, faStar, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
