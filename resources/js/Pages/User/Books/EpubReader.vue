@@ -1,217 +1,172 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
-import ePub from 'epubjs'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
-import UserLayout from '@/Layouts/UserLayout.vue'
-import { Inertia } from '@inertiajs/inertia'
-// import { useRouter } from 'vue-router'
+import { usePage, router } from '@inertiajs/vue3';
+import { ref, onMounted, watch, onBeforeUnmount } from 'vue';
+import ePub from 'epubjs';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
-defineOptions({ layout: UserLayout })
+library.add(faArrowLeft);
 
-library.add(faChevronLeft, faChevronRight)
+const { props } = usePage();
+const book = props.book;
 
-const props = defineProps({
-  url: { type: String, required: true },
-  startPercent: { type: Number, default: 0 },
-  book: { type: Object, default: null },
-  lastPercent: { type: Number, default: 0 }
-})
 
-const viewer = ref(null)
-let book = null
-let rendition = null
-const emit = defineEmits(['update:percent'])
-const currentPage = ref(1)
-const totalPages = ref(1)
-const prevBtn = ref(null);
-const nextBtn = ref(null);
-const loading = ref(true);
-
-function displayFirstContent() {
-  book.ready.then(() => {
-    const firstSpine = book.spine.spineItems.find(
-      item =>
-        !item.properties.includes('cover-image') &&
-        !item.idref.toLowerCase().includes('cover') &&
-        item.linear !== 'no'
-    );
-    if (firstSpine) {
-      rendition.display(firstSpine.href);
-    } else {
-      const fallback = book.spine.spineItems.find(item => item.linear !== 'no');
-      fallback ? rendition.display(fallback.href) : rendition.display();
-    }
-  });
-}
-
-function nextPage() {
-  if (rendition) rendition.next();
-}
-function prevPage() {
-  if (rendition) rendition.prev();
-}
-
-function handleRelocated(location) {
-  if (book && book.locations && location && location.start?.cfi) {
-    const percent = book.locations.percentageFromCfi(location.start.cfi)
-    emit('update:percent', percent)
-    if (book.locations.length() > 0) {
-      currentPage.value = book.locations.locationFromCfi(location.start.cfi)
-      totalPages.value = book.locations.length()
-    }
-  }
-}
-
-function handlePrevClick(event) {
-  prevPage();
-  event.currentTarget.blur();
-}
-
-function handleNextClick(event) {
-  nextPage();
-  event.currentTarget.blur();
-}
-
-function handleKeydown(event) {
-  if (event.key === 'ArrowLeft') prevPage();
-  if (event.key === 'ArrowRight') nextPage();
-}
-
-function goBack() {
-  if (window.history.length > 1) {
-    window.history.back();
-  } else {
-    Inertia.visit('/user/books');
-  }
-}
+const viewer = ref(null);
+const epubBook = ref(null);
+const rendition = ref(null);
+const progress = ref(0); // percentage read
+const fontSize = ref(18);
+const canPrev = ref(true);
+const canNext = ref(true);
 
 onMounted(() => {
-  book = ePub(props.url || props.book?.ebook_file)
-  rendition = book.renderTo(viewer.value, {
-    width: '100%',
-    height: window.innerWidth < 640 ? Math.floor(window.innerHeight * 0.8) : 600
-  })
+  if (props.url && viewer.value) {
+    epubBook.value = ePub(props.url);
+    rendition.value = epubBook.value.renderTo(viewer.value, {
+      width: '100%',
+      height: '100%',
+      flow: 'paginated',
+      manager: 'default',
+      spread: 'auto'
+    });
+    rendition.value.themes.fontSize(`${fontSize.value}px`);
+    epubBook.value.ready.then(() => {
+      rendition.value.display();
+    });
+    rendition.value.on('relocated', (location) => {
+      progress.value = Math.round(location.start.percentage * 100);
+      updateNav(location);
+    });
+    rendition.value.on('rendered', () => {
+      // EPUB rendered
+    });
+  }
+});
 
-  // MutationObserver to patch iframe sandbox
-  const observer = new MutationObserver(() => {
-    const iframes = viewer.value?.getElementsByTagName('iframe') || [];
-    for (const iframe of iframes) {
-      iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
-    }
-  });
-  if (viewer.value) {
-    observer.observe(viewer.value, { childList: true, subtree: true });
+watch(fontSize, (val) => {
+  if (rendition.value) {
+    rendition.value.themes.fontSize(`${val}px`);
   }
-  book.ready
-    .then(() => book.locations.generate(1000))
-    .then(() => {
-      rendition.on('relocated', handleRelocated)
-      const percent = props.startPercent || props.lastPercent || 0;
-      if (percent > 0 && percent < 1) {
-        const cfi = book.locations.cfiFromPercentage(percent)
-        rendition.display(cfi)
-      } else {
-        displayFirstContent()
-      }
-      loading.value = false;
-      setTimeout(() => {
-        if (viewer.value) viewer.value.classList.add('fade-in');
-      }, 10);
-    })
-  if (viewer.value) {
-    viewer.value.setAttribute('tabindex', '0');
-    viewer.value.addEventListener('keydown', handleKeydown);
+});
+
+const prevPage = () => {
+  if (rendition.value) {
+    rendition.value.prev();
   }
-})
+};  
+
+const nextPage = () => {
+  if (rendition.value) {
+    rendition.value.next();
+  }
+};
+
+const zoomIn = () => {
+  fontSize.value += 2;
+};
+
+const zoomOut = () => {
+  if (fontSize.value > 10) fontSize.value -= 2;
+};
+
+const updateNav = (location) => {
+  canPrev.value = !location.atStart;
+  canNext.value = !location.atEnd;
+};
+
+const goBack = () => {
+  window.history.length > 1
+    ? window.history.back()
+    : router.visit('/home');
+}
 
 onBeforeUnmount(() => {
-  if (rendition) rendition.destroy()
-  if (book) book.destroy()
-  if (viewer.value) viewer.value.removeEventListener('keydown', handleKeydown);
-})
-
-watch(() => props.url, (newUrl) => {
-  if (book && newUrl) {
-    book.destroy()
-    book = ePub(newUrl)
-    rendition = book.renderTo(viewer.value, {
-      width: '100%',
-      height: 600
-    })
-    displayFirstContent()
+  if (rendition.value) {
+    rendition.value.destroy?.();
+    rendition.value = null;
   }
-})
+  if (epubBook.value) {
+    epubBook.value.destroy?.();
+    epubBook.value = null;
+  }
+});
 </script>
 
 <template>
-    <Head :title="props.book?.title || 'Book'" />
-  <!-- Back Button OUTSIDE the frame -->
-  <button
-    class="absolute left-4 top-16 z-50 pointer-events-auto bg-white bg-opacity-90 hover:bg-green-100 text-green-700 font-bold py-2 px-3 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200 flex items-center gap-2"
-    @click="goBack"
-    aria-label="Back"
-    tabindex="0"
-    style="min-width: 44px; min-height: 44px;"
-  >
-    <font-awesome-icon icon="chevron-left" />
-    <span class="hidden sm:inline">Back</span>
-  </button>
-  <div class="relative">
-    <!-- Loading Spinner -->
-    <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-20">
-      <svg class="animate-spin h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-      </svg>
+  <div class="epub-reader-root">
+    <div class="epub-topbar">
+      <button @click="goBack" class="flex items-center gap-2 font-semibold hover:underline">
+        <font-awesome-icon icon="arrow-left" />
+        Back
+      </button>
+      <span class="ml-4 text-lg font-bold truncate">{{ book.title }}</span>
     </div>
-    <!-- Left (Previous) Button -->
-    <button
-      ref="prevBtn"
-      class="absolute left-2 bottom-14 z-10
-             bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold
-             py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent
-             sm:left-2 sm:top-1/2 sm:bottom-auto sm:py-3 sm:px-4 sm:text-xl
-             transition-all duration-200"
-      @click="handlePrevClick"
-      aria-label="Previous Page"
-      tabindex="0"
-    >
-      <font-awesome-icon icon="chevron-left" />
-    </button>
-
-    <!-- The viewer itself -->
-    <div ref="viewer" class="border-2 border-green-600 rounded-xl overflow-hidden bg-green-50 opacity-0 transition-opacity duration-500 min-h-[400px] sm:min-h-[600px]" @focus="viewer.value && viewer.value.focus()"></div>
-
-    <!-- Right (Next) Button -->
-    <button
-      ref="nextBtn"
-      class="absolute right-2 bottom-14 z-10
-             bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold
-             py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent
-             sm:right-2 sm:top-1/2 sm:bottom-auto sm:py-3 sm:px-4 sm:text-xl
-             transition-all duration-200"
-      @click="handleNextClick"
-      aria-label="Next Page"
-      tabindex="0"
-    >
-      <font-awesome-icon icon="chevron-right" />
-    </button>
-
-    <!-- Page indicator -->
-    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white bg-opacity-80 px-3 py-1 rounded shadow text-green-700 text-sm font-semibold z-20"
-         aria-live="polite">
-      Page {{ currentPage }} / {{ totalPages }}
+    <div class="epub-controls">
+      <button @click="prevPage" :disabled="!canPrev">Prev</button>
+      <span>Read: {{ progress }}%</span>
+      <button @click="nextPage" :disabled="!canNext">Next</button>
+      <button @click="zoomOut">A-</button>
+      <span>Font: {{ fontSize }}px</span>
+      <button @click="zoomIn">A+</button>
     </div>
+    <div ref="viewer" class="epub-viewer"></div>
   </div>
 </template>
 
 <style scoped>
-.fade-in {
-  opacity: 1 !important;
+.epub-reader-root {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
 }
-[ref="viewer"] {
-  opacity: 0;
+.epub-topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: #15803d;
+  color: #fff;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  z-index: 20;
+}
+.epub-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  z-index: 10;
+}
+.epub-controls button {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.epub-controls button:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+.epub-viewer {
+  flex: 1 1 0%;
+  width: 100%;
+  height: 0;
+  min-height: 0;
+  overflow: auto;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 </style> 

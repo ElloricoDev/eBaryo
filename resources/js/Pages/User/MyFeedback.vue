@@ -27,15 +27,19 @@ onMounted(() => {
   }
 });
 
-function formatDate(dateStr) {
+const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return new Intl.DateTimeFormat('en-PH', {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(date);
-}
+};
 
-function goBack() { window.history.back(); }
+const goBack = () => {
+  window.history.length > 1
+    ? window.history.back()
+    : Inertia.visit('/home');
+}
 </script>
 
 <template>
@@ -46,7 +50,6 @@ function goBack() { window.history.back(); }
       Back
     </button>
     <!-- Animated Gradient Background -->
-    <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-green-50 to-white animate-gradient-move"></div>
     <div class="animate-fade-in bg-white bg-opacity-90 rounded-2xl shadow-xl p-2 sm:p-6">
       <h1 class="text-2xl font-bold text-green-700 mb-6 flex items-center gap-2">
         <font-awesome-icon icon="comment-dots" /> My Feedback

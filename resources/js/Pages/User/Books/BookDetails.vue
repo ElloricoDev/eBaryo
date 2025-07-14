@@ -1,17 +1,15 @@
 <script setup>
 import UserLayout from '@/Layouts/UserLayout.vue';
-import { usePage, Head, Link, router } from '@inertiajs/vue3';
-import EpubReader from '@/Pages/User/Books/EpubReader.vue';
-import PdfReader from '@/Components/PdfReader.vue';
+import { usePage, router } from '@inertiajs/vue3';
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faArrowLeft, faBookOpen, faUpRightFromSquare, faBookmark, faXmark, faFlag, faBook, faFile, faDownload, faUser, faBarcode, faCalendar, faBuilding, faLanguage, faTag, faCircle, faArrowUp, faStar } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faBookOpen, faUpRightFromSquare, faBookmark, faXmark, faFlag, faBook, faFile, faDownload, faUser, faBarcode, faCalendar, faBuilding, faLanguage, faTag, faCircle, faArrowUp, faStar, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2';
 import StarRating from '@/Components/StarRating.vue';
 import ReportModal from '@/Components/ReportModal.vue';
 
-library.add(faArrowLeft, faBookOpen, faUpRightFromSquare, faBookmark, faXmark, faFlag, faBook, faFile, faDownload, faUser, faBarcode, faCalendar, faBuilding, faLanguage, faTag, faCircle, faArrowUp, faStar)
+library.add(faArrowLeft, faBookOpen, faUpRightFromSquare, faBookmark, faXmark, faFlag, faBook, faFile, faDownload, faUser, faBarcode, faCalendar, faBuilding, faLanguage, faTag, faCircle, faArrowUp, faStar, faCircleXmark)
 
 defineOptions({ layout: UserLayout });
 const { props } = usePage();
@@ -33,37 +31,12 @@ const userReview = ref(null);
 const editingReview = ref(false);
 
 const from = new URLSearchParams(window.location.search).get('from') || 'books';
-const getBackRoute = () => {
-  switch (from) {
-    case 'home': 
-    case 'new': 
-    case 'hot': 
-    case 'mostread': 
-    case 'highestrated': 
-    case 'continue': 
-      return route('home');
-    case 'saved': return route('books.saved');
-    case 'books':
-    case 'details':
-    default: return route('books.index');
-  }
-};
 
-function handleReadNow() {
-  showReader.value = !showReader.value;
-  if (!showReader.value) return;
-  nextTick(() => {
-    setTimeout(() => {
-      if (readerSection.value) {
-        const offset = 100; // px, adjust as needed
-        const top = readerSection.value.getBoundingClientRect().top + window.pageYOffset - offset;
-        window.scrollTo({ top, behavior: 'smooth' });
-      }
-    }, 200);
-  });
-}
 
-function saveBook() {
+
+
+
+const saveBook = () => {
   if (isSaved.value) return;
   router.post(route('books.save', { id: book.id }), {}, {
     preserveScroll: true,
@@ -76,9 +49,9 @@ function saveBook() {
       Swal.fire({ icon: 'error', title: 'Failed to save book', text: 'Please try again.' });
     }
   });
-}
+};
 
-function unsaveBook() {
+const unsaveBook = () => {
   if (!isSaved.value) return;
   Swal.fire({
     title: 'Unsave this book?',
@@ -103,74 +76,134 @@ function unsaveBook() {
       });
     }
   });
-}
+};
 
 const showReportModal = ref(false);
 const reportReason = ref('');
 const reportDescription = ref('');
 const isSubmittingReport = ref(false);
 
-function reportBook() {
+const reportBook = () => {
   if (!isVerified.value) {
     Swal.fire({ icon: 'warning', title: 'Verify your email', text: 'Please verify your email to report a book.' });
     return;
   }
   showReportModal.value = true;
-}
+};
 
-async function submitReport() {
-  if (!reportReason.value.trim()) {
-    Swal.fire({ icon: 'error', title: 'Reason Required', text: 'Please provide a reason.' });
+const submitReview = async () => {
+  if (!newRating.value) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Rating required',
+      text: 'Please select a rating before submitting.'
+    });
+    return;
+  }
+
+  submittingReview.value = true;
+
+  router.post(
+    route('books.reviews.store', { id: book.id }),
+    {
+      rating: newRating.value,
+      review: newReview.value
+    },
+    {
+      preserveScroll: true,
+      onSuccess: () => {
+        fetchReviews();
+        Swal.fire({
+          icon: 'success',
+          title: userReview.value ? 'Review updated!' : 'Review submitted!',
+          timer: 1500,
+          showConfirmButton: false
+        });
+        editingReview.value = false;
+      },
+      onError: (errors) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed to submit review',
+          text: errors.review || errors.rating || 'Please try again.'
+        });
+      },
+      onFinish: () => {
+        submittingReview.value = false;
+      }
+    }
+  );
+};
+
+
+const closeReportModal = () => {
+  showReportModal.value = false;
+  reportReason.value = '';
+  reportDescription.value = '';
+};
+
+const submitReport = async () => {
+  if (!reportReason.value) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Reason required',
+      text: 'Please select a reason for reporting.'
+    });
     return;
   }
   isSubmittingReport.value = true;
   try {
-    const res = await fetch(`/books/${book.id}/report`, {
+    const response = await fetch(`/books/${book.id}/report`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content,
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
       },
-      body: JSON.stringify({ reason: reportReason.value, description: reportDescription.value }),
+      body: JSON.stringify({
+        reason: reportReason.value,
+        description: reportDescription.value
+      })
     });
-    isSubmittingReport.value = false;
-    if (res.ok) {
-      showReportModal.value = false;
-      reportReason.value = '';
-      reportDescription.value = '';
-      Swal.fire({ icon: 'success', title: 'Report Submitted', text: 'Thank you for your report.', timer: 2000, showConfirmButton: false });
+    if (response.ok) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Report submitted',
+        text: 'Thank you for your feedback!',
+        timer: 1500,
+        showConfirmButton: false
+      });
+      closeReportModal();
     } else {
-      const err = await res.json();
-      Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Failed to submit. Try again.' });
+      const data = await response.json();
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed to submit report',
+        text: data.message || 'Please try again.'
+      });
     }
-  } catch (e) {
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Failed to submit report',
+      text: 'Please try again.'
+    });
+  } finally {
     isSubmittingReport.value = false;
-    Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to submit. Try again.' });
   }
-}
+};
 
-function closeReportModal() {
-  showReportModal.value = false;
-  reportReason.value = '';
-  reportDescription.value = '';
-}
 
-function closeBook() {
-  showReader.value = false;
-  nextTick(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-}
 
-function scrollToTop() {
+const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+};
 
-function handleWindowScroll() {
+const handleWindowScroll = () => {
   showScrollTop.value = window.scrollY > 200;
-}
+};
 
-async function fetchReviews() {
+const fetchReviews = async () => {
   const res = await fetch(`/books/${book.id}/reviews`);
   if (res.ok) {
     const data = await res.json();
@@ -188,32 +221,7 @@ async function fetchReviews() {
       editingReview.value = true;
     }
   }
-}
-
-async function submitReview() {
-  if (!newRating.value) {
-    Swal.fire({ icon: 'error', title: 'Rating required', text: 'Please select a rating before submitting.' });
-    return;
-  }
-  submittingReview.value = true;
-  router.post(route('books.reviews.store', { id: book.id }), {
-    rating: newRating.value,
-    review: newReview.value
-  }, {
-    preserveScroll: true,
-    onSuccess: () => {
-      fetchReviews();
-      Swal.fire({ icon: 'success', title: userReview.value ? 'Review updated!' : 'Review submitted!', timer: 1500, showConfirmButton: false });
-      editingReview.value = false;
-    },
-    onError: (errors) => {
-      Swal.fire({ icon: 'error', title: 'Failed to submit review', text: errors.review || errors.rating || 'Please try again.' });
-    },
-    onFinish: () => {
-      submittingReview.value = false;
-    }
-  });
-}
+};
 
 onMounted(() => {
   window.addEventListener('scroll', handleWindowScroll);
@@ -235,42 +243,28 @@ const fileType = computed(() => {
 const isPdf = computed(() => fileType.value === 'pdf');
 const isEpub = computed(() => fileType.value === 'epub');
 
-const params = new URLSearchParams(window.location.search);
-const returnTo = params.get('returnTo');
 
-const routeMap = {
-  home: 'home',
-  new: 'home',
-  hot: 'home',
-  mostread: 'home',
-  highestrated: 'home',
-  continue: 'home',
-  saved: 'books.saved',
-  feedback: 'feedback.create',
-  profile: 'user.profile.index',
-  // add more as needed
+
+const goBack = () => {
+  window.history.length > 1
+    ? window.history.back()
+    : router.visit('/home');
+}
+// Remove goToEpuReader
+// const goToEpuReader = () => {
+//   router.visit(route('books.read', { id: book.id, from: 'details' }), {
+//     preserveScroll: true
+//   });
+// };
+
+const handleReadClick = () => {
+  if (isPdf.value) {
+    router.visit(route('books.pdfReader', { id: book.id }), { preserveScroll: true });
+  } else if (isEpub.value) {
+    router.visit(route('books.epubReader', { id: book.id }), { preserveScroll: true });
+  }
 };
 
-function goBack() {
-  if (returnTo && routeMap[returnTo]) {
-    router.visit(route(routeMap[returnTo]), {
-      preserveScroll: true,
-      onFinish: () => {
-        const scrollPosition = sessionStorage.getItem('scrollPosition');
-        if (scrollPosition) {
-          window.scrollTo({ top: parseInt(scrollPosition, 10), behavior: 'auto' });
-          sessionStorage.removeItem('scrollPosition');
-        }
-      }
-    });
-  } else {
-    window.history.back();
-  }
-}
-
-function goToEpubReader() {
-  router.visit(route('books.read', { id: book.id, from: 'details' }), { preserveScroll: true });
-}
 </script>
 
 <template>
@@ -279,13 +273,10 @@ function goToEpubReader() {
     <!-- Animated Gradient Background -->
     <div class="animate-fade-in bg-opacity-90 rounded-2xl shadow-xl p-6">
       <div class="mb-4">
-        <button @click="goBack" class="block sm:hidden mb-4 text-green-700 font-bold flex items-center gap-2">
+        <button @click="goBack" class="block mb-4 text-green-700 font-bold flex items-center gap-2">
           <font-awesome-icon icon="arrow-left" class="text-lg" />
           Back
         </button>
-        <Link :href="getBackRoute()" class="hidden sm:inline-flex items-center gap-2 text-green-700 border border-green-600 hover:bg-green-50 focus:bg-green-100 transition px-4 py-2 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-green-400">
-          <font-awesome-icon icon="arrow-left" class="h-5 w-5" /> Back
-        </Link>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -297,7 +288,7 @@ function goToEpubReader() {
           />
 
           <div class="space-y-2">
-            <button v-if="book.ebook_file && isVerified" @click="goToEpubReader" class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 focus:bg-green-800 text-white font-semibold px-4 py-2 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-green-400 animate-pulse-cta">
+            <button v-if="book.ebook_file && isVerified" @click="handleReadClick" class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 focus:bg-green-800 text-white font-semibold px-4 py-2 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-green-400 animate-pulse-cta">
               <font-awesome-icon icon="book-open" class="h-5 w-5" />
               <span>
                 <template v-if="book.progress && book.progress > 0 && book.progress < 1">Continue Reading</template>
@@ -363,25 +354,6 @@ function goToEpubReader() {
           <p class="text-sm text-gray-500">Last Updated: {{ new Date(book.updated_at).toLocaleString() }}</p>
 
           <span v-if="!book.ebook_file" class="text-red-600">No eBook file available.</span>
-        </div>
-      </div>
-
-      <div v-if="showReader && book.ebook_file" class="mt-8" ref="readerSection">
-        <!-- Close Book Button -->
-        <button @click="closeBook" class="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded shadow flex items-center gap-2">
-          <font-awesome-icon icon="xmark" class="h-5 w-5" />
-          Close Book
-        </button>
-        <PdfReader v-if="isPdf" :url="book.ebook_file" />
-        <EpubReader v-else-if="isEpub" :url="book.ebook_file" />
-        <div v-else class="text-center py-10 animate-fade-in">
-          <font-awesome-icon icon="file" class="mx-auto text-gray-400 text-5xl" />
-          <h5 class="text-lg font-medium text-gray-500 mt-4">Unsupported File Format</h5>
-          <p class="text-gray-400">This file format is not supported for reading in the browser.</p>
-          <a :href="book.ebook_file" target="_blank" class="inline-flex items-center gap-2 border border-green-600 text-green-700 hover:bg-green-50 focus:bg-green-100 font-semibold px-4 py-2 rounded-lg shadow transition mt-3 focus:outline-none focus:ring-2 focus:ring-green-400">
-            <font-awesome-icon icon="download" class="h-5 w-5" />
-            Download File
-          </a>
         </div>
       </div>
 

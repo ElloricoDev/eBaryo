@@ -32,7 +32,15 @@ function submit() {
   });
 }
 
-function goBack() { window.history.back(); }
+function goBack() {
+  const lastPage = sessionStorage.getItem('lastPage');
+  if (lastPage) {
+    window.location.href = lastPage;
+    sessionStorage.removeItem('lastPage');
+  } else {
+    window.history.back();
+  }
+}
 </script>
 
 <template>
@@ -45,7 +53,6 @@ function goBack() { window.history.back(); }
   </div>
   <div class="relative min-h-screen">
     <!-- Animated Gradient Background -->
-    <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-green-50 to-white animate-gradient-move"></div>
     <div class="animate-fade-in bg-white bg-opacity-90 rounded-2xl shadow-xl p-2 sm:p-6">
       <h1 class="text-2xl font-bold mb-6 text-green-700 flex items-center gap-2">
         <font-awesome-icon icon="comment-dots" /> Submit Feedback

@@ -26,6 +26,7 @@ defineOptions({ inheritAttrs: false })
     class="book-image-link group relative flex flex-col items-center justify-center cursor-pointer focus:outline-none"
     tabindex="0"
     aria-label="Book card for {{ book.title }}"
+    @click="() => { if (typeof window !== 'undefined' && window.sessionStorage) window.sessionStorage.setItem('lastPage', window.location.pathname + window.location.search) }"
   >
     <img
       :src="avatarUrl"
@@ -33,7 +34,10 @@ defineOptions({ inheritAttrs: false })
       alt="Book Cover"
       @error="event.target.src = '/images/default.svg'"
     />
-    <span class="book-hover-title">{{ book.title }}</span>
+    <!-- Always show title below image -->
+    <h4 class="text-xs sm:text-sm font-medium text-center mt-2 line-clamp-2 break-words max-w-[120px] mx-auto">
+      {{ book.title }}
+    </h4>
   </Link>
 </template>
 
@@ -62,24 +66,5 @@ defineOptions({ inheritAttrs: false })
 .group:hover .book-image-main {
   transform: scale(1.04);
   box-shadow: 0 4px 16px 0 rgba(16,185,129,0.18);
-}
-.book-hover-title {
-  display: none;
-  position: absolute;
-  bottom: 8px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: #fff;
-  background: rgba(0,0,0,0.6);
-  font-weight: bold;
-  border-bottom-left-radius: 1rem;
-  border-bottom-right-radius: 1rem;
-  padding: 4px 0;
-  font-size: 0.95em;
-  pointer-events: none;
-}
-.group:hover .book-hover-title {
-  display: block;
 }
 </style>

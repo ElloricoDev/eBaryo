@@ -1,401 +1,338 @@
-<script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faExclamationTriangle, faArrowRotateRight, faDownload, faChevronLeft, faChevronRight, faMagnifyingGlassPlus, faMagnifyingGlassMinus, faSpinner } from '@fortawesome/free-solid-svg-icons'
-
-library.add(faExclamationTriangle, faArrowRotateRight, faDownload, faChevronLeft, faChevronRight, faMagnifyingGlassPlus, faMagnifyingGlassMinus, faSpinner)
-
-// Use window.route for generating URLs (Laravel's route helper)
-const route = window.route || ((name, params) => {
-  // Fallback if route helper is not available
-  if (name === 'files.serve') {
-    return `/files/${params.filename}`
-  }
-  if (name === 'test.pdf') {
-    return `/test-pdf/${params.filename}`
-  }
-  return '/'
-})
-
-const props = defineProps({
-  url: { type: String, required: true },
-  startPercent: { type: Number, default: 0 }
-})
-
-const viewer = ref(null)
-const pdfDoc = ref(null)
-const pageNum = ref(1)
-const numPages = ref(1)
-const scale = ref(1.5)
-const canvas = ref(null)
-const ctx = ref(null)
-const loading = ref(false)
-const error = ref(null)
-const isUnmounting = ref(false)
-const isDestroyed = ref(false)
-const emit = defineEmits(['update:percent'])
-
-// Load PDF.js dynamically
-let pdfjsLib = null
-
-async function loadPdfJs() {
-  if (!pdfjsLib) {
-    try {
-          const pdfjsModule = await import('pdfjs-dist')
-    pdfjsLib = pdfjsModule.default || pdfjsModule
-      
-      // Try local worker file first, fallback to disabled worker if it fails
-      try {
-        // Test if worker file is accessible
-        const response = await fetch('/pdf.worker.min.js')
-        if (response.ok) {
-                pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
-    } else {
-      throw new Error('Worker file not accessible')
-    }
-  } catch (error) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = false
-  }
-} catch (importError) {
-  throw new Error('Failed to load PDF.js library')
-}
-  }
-  return pdfjsLib
-}
-
-function clearPdfJsCache() {
-  pdfjsLib = null
-}
-
-function cleanupPdfDoc() {
-  isUnmounting.value = true
-  isDestroyed.value = true
-  
-  // Simply set pdfDoc to null and let garbage collection handle the cleanup
-  // This avoids any private field access issues
-  pdfDoc.value = null
-}
-
-function retryLoadPDF() {
-  if (isDestroyed.value) return
-  
-  const currentError = error.value
-  error.value = null
-  if (currentError && (currentError.includes('version mismatch') || currentError.includes('worker'))) {
-    clearPdfJsCache()
-  }
-  loadPDF()
-}
-
-async function checkFileExists(filename) {
-  try {
-    const testUrl = route('test.pdf', { filename })
-    const response = await fetch(testUrl)
-    return response.ok
-  } catch (error) {
-    return false
-  }
-}
-
-async function renderPage(pageNumber) {
-  if (!pdfDoc.value || !canvas.value || !ctx.value || isUnmounting.value || isDestroyed.value) return
-  
-  try {
-    // Additional safety check for PDF document state
-    if (!pdfDoc.value || typeof pdfDoc.value.getPage !== 'function') {
-      throw new Error('PDF document getPage method not available')
-    }
-    
-    const page = await pdfDoc.value.getPage(pageNumber)
-    
-    if (!page || typeof page.getViewport !== 'function') {
-      throw new Error('PDF page getViewport method not available')
-    }
-    
-    const viewport = page.getViewport({ scale: scale.value })
-    
-    // Set canvas dimensions
-    canvas.value.height = viewport.height
-    canvas.value.width = viewport.width
-    
-    // Render PDF page to canvas
-    const renderContext = {
-      canvasContext: ctx.value,
-      viewport: viewport
-    }
-    
-    await page.render(renderContext).promise
-    
-    // Update page info
-    pageNum.value = pageNumber
-    
-    // Safely access numPages
-    if (pdfDoc.value && typeof pdfDoc.value.numPages === 'number') {
-      numPages.value = pdfDoc.value.numPages
-      
-      // Calculate and emit progress
-      const percent = (pageNumber - 1) / (numPages.value - 1)
-      emit('update:percent', percent)
-    }
-    
-  } catch (err) {
-    error.value = 'Failed to render PDF page: ' + (err.message || 'Unknown error')
-  }
-}
-
-async function loadPDF() {
-  if (isUnmounting.value || isDestroyed.value) return
-  
-  // Declare variables outside try block to fix scope issues
-  let pdfUrl = props.url
-  let useFileServingRoute = false
-  let filename = null
-  
-  try {
-    loading.value = true
-    error.value = null
-    
-    if (pdfUrl.startsWith('/storage/ebooks/')) {
-      filename = pdfUrl.replace('/storage/ebooks/', '')
-      
-      // Check if file exists first
-      const fileExists = await checkFileExists(filename)
-      if (!fileExists) {
-        error.value = 'PDF file not found on server'
-        return
-      }
-      
-      const fileUrl = route('files.serve', { filename })
-      pdfUrl = fileUrl
-      useFileServingRoute = true
-    }
-    
-    const pdfjs = await loadPdfJs()
-    
-    if (!pdfjs || !pdfjs.getDocument) {
-      throw new Error('PDF.js library not properly loaded')
-    }
-    
-    const loadingTask = pdfjs.getDocument(pdfUrl)
-    
-    if (!loadingTask || !loadingTask.promise) {
-      throw new Error('Failed to create PDF loading task')
-    }
-    
-    pdfDoc.value = await loadingTask.promise
-    
-    // Start from saved position or first page
-    let startPage = 1
-    if (props.startPercent > 0 && props.startPercent < 1 && pdfDoc.value && typeof pdfDoc.value.numPages === 'number') {
-      startPage = Math.floor(props.startPercent * pdfDoc.value.numPages) + 1
-    }
-    
-    await renderPage(startPage)
-  } catch (err) {
-    
-    // Try fallback to direct URL if file serving route failed
-    if (useFileServingRoute) {
-      try {
-        const pdfjs = await loadPdfJs()
-        
-        if (!pdfjs || !pdfjs.getDocument) {
-          throw new Error('PDF.js library not properly loaded (fallback)')
-        }
-        
-        const loadingTask = pdfjs.getDocument(props.url)
-        
-        if (!loadingTask || !loadingTask.promise) {
-          throw new Error('Failed to create PDF loading task (fallback)')
-        }
-        
-        pdfDoc.value = await loadingTask.promise
-        
-        let startPage = 1
-        if (props.startPercent > 0 && props.startPercent < 1 && pdfDoc.value && typeof pdfDoc.value.numPages === 'number') {
-          startPage = Math.floor(props.startPercent * pdfDoc.value.numPages) + 1
-        }
-        
-        await renderPage(startPage)
-        return
-      } catch (fallbackErr) {
-        // Handle specific PDF.js errors in fallback
-        if (fallbackErr.name === 'InvalidPDFException') {
-          error.value = 'Invalid PDF file format'
-        } else if (fallbackErr.name === 'MissingPDFException') {
-          error.value = 'PDF file not found or inaccessible'
-        } else if (fallbackErr.name === 'UnexpectedResponseException') {
-          error.value = 'Server error while loading PDF'
-        } else if (fallbackErr.name === 'UnknownErrorException') {
-          if (fallbackErr.message.includes('API version') && fallbackErr.message.includes('Worker version')) {
-            error.value = 'PDF.js version mismatch. Please click "Retry" to reload the PDF viewer.'
-          } else if (fallbackErr.message.includes('fake worker') || fallbackErr.message.includes('worker')) {
-            error.value = 'PDF viewer worker error. Please click "Retry" to reload the PDF viewer.'
-          } else {
-            error.value = 'Unknown error occurred while loading PDF. Please try again or download the file.'
-          }
-        } else {
-          error.value = fallbackErr.message || 'Failed to load PDF file'
-        }
-      }
-    }
-    
-    // Handle specific PDF.js errors
-    if (err.name === 'InvalidPDFException') {
-      error.value = 'Invalid PDF file format'
-    } else if (err.name === 'MissingPDFException') {
-      error.value = 'PDF file not found or inaccessible'
-    } else if (err.name === 'UnexpectedResponseException') {
-      error.value = 'Server error while loading PDF'
-    } else if (err.name === 'UnknownErrorException') {
-      if (err.message.includes('API version') && err.message.includes('Worker version')) {
-        error.value = 'PDF.js version mismatch. Please click "Retry" to reload the PDF viewer.'
-      } else if (err.message.includes('fake worker') || err.message.includes('worker')) {
-        error.value = 'PDF viewer worker error. Please click "Retry" to reload the PDF viewer.'
-      } else {
-        error.value = 'Unknown error occurred while loading PDF. Please try again or download the file.'
-      }
-    } else {
-      error.value = err.message || 'Failed to load PDF file'
-    }
-  } finally {
-    loading.value = false
-  }
-}
-
-function nextPage() {
-  if (pageNum.value < numPages.value && !isDestroyed.value) {
-    renderPage(pageNum.value + 1)
-  }
-}
-
-function prevPage() {
-  if (pageNum.value > 1 && !isDestroyed.value) {
-    renderPage(pageNum.value - 1)
-  }
-}
-
-function zoomIn() {
-  if (scale.value < 3 && !isDestroyed.value) {
-    scale.value += 0.2
-    renderPage(pageNum.value)
-  }
-}
-
-function zoomOut() {
-  if (scale.value > 0.5 && !isDestroyed.value) {
-    scale.value -= 0.2
-    renderPage(pageNum.value)
-  }
-}
-
-onMounted(async () => {
-  if (canvas.value) {
-    ctx.value = canvas.value.getContext('2d')
-    await loadPDF()
-  }
-})
-
-onBeforeUnmount(() => {
-  cleanupPdfDoc()
-})
-
-watch(() => props.url, async (newUrl) => {
-  if (newUrl) {
-    cleanupPdfDoc()
-    await loadPDF()
-  }
-})
-
-watch(() => props.startPercent, async (newPercent) => {
-  if (pdfDoc.value && newPercent > 0 && newPercent < 1 && !isUnmounting.value && !isDestroyed.value) {
-    try {
-      // Check if numPages is accessible before using it
-      if (pdfDoc.value.numPages && typeof pdfDoc.value.numPages === 'number') {
-        const startPage = Math.floor(newPercent * pdfDoc.value.numPages) + 1
-        await renderPage(startPage)
-      }
-    } catch (error) {
-      // Handle errors when PDF document is being destroyed
-    }
-  }
-})
-</script>
-
 <template>
-  <div>
-    <!-- Loading State -->
-    <div v-if="loading" class="text-center py-10">
-      <font-awesome-icon icon="spinner" spin class="text-green-500 text-5xl mx-auto" />
-      <p class="text-gray-500 mt-2">Loading PDF...</p>
+  <div :class="['w-full h-full flex flex-col', { 'dark': isDark }]">
+    <div v-if="!url" class="flex-1 flex items-center justify-center text-gray-500">
+      <fa icon="file-pdf" class="text-4xl mr-2" /> PDF file not available.
     </div>
-
-    <!-- Error State -->
-    <div v-else-if="error" class="text-center py-10">
-      <font-awesome-icon icon="exclamation-triangle" class="text-yellow-500 text-5xl" />
-      <h5 class="text-yellow-600 mt-3 text-lg font-semibold">Error Loading PDF</h5>
-      <p class="text-gray-500">{{ error }}</p>
-      <div class="flex gap-3 justify-center mt-4 flex-wrap">
-        <button class="btn border border-green-600 text-green-600 px-4 py-2 rounded hover:bg-green-50" @click="retryLoadPDF">
-          <font-awesome-icon icon="arrow-rotate-right" /> Retry
-        </button>
-        <a :href="props.url" target="_blank" class="btn border border-blue-600 text-blue-600 px-4 py-2 rounded hover:bg-blue-50">
-          <font-awesome-icon icon="download" /> Download PDF
-        </a>
-      </div>
-    </div>
-
-    <!-- PDF Viewer -->
-    <div v-else-if="!isDestroyed">
-      <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-        <div class="flex gap-2 flex-wrap">
-          <button class="btn border border-green-600 text-green-600 px-3 py-1 text-sm rounded hover:bg-green-50" @click="prevPage" :disabled="pageNum <= 1">
-            <font-awesome-icon icon="chevron-left" /> Previous
-          </button>
-          <button class="btn border border-gray-400 text-gray-600 px-3 py-1 text-sm rounded hover:bg-gray-100" @click="zoomOut" :disabled="scale <= 0.5">
-            <font-awesome-icon icon="magnifying-glass-minus" />
-          </button>
-          <button class="btn border border-gray-400 text-gray-600 px-3 py-1 text-sm rounded hover:bg-gray-100" @click="zoomIn" :disabled="scale >= 3">
-            <font-awesome-icon icon="magnifying-glass-plus" />
-          </button>
+    <div v-else class="flex-1 overflow-auto relative pdf-bg" @touchstart="onTouchStart" @touchend="onTouchEnd">
+      <!-- Toolbar: top for desktop, bottom for mobile -->
+      <div class="pdf-toolbar" :class="{ 'pdf-toolbar-bottom': isMobile }">
+        <div class="pdf-toolbar-group">
+          <button @click="prevPage" :disabled="pageNum <= 1" :title="'Previous Page'" class="pdf-btn"><fa icon="angle-left" /></button>
+          <span class="mx-1 text-xs md:text-base">{{ pageNum }} / {{ numPages }}</span>
+          <button @click="nextPage" :disabled="pageNum >= numPages" :title="'Next Page'" class="pdf-btn"><fa icon="angle-right" /></button>
+          <input type="number" v-model.number="inputPage" @change="jumpToPage" :min="1" :max="numPages" class="pdf-input" :title="'Jump to Page'" />
         </div>
-        <span class="text-green-700 text-sm font-semibold">
-          Page {{ pageNum }} / {{ numPages }}
-          <span class="text-gray-400">({{ Math.round(scale * 100) }}%)</span>
-        </span>
-        <button class="btn border border-green-600 text-green-600 px-3 py-1 text-sm rounded hover:bg-green-50" @click="nextPage" :disabled="pageNum >= numPages">
-          Next <font-awesome-icon icon="chevron-right" />
-        </button>
+        <div class="pdf-toolbar-group">
+          <button @click="zoomOut" :title="'Zoom Out'" class="pdf-btn"><fa icon="search-minus" /></button>
+          <button @click="zoomIn" :title="'Zoom In'" class="pdf-btn"><fa icon="search-plus" /></button>
+          <button @click="fitToWidth" :title="'Fit to Width'" class="pdf-btn"><fa icon="arrows-alt-h" /></button>
+          <button @click="fitToPage" :title="'Fit to Page'" class="pdf-btn"><fa icon="expand" /></button>
+          <button @click="rotate" :title="'Rotate'" class="pdf-btn"><fa icon="redo" /></button>
+        </div>
+        <div class="pdf-toolbar-group">
+          <button @click="download" :title="'Download PDF'" class="pdf-btn"><fa icon="download" /></button>
+          <button @click="toggleDark" :title="isDark ? 'Light Mode' : 'Dark Mode'" class="pdf-btn"><fa :icon="isDark ? 'sun' : 'moon'" /></button>
+        </div>
       </div>
-      <div class="border-2 border-green-600 rounded-xl overflow-auto bg-green-50 max-h-[600px] flex justify-center p-4">
-        <canvas ref="canvas" class="rounded shadow bg-white"></canvas>
+      <div class="pdf-canvas-container">
+        <canvas ref="pdfCanvas" class="pdf-canvas transition-transform duration-200" :style="{ transform: `rotate(${rotation}deg)` }"/>
       </div>
-    </div>
-
-    <!-- Component Destroyed State -->
-    <div v-else class="text-center py-10">
-      <font-awesome-icon icon="spinner" spin class="text-gray-400 text-5xl mx-auto" />
-      <p class="text-gray-500 mt-2">Loading...</p>
+      <transition name="fade">
+        <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 dark:bg-gray-900 dark:bg-opacity-80 z-10">
+          <fa icon="spinner" spin class="text-4xl text-green-700 dark:text-green-400" />
+        </div>
+      </transition>
+      <transition name="fade">
+        <div v-if="error" class="absolute inset-0 flex flex-col items-center justify-center text-red-500 z-10">
+          <fa icon="exclamation-triangle" class="text-4xl mb-2" />
+          <span class="mb-2">{{ error }}</span>
+          <button @click="retry" class="px-4 py-2 bg-white dark:bg-gray-800 rounded shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition">Retry</button>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
 
+<script setup>
+import { ref, watch, onMounted, nextTick } from 'vue';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf';
+import { FontAwesomeIcon as Fa } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faAngleLeft, faAngleRight, faSearchMinus, faSearchPlus, faArrowsAltH, faExpand, faRedo, faDownload, faMoon, faSun, faFilePdf, faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-icons';
+library.add(faAngleLeft, faAngleRight, faSearchMinus, faSearchPlus, faArrowsAltH, faExpand, faRedo, faDownload, faMoon, faSun, faFilePdf, faExclamationTriangle, faSpinner);
+
+const props = defineProps({
+  url: String
+});
+
+const pdfCanvas = ref(null);
+const loading = ref(false);
+const error = ref('');
+const scale = ref(1.2);
+const pageNum = ref(1);
+const numPages = ref(1);
+const inputPage = ref(1);
+const rotation = ref(0);
+const isDark = ref(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+const isMobile = ref(false);
+let pdfDoc = null;
+let lastFit = 'width';
+let touchStartX = 0;
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/js/pdf.worker.min.js';
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 768;
+};
+
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+
+const renderPage = async (num = 1) => {
+  if (!pdfDoc) return;
+  loading.value = true;
+  error.value = '';
+  try {
+    const page = await pdfDoc.getPage(num);
+    const viewport = page.getViewport({ scale: scale.value, rotation: rotation.value });
+    const canvas = pdfCanvas.value;
+    const context = canvas.getContext('2d');
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+    await page.render({ canvasContext: context, viewport }).promise;
+    pageNum.value = num;
+    inputPage.value = num;
+  } catch (e) {
+    error.value = 'Failed to render PDF page.';
+  } finally {
+    loading.value = false;
+  }
+};
+
+const fitToWidth = async () => {
+  await nextTick();
+  const container = pdfCanvas.value.parentElement;
+  const page = await pdfDoc.getPage(pageNum.value);
+  const viewport = page.getViewport({ scale: 1, rotation: rotation.value });
+  const width = container.clientWidth;
+  scale.value = width / viewport.width;
+  lastFit = 'width';
+};
+const fitToPage = async () => {
+  await nextTick();
+  const container = pdfCanvas.value.parentElement;
+  const page = await pdfDoc.getPage(pageNum.value);
+  const viewport = page.getViewport({ scale: 1, rotation: rotation.value });
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  scale.value = Math.min(width / viewport.width, height / viewport.height);
+  lastFit = 'page';
+};
+
+const loadPdf = async () => {
+  if (!props.url) return;
+  loading.value = true;
+  error.value = '';
+  pageNum.value = 1;
+  inputPage.value = 1;
+  scale.value = 1.2;
+  rotation.value = 0;
+  try {
+    pdfDoc = await pdfjsLib.getDocument(props.url).promise;
+    numPages.value = pdfDoc.numPages;
+    await fitToWidth();
+    await renderPage(1);
+  } catch (e) {
+    error.value = 'Failed to load PDF.';
+  } finally {
+    loading.value = false;
+  }
+};
+const nextPage = () => {
+  if (pageNum.value < numPages.value) renderPage(pageNum.value + 1);
+};
+const prevPage = () => {
+  if (pageNum.value > 1) renderPage(pageNum.value - 1);
+};
+const jumpToPage = () => {
+  if (inputPage.value >= 1 && inputPage.value <= numPages.value) renderPage(inputPage.value);
+};
+const zoomIn = () => {
+  scale.value = Math.min(scale.value + 0.2, 3);
+  renderPage(pageNum.value);
+};
+const zoomOut = () => {
+  scale.value = Math.max(scale.value - 0.2, 0.5);
+  renderPage(pageNum.value);
+};
+const rotate = () => {
+  rotation.value = (rotation.value + 90) % 360;
+  renderPage(pageNum.value);
+};
+const download = () => {
+  const link = document.createElement('a');
+  link.href = props.url;
+  link.download = props.url.split('/').pop();
+  link.click();
+};
+const retry = () => {
+  error.value = '';
+  loadPdf();
+};
+const toggleDark = () => {
+  isDark.value = !isDark.value;
+};
+// Touch swipe for page navigation
+const onTouchStart = (e) => {
+  if (e.touches && e.touches.length === 1) {
+    touchStartX = e.touches[0].clientX;
+  }
+};
+const onTouchEnd = (e) => {
+  if (e.changedTouches && e.changedTouches.length === 1) {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) nextPage();
+      else prevPage();
+    }
+  }
+};
+
+watch(() => props.url, loadPdf);
+onMounted(loadPdf);
+</script>
 
 <style scoped>
-.pdf-viewer-green {
-  border: 2px solid #198754;
-  border-radius: 1rem;
-  overflow: auto;
-  background: #f6fef6;
-  max-height: 600px;
+.pdf-bg {
+  background: #f3f4f6;
+  min-height: 0;
+  min-width: 0;
+  position: relative;
+}
+.dark .pdf-bg {
+  background: #18181b;
+}
+.pdf-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
   display: flex;
   justify-content: center;
-  padding: 1rem;
+  align-items: center;
+  gap: 2rem;
+  background: rgba(255,255,255,0.98);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  padding: 0.5rem 2rem;
+  z-index: 40;
+  border-bottom-left-radius: 1.5rem;
+  border-bottom-right-radius: 1.5rem;
+  transition: background 0.2s, box-shadow 0.2s;
 }
-
-.pdf-canvas {
+.pdf-toolbar-bottom {
+  position: absolute;
+  top: unset;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  border-radius: 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  padding: 0.5rem 1rem;
+  background: rgba(255,255,255,0.95);
+}
+@media (max-width: 767px) {
+  .pdf-toolbar {
+    position: absolute;
+    top: unset;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    border-radius: 2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    padding: 0.5rem 1rem;
+    background: rgba(255,255,255,0.95);
+  }
+}
+.dark .pdf-toolbar, .dark .pdf-toolbar-bottom {
+  background: rgba(24,24,27,0.98);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.30);
+}
+.pdf-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pdf-btn {
+  background: none;
+  border: none;
+  padding: 0.6rem;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  color: #222;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pdf-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.pdf-btn:hover:not(:disabled), .pdf-btn:focus:not(:disabled) {
+  background: #e5e7eb;
+  color: #16a34a;
+}
+.dark .pdf-btn {
+  color: #eee;
+}
+.dark .pdf-btn:hover:not(:disabled), .dark .pdf-btn:focus:not(:disabled) {
+  background: #27272a;
+  color: #4ade80;
+}
+.pdf-input {
+  width: 2.5rem;
+  padding: 0.2rem 0.3rem;
   border-radius: 0.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background: white;
+  border: 1px solid #d1d5db;
+  text-align: center;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+}
+.pdf-input:focus {
+  border: 1.5px solid #16a34a;
+}
+.pdf-canvas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding-top: 4.5rem;
+  padding-bottom: 2rem;
+}
+@media (max-width: 767px) {
+  .pdf-canvas-container {
+    padding-top: 1rem;
+    padding-bottom: 5.5rem;
+  }
+}
+.pdf-canvas {
+  max-width: 100vw;
+  max-height: 90vh;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+  border-radius: 0.5rem;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.dark .pdf-canvas {
+  background: #23272f;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+.flex-1 {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow: auto;
 }
 </style> 

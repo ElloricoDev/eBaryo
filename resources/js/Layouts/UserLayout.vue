@@ -12,6 +12,8 @@ const { props } = usePage()
 const user = props.auth?.user || {}
 const searchQuery = ref('')
 const newResponsesCount = props.newResponsesCount || 0;
+const categories = props.categories || [];
+const browseDropdown = ref(false);
 
 const submitSearch = () => {
   window.dispatchEvent(new CustomEvent('user-search', { detail: searchQuery.value }))
@@ -60,6 +62,10 @@ watch(toggle, (val) => {
 const closeDropdown = () => {
   toggleDropdown.value = false
 }
+
+const closeBrowseDropdown = () => {
+  browseDropdown.value = false;
+}
 </script>
 
 <template>
@@ -70,10 +76,39 @@ const closeDropdown = () => {
     <!-- Navbar -->
     <nav class="bg-gradient-to-r from-green-700 via-green-600 to-green-500 shadow-lg border-b border-green-700 fixed top-0 left-0 w-full z-40">
       <div class=" mx-auto px-4 flex flex-wrap items-center justify-between h-16">
-        <!-- Brand -->
-        <Link class="text-white font-bold flex items-center gap-2 text-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300" :href="route('home')">
-          <font-awesome-icon icon="book" class="text-2xl" /> <span>eBaryo</span>
-        </Link>
+        <!-- Brand and Browse Books Dropdown Group -->
+        <div class="flex items-center gap-2">
+          <!-- Brand -->
+          <Link class="text-white font-bold flex items-center gap-2 text-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300" :href="route('home')">
+            <font-awesome-icon icon="book" class="text-2xl" /> <span>eBaryo</span>
+          </Link>
+          <!-- Browse Books Dropdown (desktop) -->
+          <div class="relative hidden md:block">
+            <button
+              @mousedown.stop="browseDropdown = !browseDropdown"
+              class="flex items-center gap-2 text-white px-4 py-2 bg-green-700 rounded hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-300"
+              type="button"
+            >
+              <font-awesome-icon icon="journal-whills" class="mr-2" /> Browse Books
+              <font-awesome-icon icon="caret-down" class="ml-1" />
+            </button>
+            <ul
+              v-show="browseDropdown"
+              class="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg border z-50 overflow-hidden"
+              @mouseleave="closeBrowseDropdown"
+            >
+              <li v-for="category in categories" :key="category.id">
+                <Link
+                  class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200"
+                  :href="route('books.index', { category: category.id })"
+                  @click="closeBrowseDropdown"
+                >
+                  {{ category.name }}
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
         <!-- Toggle for mobile -->
         <button
           @click="toggle = true"
@@ -129,7 +164,6 @@ const closeDropdown = () => {
               <li><Link class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200" :href="route('home')"><font-awesome-icon icon="house" class="mr-2" /> Home</Link></li>
               <li><Link @click="closeDropdown" class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200" :href="route('user.profile.index')"><font-awesome-icon icon="user" class="mr-2" /> Profile</Link></li>
               <li><hr /></li>
-              <li><Link @click="closeDropdown" class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200" :href="route('books.index')"><font-awesome-icon icon="journal-whills" class="mr-2" /> All Books</Link></li>
               <li><Link @click="closeDropdown" class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200" :href="route('books.saved')"><font-awesome-icon icon="bookmark" class="mr-2" /> Saved Books</Link></li>
               <li><hr /></li>
               <li><Link @click="closeDropdown" class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200" :href="route('feedback.create')"><font-awesome-icon icon="comment-dots" class="mr-2" /> Feedback</Link></li>
@@ -164,7 +198,10 @@ const closeDropdown = () => {
         </div>
         <ul class="flex flex-col gap-2 p-4">
           <li>
-           
+            <!-- Browse Books Dropdown for mobile -->
+            
+          </li>
+          <li>
             <form class="flex max-w-md w-full mb-2" @submit.prevent="submitSearch">
               <input
                 v-model="searchQuery"
@@ -179,6 +216,31 @@ const closeDropdown = () => {
                 <font-awesome-icon icon="search" />
               </button>
             </form>
+            <div class="relative mb-2">
+              <button
+                @click="browseDropdown = !browseDropdown"
+                class="w-full flex items-center gap-2 text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 bg-green-50"
+                type="button"
+              >
+                <font-awesome-icon icon="journal-whills" class="mr-2" /> Browse Books
+                <font-awesome-icon icon="caret-down" class="ml-1" />
+              </button>
+              <ul
+                v-show="browseDropdown"
+                class="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg border z-50 overflow-hidden"
+                @mouseleave="closeBrowseDropdown"
+              >
+                <li v-for="category in categories" :key="category.id">
+                  <Link
+                    class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200"
+                    :href="route('books.index', { category: category.id })"
+                    @click="closeBrowseDropdown; toggle = false"
+                  >
+                    {{ category.name }}
+                  </Link>
+                </li>
+              </ul>
+            </div>
             <Link @mousedown="toggle = false" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 flex items-center gap-2" :href="route('home')">
               <font-awesome-icon icon="house" class="mr-2" /> Home
             </Link>
@@ -188,11 +250,6 @@ const closeDropdown = () => {
           <li>
             <Link @mousedown="toggle = false" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 flex items-center gap-2" :href="route('user.profile.index')">
               <font-awesome-icon icon="user" class="mr-2" /> Profile
-            </Link>
-          </li>
-          <li>
-            <Link @mousedown="toggle = false" class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 flex items-center gap-2" :href="route('books.index')">
-              <font-awesome-icon icon="journal-whills" class="mr-2" /> All Books
             </Link>
           </li>
           <li>

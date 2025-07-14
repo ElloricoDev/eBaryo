@@ -25,12 +25,10 @@ const unsaveBook = (book) => {
   })
 }
 
-function goBack() {
-  if (window.history.length > 1) {
-    window.history.back();
-  } else {
-    window.location.href = route('books.index');
-  }
+const goBack = () => {
+  window.history.length > 1
+    ? window.history.back()
+    : Inertia.visit('/home');
 }
 </script>
 

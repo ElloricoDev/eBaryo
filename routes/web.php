@@ -90,7 +90,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/books/{bookId}/report', [FeedbackController::class, 'reportBook'])->name('books.report');
 
     // Book Reading
-    Route::get('/books/{id}/read', [BookController::class, 'read'])->name('books.read');
+    Route::get('/books/{id}/read/epub', [BookController::class, 'epubReader'])->name('books.epubReader');
+    Route::get('/books/{id}/read/pdf', [BookController::class, 'pdfReader'])->name('books.pdfReader');
     Route::get('/user/profile/genres', [\App\Http\Controllers\UserControllers\GenreController::class, 'edit'])->name('user.profile.genres.edit');
     Route::post('/user/profile/genres', [\App\Http\Controllers\UserControllers\GenreController::class, 'update'])->name('user.profile.genres.update');
 });

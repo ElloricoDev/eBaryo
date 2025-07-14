@@ -7,6 +7,7 @@ use App\Models\Book;
 use App\Models\ReadingLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use App\Models\Category;
 
 class HomeController extends Controller
 {
@@ -43,6 +44,7 @@ class HomeController extends Controller
 
         // New Books (all active books, ordered by latest)
         $newBooks = Book::with('category')->where('status', 'active')
+            ->where('created_at', '>=', Carbon::now()->subDays(30))
             ->orderByDesc('created_at')
             ->get();
 
@@ -164,6 +166,8 @@ class HomeController extends Controller
             $reviews = \App\Models\BookReview::where('user_id', $user->id)->get();
         }
 
+        $categories = Category::all();
+
         return inertia('User/Home', [
             'books' => $books,
             'continueReading' => $continueReading,
@@ -176,6 +180,7 @@ class HomeController extends Controller
             'recommendedBooks' => $recommendedBooks,
             'reading_logs' => $readingLogs,
             'reviews' => $reviews,
+            'categories' => $categories,
         ]);
     }
 }

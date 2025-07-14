@@ -59,22 +59,22 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function savedBooks()
     {
-        return $this->belongsToMany(Book::class, 'book_user')->withTimestamps();
+        return $this->belongsToMany(Book::class, 'book_user', 'user_id', 'book_id')->withTimestamps();
     }
 
     public function bookReviews()
     {
-        return $this->hasMany(\App\Models\BookReview::class);
+        return $this->hasMany(BookReview::class);
     }
 
     public function readingLogs()
     {
-        return $this->hasMany(\App\Models\ReadingLog::class);
+        return $this->hasMany(ReadingLog::class);
     }
 
     public function genres()
     {
-        return $this->belongsToMany(\App\Models\Category::class, 'user_genres', 'user_id', 'category_id')->withTimestamps();
+        return $this->belongsToMany(Category::class, 'user_genres', 'user_id', 'category_id')->withTimestamps();
     }
 
 

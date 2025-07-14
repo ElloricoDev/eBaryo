@@ -3,7 +3,7 @@ import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { usePage, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import PdfReader from '@/Components/PdfReader.vue';
-import EpubReader from '@/Pages/User/Books/EpubReader.vue';
+import EpubReader from '@/Components/EpubReader.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
