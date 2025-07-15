@@ -139,6 +139,18 @@ library.add(
                         </span>
                     </Link>
                 </li>
+                <li>
+                    <Link
+                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2"
+                        :class="{
+                            'bg-green-700 font-semibold':
+                                isActive('/testimonials'),
+                        }"
+                        :href="route('admin.testimonials.index')"
+                    >
+                        <font-awesome-icon icon="comments" /> Testimonials
+                    </Link>
+                </li>
             </ul>
         </nav>
 

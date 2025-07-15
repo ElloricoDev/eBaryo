@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminControllers\ProfileController;
 use App\Http\Controllers\AdminControllers\UserController;
 use App\Http\Controllers\AdminControllers\AdminSettingsController;
 use App\Http\Controllers\AdminControllers\AdminFeedbackController;
+use App\Http\Controllers\AdminControllers\AdminTestimonialsController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -87,4 +88,6 @@ Route::middleware('auth', 'admin')->group(function () {
             Route::put('/respond/{id}', 'respond')->name('respond');
             Route::put('/response/{id}', 'update')->name('update');
         });
+    
+    Route::resource('testimonials', AdminTestimonialsController::class)->names('admin.testimonials');
 });

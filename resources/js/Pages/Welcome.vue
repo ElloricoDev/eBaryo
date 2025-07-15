@@ -1,6 +1,6 @@
 <script setup>
 import GuestLayout from "@/Layouts/GuestLayout.vue";
-import { Link, Head } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -83,6 +83,9 @@ onUnmounted(() => {
     cancelAnimationFrame(animationFrame);
     window.removeEventListener("scroll", handleScroll);
 });
+
+const { props } = usePage();
+const testimonials = props.testimonials || [];
 </script>
 
 <template>
@@ -237,8 +240,14 @@ onUnmounted(() => {
                 <div
                     class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
+                    <div v-if="testimonials.length === 0" class="col-span-3 text-center text-gray-500">
+                        No testimonials yet.
+                    </div>
                     <div
+                        v-for="(testimonial, idx) in testimonials"
+                        :key="testimonial.id"
                         class="bg-green-100 border-l-4 border-green-600 rounded-2xl text-center p-6 shadow animate-slide-up"
+                        :class="{'delay-150': idx === 1, 'delay-300': idx === 2}"
                     >
                         <div class="flex justify-center mb-2">
                             <font-awesome-icon
@@ -248,51 +257,11 @@ onUnmounted(() => {
                         </div>
                         <blockquote>
                             <p class="text-green-700 mb-2">
-                                <font-awesome-icon icon="smile" /> "eBaryo
-                                Library made it so easy for me to find books for
-                                my kids!"
+                                <font-awesome-icon icon="smile" />
+                                "{{ testimonial.content }}"
                             </p>
                             <footer class="text-green-600">
-                                Maria, Parent
-                            </footer>
-                        </blockquote>
-                    </div>
-                    <div
-                        class="bg-green-100 border-l-4 border-green-600 rounded-2xl text-center p-6 shadow animate-slide-up delay-150"
-                    >
-                        <div class="flex justify-center mb-2">
-                            <font-awesome-icon
-                                icon="user-circle"
-                                class="text-3xl text-green-400"
-                            />
-                        </div>
-                        <blockquote>
-                            <p class="text-green-700 mb-2">
-                                <font-awesome-icon icon="smile" /> "I love being
-                                able to read anywhere, anytime. Highly
-                                recommended!"
-                            </p>
-                            <footer class="text-green-600">
-                                John, Student
-                            </footer>
-                        </blockquote>
-                    </div>
-                    <div
-                        class="bg-green-100 border-l-4 border-green-600 rounded-2xl text-center p-6 shadow animate-slide-up delay-300"
-                    >
-                        <div class="flex justify-center mb-2">
-                            <font-awesome-icon
-                                icon="user-circle"
-                                class="text-3xl text-green-400"
-                            />
-                        </div>
-                        <blockquote>
-                            <p class="text-green-700 mb-2">
-                                <font-awesome-icon icon="smile" /> "A wonderful
-                                resource for our whole community."
-                            </p>
-                            <footer class="text-green-600">
-                                Liza, Teacher
+                                {{ testimonial.author_name }}<span v-if="testimonial.role">, {{ testimonial.role }}</span>
                             </footer>
                         </blockquote>
                     </div>

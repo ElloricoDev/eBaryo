@@ -10,9 +10,13 @@ use App\Http\Controllers\UserControllers\BookController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\BookReviewController;
 use App\Http\Controllers\UserControllers\GenreController;
+use App\Models\Testimonial;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    $testimonials = Testimonial::where('approved', true)->orderByDesc('created_at')->limit(6)->get();
+    return Inertia::render('Welcome', [
+        'testimonials' => $testimonials,
+    ]);
 })->name('welcome')->middleware('guest');
 
 Route::middleware('auth', 'user')->group(function () {

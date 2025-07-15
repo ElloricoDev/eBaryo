@@ -181,13 +181,14 @@ onUnmounted(() => {
     <Head title="Home" />
     <UserLayout>
         <div class="relative">
-            <ContinueReadingSection
-                ref="continueReadingSectionRef"
-                :continueReadingList="continueReadingList"
+            <BookSection
+                title="Continue Reading"
+                icon="play-circle"
+                :books="continueReadingList.map(log => ({ ...log.book, last_percent: log.last_percent, progress: log.last_percent }))"
+                sectionType="continue"
                 :savedBookIds="savedBookIds"
                 :auth="$page.props.auth"
-                @save="saveBook"
-                @unsave="unsaveBook"
+                emptyMessage="No books to continue reading. Start a new book today!"
             />
         </div>
 

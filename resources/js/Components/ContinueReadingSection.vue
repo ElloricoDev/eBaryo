@@ -82,6 +82,7 @@ onUnmounted(() => {
                 In Progress
             </span>
         </div>
+        <div class="border-b border-gray-200 mb-4"></div>
 
         <div v-if="continueReadingList.length" class="relative">
             <button
@@ -95,38 +96,50 @@ onUnmounted(() => {
             </button>
             <div
                 ref="scrollRowRef"
-                class="section-scroll-row hide-scrollbar md:justify-center md:gap-6"
+                class="section-scroll-row hide-scrollbar md:gap-6"
             >
-                <BookCard
+                <div
                     v-for="log in continueReadingList"
                     :key="log.id"
-                    :book="{
-                        ...log.book,
-                        from: 'continue',
-                        highlightProgress: true,
-                        progress: log.last_percent,
-                    }"
-                    :isSaved="savedBookIds.includes(log.book.id)"
-                    :auth="auth"
-                    @save="saveBook"
-                    @unsave="unsaveBook"
-                    class="mx-2 min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0"
+                    class="mx-2 flex flex-col items-center min-w-[180px] max-w-[220px] sm:min-w-[260px] sm:max-w-[260px] flex-shrink-0 group relative"
                 >
-                    <template #footer>
-                        <div class="flex items-center justify-between w-full">
-                            <div class="text-xs text-green-700 font-semibold">
-                                {{ Math.round((log.last_percent || 0) * 100) }}%
-                                read
+                    <BookCard
+                        :book="{
+                            ...log.book,
+                            from: 'continue',
+                            highlightProgress: true,
+                            progress: log.last_percent,
+                        }"
+                        :isSaved="savedBookIds.includes(log.book.id)"
+                        :auth="auth"
+                        @save="saveBook"
+                        @unsave="unsaveBook"
+                    >
+                        <template #footer>
+                            <div class="w-full mt-2">
+                                <div class="h-2 bg-gray-200 rounded-full relative overflow-hidden">
+                                    <div
+                                        class="h-2 bg-green-400 rounded-full transition-all"
+                                        :style="{ width: ((log.last_percent || 0) * 100) + '%' }"
+                                    ></div>
+                                </div>
+                                <Link
+                                    :href="route('books.epubReader', { id: log.book.id })"
+                                    class="block mt-1 bg-green-50 hover:bg-green-100 text-green-700 font-semibold text-xs rounded px-3 py-1 text-center transition"
+                                >
+                                    Continue Read
+                                </Link>
                             </div>
-                            <Link
-                                :href="route('books.read', { id: log.book.id })"
-                                class="ml-2 text-green-600 hover:underline font-bold"
-                            >
-                                Continue Read
-                            </Link>
-                        </div>
-                    </template>
-                </BookCard>
+                        </template>
+                    </BookCard>
+                    <!-- Hover overlay for percent, outside BookCard -->
+                    <div
+                        class="absolute top-2 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30 border border-white"
+                        style="white-space: nowrap;"
+                    >
+                        {{ Math.round((log.last_percent || 0) * 100) }}% read
+                    </div>
+                </div>
             </div>
             <button
                 v-if="hasNext"
@@ -139,14 +152,12 @@ onUnmounted(() => {
             </button>
         </div>
 
-        <div v-else class="text-center text-gray-500 py-8">
+        <div v-else class="text-center text-gray-400 py-10 animate-fade-in">
             <font-awesome-icon
                 icon="play-circle"
-                class="text-green-400 text-3xl mb-2"
+                class="text-gray-200 text-4xl mb-2 animate-pulse"
             />
-            <div>
-                No books in progress. Start reading to see your progress here!
-            </div>
+            <div class="text-base mt-2">No books in progress. Start reading to see your progress here!</div>
         </div>
     </div>
 </template>
@@ -173,8 +184,22 @@ onUnmounted(() => {
 @media (min-width: 640px) {
     .section-scroll-row {
         gap: 1rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding-left: 2.5rem;
+        padding-right: 2.5rem;
     }
+}
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.animate-fade-in {
+    animation: fade-in 1s both;
+}
+@keyframes pulse-cta {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+}
+.animate-pulse {
+    animation: pulse-cta 2s infinite;
 }
 </style>
