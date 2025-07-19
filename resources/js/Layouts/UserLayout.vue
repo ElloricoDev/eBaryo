@@ -39,6 +39,7 @@ import {
     faRightFromBracket,
     faCopyright,
     faHouse,
+    faBookOpen,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -75,7 +76,8 @@ library.add(
     faListCheck,
     faRightFromBracket,
     faCopyright,
-    faHouse
+    faHouse,
+    faBookOpen
 );
 
 const { props } = usePage();
@@ -288,12 +290,13 @@ const closeBrowseDropdown = () => {
                                     class="block px-4 py-2 text-gray-700 hover:bg-green-100 focus:bg-green-200"
                                     :href="route('books.saved')"
                                     ><font-awesome-icon
-                                        icon="bookmark"
+                                        icon="book-open"
                                         class="mr-2"
                                     />
-                                    Saved Books</Link
+                                    My Library</Link
                                 >
                             </li>
+
                             <li><hr /></li>
                             <li>
                                 <Link
@@ -453,10 +456,11 @@ const closeBrowseDropdown = () => {
                             class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 flex items-center gap-2"
                             :href="route('books.saved')"
                         >
-                            <font-awesome-icon icon="bookmark" class="mr-2" />
-                            Saved Books
+                            <font-awesome-icon icon="book-open" class="mr-2" />
+                            My Library
                         </Link>
                     </li>
+
                     <li>
                         <Link
                             @mousedown="toggle = false"

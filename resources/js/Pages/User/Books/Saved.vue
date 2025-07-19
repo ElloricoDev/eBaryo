@@ -1,18 +1,22 @@
 <script setup>
 import UserLayout from "@/Layouts/UserLayout.vue";
 import BookCard from "@/Components/BookCard.vue";
+import BookSection from "@/Components/BookSection.vue";
 import { usePage, router, Head } from "@inertiajs/vue3";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faBookmark } from "@fortawesome/free-solid-svg-icons";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faBookmark, faArrowLeft, faPlayCircle, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
 defineOptions({ layout: UserLayout });
 const { props } = usePage();
-const books = props.books || [];
+const currentlyReadingBooks = props.currentlyReadingBooks || [];
+const finishedBooks = props.finishedBooks || [];
+const savedBooks = props.books || [];
 
 library.add(faBookmark);
 library.add(faArrowLeft);
+library.add(faPlayCircle);
+library.add(faCheckCircle);
 
 const unsaveBook = (book) => {
     router.post(
@@ -50,42 +54,47 @@ const goBack = () => {
                     icon="bookmark"
                     class="text-green-600 text-3xl"
                 />
-                Saved Books
+                My Library
             </h1>
 
-            <div
-                class="grid grid-cols-2 gap-3 px-1 pb-6 sm:grid-cols-2 lg:grid-cols-5 sm:gap-6 sm:px-0 mt-4 animate-fade-in"
-            >
-                <template v-if="books.length > 0">
-                    <BookCard
-                        v-for="book in books"
-                        :key="book.id"
-                        :book="{ ...book, from: 'saved' }"
-                        :isSaved="true"
-                        :auth="$page.props.auth"
-                        @unsave="unsaveBook"
-                        class="w-full max-w-[180px] mx-auto sm:max-w-[220px] sm:min-w-[200px]"
-                    >
-                    </BookCard>
-                </template>
-                <template v-else>
-                    <div
-                        class="col-span-full flex flex-col items-center justify-center text-center text-gray-500 py-10 animate-fade-in"
-                    >
-                        <font-awesome-icon
-                            icon="bookmark"
-                            class="text-green-200 text-6xl mb-4"
-                        />
-                        <p class="text-lg">
-                            No saved books yet.<br /><span
-                                class="text-sm text-gray-400"
-                                >Books you save will appear here for quick
-                                access.</span
-                            >
-                        </p>
-                    </div>
-                </template>
-            </div>
+            <!-- Currently Reading Section -->
+            <section class="mb-10">
+                <BookSection
+                    title="Currently Reading"
+                    icon="play-circle"
+                    :books="currentlyReadingBooks.map(book => ({ ...book, last_percent: book.progress, progress: book.progress }))"
+                    sectionType="continue"
+                    :savedBookIds="$page.props.saved_books || []"
+                    :auth="$page.props.auth"
+                    emptyMessage="No books currently being read. Start reading a book and it will appear here."
+                />
+            </section>
+
+            <!-- Finished Reading Section -->
+            <section class="mb-10">
+                <BookSection
+                    title="Finished Reading"
+                    icon="check-circle"
+                    :books="finishedBooks.map(book => ({ ...book, last_percent: book.progress, progress: book.progress }))"
+                    sectionType="finished"
+                    :savedBookIds="$page.props.saved_books || []"
+                    :auth="$page.props.auth"
+                    emptyMessage="No finished books yet. Books you finish will appear here."
+                />
+            </section>
+
+            <!-- Saved Books Section -->
+            <section>
+                <BookSection
+                    title="Saved Books"
+                    icon="bookmark"
+                    :books="savedBooks"
+                    sectionType="saved"
+                    :savedBookIds="$page.props.saved_books || []"
+                    :auth="$page.props.auth"
+                    emptyMessage="No saved books yet. Books you save will appear here for quick access."
+                />
+            </section>
         </div>
     </div>
 </template>

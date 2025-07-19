@@ -75,7 +75,7 @@ library.add(
             <ul class="space-y-2">
                 <li>
                     <Link
-                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2"
+                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2 hover:bg-green-500"
                         :class="{
                             'bg-green-700 font-semibold':
                                 isActive('/dashboard'),
@@ -87,7 +87,7 @@ library.add(
                 </li>
                 <li>
                     <Link
-                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2"
+                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2 hover:bg-green-500"
                         :class="{
                             'bg-green-700 font-semibold':
                                 isActive('/admin/users'),
@@ -99,7 +99,7 @@ library.add(
                 </li>
                 <li>
                     <Link
-                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2"
+                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2 hover:bg-green-500"
                         :class="{
                             'bg-green-700 font-semibold':
                                 isActive('/admin/books'),
@@ -111,7 +111,7 @@ library.add(
                 </li>
                 <li>
                     <Link
-                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2"
+                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2 hover:bg-green-500"
                         :class="{
                             'bg-green-700 font-semibold':
                                 isActive('/admin/category'),
@@ -123,7 +123,7 @@ library.add(
                 </li>
                 <li>
                     <Link
-                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2 relative"
+                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2 relative hover:bg-green-500"
                         :class="{
                             'bg-green-700 font-semibold':
                                 isActive('/admin/feedback'),
@@ -141,7 +141,7 @@ library.add(
                 </li>
                 <li>
                     <Link
-                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2"
+                        class="block px-4 py-2 rounded transition-all duration-200 flex items-center gap-2 hover:bg-green-500"
                         :class="{
                             'bg-green-700 font-semibold':
                                 isActive('/testimonials'),

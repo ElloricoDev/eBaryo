@@ -19,6 +19,14 @@ class BookController extends Controller
         
         $books = $query->paginate(10);
 
+        // Attach read_count, reviews_count, and average_rating to each book
+        $books->getCollection()->transform(function ($book) {
+            $book->read_count = $book->readingLogs()->count();
+            $book->reviews_count = $book->reviews()->count();
+            $book->average_rating = round($book->reviews()->avg('rating'), 2);
+            return $book;
+        });
+
         return inertia('Admin/Books/Index', [
             'books' => $books,
             'filters' => $request->only(['status'])
@@ -64,6 +72,9 @@ class BookController extends Controller
 
     public function show($id) {
         $book = Book::with('category')->findOrFail($id);
+        $book->read_count = $book->readingLogs()->count();
+        $book->reviews_count = $book->reviews()->count();
+        $book->average_rating = round($book->reviews()->avg('rating'), 2);
         return inertia('Admin/Books/View', [
             'book' => $book
         ]);

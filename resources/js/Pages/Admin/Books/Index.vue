@@ -6,10 +6,10 @@ import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
-  faBook, faPlus, faFunnelDollar, faSearch, faXmarkCircle, faHashtag, faUser, faTags, faCheckCircle, faGear, faEye, faPencilAlt, faPauseCircle, faPlayCircle, faTrash
+  faBook, faPlus, faFunnelDollar, faSearch, faXmarkCircle, faHashtag, faUser, faTags, faCheckCircle, faGear, faEye, faPencilAlt, faPauseCircle, faPlayCircle, faTrash, faStar, faTrophy
 } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faBook, faPlus, faFunnelDollar, faSearch, faXmarkCircle, faHashtag, faUser, faTags, faCheckCircle, faGear, faEye, faPencilAlt, faPauseCircle, faPlayCircle, faTrash)
+library.add(faBook, faPlus, faFunnelDollar, faSearch, faXmarkCircle, faHashtag, faUser, faTags, faCheckCircle, faGear, faEye, faPencilAlt, faPauseCircle, faPlayCircle, faTrash, faStar, faTrophy)
 
 defineOptions({ layout: AdminLayout });
 
@@ -69,7 +69,7 @@ const toggleStatus = (id) => {
 
 <template>
   <Head title="Books" />
-  <div class="max-w-7xl mx-auto py-8 px-4">
+  <div class="max-w-7xl mx-auto px-4">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2">
         <font-awesome-icon icon="book" /> Books
@@ -113,6 +113,9 @@ const toggleStatus = (id) => {
             <th class="px-4 py-3 text-left"><font-awesome-icon icon="user" /> Author</th>
             <th class="px-4 py-3 text-left"><font-awesome-icon icon="tags" /> Category</th>
             <th class="px-4 py-3 text-left"><font-awesome-icon icon="check-circle" /> Status</th>
+            <th class="px-4 py-3 text-left"><font-awesome-icon icon="eye" /> Reads</th>
+            <th class="px-4 py-3 text-left"><font-awesome-icon icon="star" /> Reviews</th>
+            <th class="px-4 py-3 text-left"><font-awesome-icon icon="trophy" /> Rating</th>
             <th class="px-4 py-3 text-right"><font-awesome-icon icon="gear" /> Actions</th>
           </tr>
         </thead>
@@ -128,6 +131,9 @@ const toggleStatus = (id) => {
                 {{ book.status.charAt(0).toUpperCase() + book.status.slice(1) }}
               </span>
             </td>
+            <td class="px-4 py-2">{{ book.read_count }}</td>
+            <td class="px-4 py-2">{{ book.reviews_count }}</td>
+            <td class="px-4 py-2">{{ book.average_rating !== null ? book.average_rating : '—' }}</td>
             <td class="px-4 py-2 text-right whitespace-nowrap">
               <Link :href="route('admin.books.show', book.id)" class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded text-sm mr-1 flex items-center gap-1">
                 <font-awesome-icon icon="eye" /> View

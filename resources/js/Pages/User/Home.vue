@@ -2,7 +2,6 @@
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { usePage, router } from "@inertiajs/vue3";
 import BookSection from "@/Components/BookSection.vue";
-import ContinueReadingSection from "@/Components/ContinueReadingSection.vue";
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -190,6 +189,8 @@ onUnmounted(() => {
                 :auth="$page.props.auth"
                 emptyMessage="No books to continue reading. Start a new book today!"
             />
+
+            
         </div>
 
         <div class="relative">

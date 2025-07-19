@@ -4,6 +4,7 @@ namespace App\Http\Controllers\UserControllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Book;
+use App\Models\BookReview;
 use Illuminate\Http\Request;
 use App\Models\ReadingLog;
 use Illuminate\Support\Facades\Auth;
@@ -147,7 +148,7 @@ class BookController extends Controller
         // Add reading progress
         $progress = null;
         if ($user) {
-            $log = \App\Models\ReadingLog::where('user_id', $user->id)->where('book_id', $id)->first();
+            $log = ReadingLog::where('user_id', $user->id)->where('book_id', $id)->first();
             if ($log) {
                 $progress = $log->last_percent;
             }
@@ -249,7 +250,7 @@ class BookController extends Controller
 
         // Attach ratings and read count
         $bookIds = $books->pluck('id');
-        $reviewCounts = \App\Models\BookReview::whereIn('book_id', $bookIds)
+        $reviewCounts = BookReview::whereIn('book_id', $bookIds)
             ->selectRaw('book_id, COUNT(*) as count, AVG(rating) as avg_rating')
             ->groupBy('book_id')
             ->get()
@@ -266,9 +267,42 @@ class BookController extends Controller
             return $book;
         });
 
+        // Finished: last_percent >= 1
+        $finishedBookIds = ReadingLog::where('user_id', $user->id)
+            ->where('last_percent', '>=', 1)
+            ->pluck('book_id');
+        $finishedBooks = Book::with('category')
+            ->whereIn('id', $finishedBookIds)
+            ->where('status', 'active')
+            ->get();
+
+        // Currently Reading: last_percent > 0 and < 1, but exclude finished books
+        $currentlyReadingLogs = ReadingLog::with('book')
+            ->where('user_id', $user->id)
+            ->where('last_percent', '>', 0)
+            ->where('last_percent', '<', 1)
+            ->whereNotIn('book_id', $finishedBookIds)
+            ->whereHas('book', function($query) {
+                $query->where('status', 'active');
+            })
+            ->orderByDesc('updated_at')
+            ->get();
+        $currentlyReadingBooks = $currentlyReadingLogs->map(function($log) {
+            if ($log->book) {
+                $book = $log->book;
+                $book->last_percent = $log->last_percent;
+                $book->progress = $log->last_percent;
+                return $book;
+            }
+        })->filter()->values();
+
         return inertia('User/Books/Saved', [
             'books' => $books,
-            'saved_books' => $savedBookIds
+            'saved_books' => $savedBookIds,
+            'currentlyReadingBooks' => $currentlyReadingBooks,
+            'finishedBooks' => $finishedBooks,
         ]);
     }
+
+    
 }

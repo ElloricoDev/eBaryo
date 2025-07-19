@@ -1,11 +1,15 @@
 <template>
   <Head title="Edit Book" />
-  <div class="max-w-7xl mx-auto py-8 px-4">
-    <div class="flex items-center gap-3 mb-6">
-      <Link :href="route('admin.books.index')" class="btn-outline flex items-center gap-2">
-        <font-awesome-icon icon="arrow-left" /> Back
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center mb-6 gap-4">
+      <Link :href="route('admin.books.index')"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-bold rounded-full shadow-lg hover:from-green-600 hover:to-green-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+      >
+        <font-awesome-icon icon="arrow-left" class="text-lg" />
+        <span class="hidden sm:inline">Back to Books</span>
+        <span class="sm:hidden">Back</span>
       </Link>
-      <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2">
+      <h1 class="text-2xl font-bold text-green-600 flex items-center gap-2">
         <font-awesome-icon icon="pencil-alt" /> Edit Book
       </h1>
     </div>

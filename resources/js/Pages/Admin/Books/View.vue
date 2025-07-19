@@ -2,15 +2,13 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { usePage, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import PdfReader from '@/Components/PdfReader.vue';
-import EpubReader from '@/Components/EpubReader.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
-  faArrowLeft, faEye, faBook, faUser, faTags, faBuilding, faLanguage, faBarcode, faCalendar, faInfoCircle, faAlignLeft, faImage, faFile, faFileCircleXmark, faDownload
+  faArrowLeft, faEye, faBook, faUser, faTags, faBuilding, faLanguage, faBarcode, faCalendar, faInfoCircle, faAlignLeft, faImage, faFile, faFileCircleXmark, faDownload, faStar, faTrophy
 } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faArrowLeft, faEye, faBook, faUser, faTags, faBuilding, faLanguage, faBarcode, faCalendar, faInfoCircle, faAlignLeft, faImage, faFile, faFileCircleXmark, faDownload)
+library.add(faArrowLeft, faEye, faBook, faUser, faTags, faBuilding, faLanguage, faBarcode, faCalendar, faInfoCircle, faAlignLeft, faImage, faFile, faFileCircleXmark, faDownload, faStar, faTrophy)
 
 defineOptions({ layout: AdminLayout });
 
@@ -28,9 +26,13 @@ const isEpub = computed(() => fileExt.value === 'epub');
 
 <template>
   <div class="max-w-7xl mx-auto py-6 px-4">
-    <div class="flex items-center mb-6">
-      <Link :href="route('admin.books.index')" class="btn btn-outline-success me-3 flex items-center gap-2">
-        <font-awesome-icon icon="arrow-left" /> Back
+    <div class="flex flex-col sm:flex-row items-start sm:items-center mb-6 gap-4">
+      <Link :href="route('admin.books.index')"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-bold rounded-full shadow-lg hover:from-green-600 hover:to-green-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+      >
+        <font-awesome-icon icon="arrow-left" class="text-lg" />
+        <span class="hidden sm:inline">Back to Books</span>
+        <span class="sm:hidden">Back</span>
       </Link>
       <h1 class="text-2xl font-bold text-green-600 flex items-center gap-2">
         <font-awesome-icon icon="eye" /> Book Details
@@ -70,6 +72,9 @@ const isEpub = computed(() => fileExt.value === 'epub');
                 {{ book.status ? book.status.charAt(0).toUpperCase() + book.status.slice(1) : 'N/A' }}
               </span>
             </div>
+            <div><strong><font-awesome-icon icon="eye" /> Reads:</strong> {{ book.read_count ?? 0 }}</div>
+            <div><strong><font-awesome-icon icon="star" /> Reviews:</strong> {{ book.reviews_count ?? 0 }}</div>
+            <div><strong><font-awesome-icon icon="trophy" /> Rating:</strong> {{ book.average_rating !== null ? book.average_rating : '—' }}</div>
           </div>
 
           <div class="mt-3 text-sm">
@@ -86,31 +91,6 @@ const isEpub = computed(() => fileExt.value === 'epub');
             </div>
             <div v-else class="text-gray-500">N/A</div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white border-2 border-green-500 shadow-md rounded-2xl overflow-hidden">
-      <div class="bg-green-600 text-white font-semibold px-4 py-2 rounded-t-2xl flex items-center gap-2">
-        <font-awesome-icon icon="file" /> Read Ebook
-      </div>
-      <div class="bg-gray-100 px-4 py-6 rounded-b-2xl">
-        <PdfReader v-if="isPdf && book.ebook_file" :url="book.ebook_file" />
-        <EpubReader v-else-if="isEpub && book.ebook_file" :url="book.ebook_file" />
-
-        <div v-else-if="book.ebook_file" class="text-center py-10">
-          <font-awesome-icon icon="file-circle-xmark" class="text-5xl text-gray-400" />
-          <h5 class="text-lg text-gray-500 mt-3">Unsupported File Format</h5>
-          <p class="text-sm text-gray-500">This file format is not supported for reading in the browser.</p>
-          <a :href="book.ebook_file" target="_blank" class="inline-block mt-3 px-4 py-2 border border-green-600 text-green-600 rounded hover:bg-green-100 flex items-center gap-2">
-            <font-awesome-icon icon="download" /> Download File
-          </a>
-        </div>
-
-        <div v-else class="text-center py-10">
-          <font-awesome-icon icon="file-circle-xmark" class="text-5xl text-gray-400" />
-          <h5 class="text-lg text-gray-500 mt-3">No Ebook File</h5>
-          <p class="text-sm text-gray-500">No ebook file has been uploaded for this book.</p>
         </div>
       </div>
     </div>
