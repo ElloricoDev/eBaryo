@@ -61,7 +61,7 @@ const submit = async () => {
                     />
                     <label
                         for="delete_password"
-                        class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"
+                        class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"
                     >
                         <font-awesome-icon icon="key" /> Password
                     </label>

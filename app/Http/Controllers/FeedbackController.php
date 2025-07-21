@@ -7,12 +7,16 @@ use App\Models\Feedback;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use App\Events\FeedbackUpdated;
+use App\Models\Category;
 
 class FeedbackController extends Controller
 {
     public function create()
     {
-        return Inertia::render('User/Feedback');
+        $categories = Category::all();
+        return Inertia::render('User/Feedback',[
+            'categories' => $categories,
+        ]);
     }
 
     public function store(Request $request)
@@ -40,9 +44,12 @@ class FeedbackController extends Controller
         if ($newResponses->count() > 0) {
             event(new FeedbackUpdated(auth()->id(), 'user'));
         }
+
+        $categories = Category::all();
         return Inertia::render('User/MyFeedback', [
             'feedbacks' => $feedbacks,
             'hasNewResponses' => $newResponses->count() > 0,
+            'categories' => $categories,
         ]);
     }
 

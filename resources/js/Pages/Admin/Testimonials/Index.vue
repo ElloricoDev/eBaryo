@@ -3,6 +3,7 @@ import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { router } from '@inertiajs/vue3';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faPlus, faEdit, faTrash, faCheckCircle, faTimesCircle, faQuoteLeft } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
 defineOptions({layout:AdminLayout});
 
 
@@ -11,23 +12,60 @@ const props = defineProps({
 });
 
 function destroy(id) {
-    if (confirm('Are you sure you want to delete this testimonial?')) {
-        router.delete(route('admin.testimonials.destroy', id));
-    }
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.delete(route('admin.testimonials.destroy', id), {
+                onSuccess: () => {
+                    Swal.fire('Deleted!', 'Testimonial has been deleted.', 'success');
+                }
+            });
+        }
+    });
 }
 
 function toggleApproved(testimonial) {
-    router.put(route('admin.testimonials.update', testimonial.id), {
-        ...testimonial,
-        approved: !testimonial.approved,
-    }, {
-        preserveScroll: true,
-        only: ['testimonials'],
+    const action = testimonial.approved ? 'disapprove' : 'approve';
+    Swal.fire({
+        title: `Are you sure you want to ${action} this testimonial?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `Yes, ${action} it!`,
+        cancelButtonText: 'Cancel',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.put(route('admin.testimonials.update', testimonial.id), {
+                ...testimonial,
+                approved: !testimonial.approved,
+            }, {
+                preserveScroll: true,
+                only: ['testimonials'],
+                onSuccess: () => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: `Testimonial ${action === 'approve' ? 'approved' : 'disapproved'}!`,
+                        timer: 1500,
+                        showConfirmButton: false,
+                    });
+                }
+            });
+        }
     });
 }
 </script>
 
 <template>
+    <Head title="Testimonials"/>
     <div class="p-6">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold flex items-center gap-2">

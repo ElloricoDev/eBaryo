@@ -39,24 +39,24 @@ function deleteCategory(id) {
 
 <template>
     <Head title="Categories" />
-    <div class="max-w-7xl mx-auto py-8 px-4">
+    <div class="max-w-7xl mx-auto py-10 px-4">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-green-600 flex items-center gap-2">
+        <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2">
                 <font-awesome-icon icon="tags" /> Categories
             </h1>
             <Link
                 :href="route('admin.categories.create')"
-                class="inline-flex items-center bg-green-600 text-white font-semibold px-5 py-2 rounded-full shadow hover:bg-green-700 transition"
+                class="inline-flex items-center bg-green-600 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:bg-green-700 transition-transform duration-200 hover:scale-105 text-base"
             >
                 <font-awesome-icon icon="plus" class="mr-2" /> Add Category
             </Link>
         </div>
 
         <!-- Table Card -->
-        <div class="bg-white border border-green-600 rounded-2xl shadow overflow-x-auto">
+        <div class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl overflow-x-auto">
             <table class="min-w-full table-auto text-left">
-                <thead class="bg-green-100 text-green-700">
+                <thead class="bg-green-100 text-green-700 sticky top-0 z-10">
                     <tr>
                         <th class="px-4 py-3 font-semibold"><font-awesome-icon icon="hashtag" /> ID</th>
                         <th class="px-4 py-3 font-semibold"><font-awesome-icon icon="tag" /> Name</th>
@@ -68,33 +68,35 @@ function deleteCategory(id) {
                     <tr
                         v-for="category in categories"
                         :key="category.id"
-                        class="border-t hover:bg-gray-50 transition"
+                        class="even:bg-green-50 hover:bg-green-100 transition-colors duration-150 hover:scale-[1.01] border-t"
                     >
                         <td class="px-4 py-3 font-medium">{{ category.id }}</td>
-                        <td class="px-4 py-3">{{ category.name }}</td>
+                        <td class="px-4 py-3">
+                          <span class="inline-block px-3 py-1 rounded-full bg-green-200 text-green-800 font-semibold text-xs">{{ category.name }}</span>
+                        </td>
                         <td class="px-4 py-3">{{ category.description }}</td>
                         <td class="px-4 py-3 text-right space-x-1 whitespace-nowrap">
                             <Link
                                 :href="route('admin.categories.edit', category.id)"
-                                class="inline-flex items-center px-3 py-1 text-sm bg-yellow-400 text-white rounded-full hover:bg-yellow-500 transition"
+                                class="inline-flex items-center px-3 py-1 text-sm bg-yellow-400 text-white rounded-full hover:bg-yellow-500 transition-transform duration-150 hover:scale-105 shadow"
                             >
                                 <font-awesome-icon icon="pencil-alt" class="mr-1" /> Edit
                             </Link>
                             <Link
                                 :href="route('admin.categories.show', category.id)"
-                                class="inline-flex items-center px-3 py-1 text-sm bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+                                class="inline-flex items-center px-3 py-1 text-sm bg-green-600 text-white rounded-full hover:bg-green-700 transition-transform duration-150 hover:scale-105 shadow"
                             >
                                 <font-awesome-icon icon="eye" class="mr-1" /> View
                             </Link>
                             <button
                                 @click="deleteCategory(category.id)"
-                                class="inline-flex items-center px-3 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition"
+                                class="inline-flex items-center px-3 py-1 text-sm bg-red-600 text-white rounded-full hover:bg-red-700 transition-transform duration-150 hover:scale-105 shadow"
                             >
                                 <font-awesome-icon icon="trash" class="mr-1" /> Delete
                             </button>
                             <Link
                                 :href="route('admin.categories.books', category.id)"
-                                class="inline-flex items-center px-3 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
+                                class="inline-flex items-center px-3 py-1 text-sm bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-transform duration-150 hover:scale-105 shadow"
                             >
                                 <font-awesome-icon icon="book" class="mr-1" /> View Books
                             </Link>

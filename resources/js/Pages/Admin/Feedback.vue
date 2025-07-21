@@ -52,12 +52,14 @@ function markResponded(id) {
 
 <template>
   <Head title="Feedback Management" />
-  <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-    <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2 mb-6">
-      <font-awesome-icon icon="comments" /> Feedback Management
-    </h1>
+  <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex items-center gap-2">
+      <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2">
+        <font-awesome-icon icon="comments" /> Feedback Management
+      </h1>
+    </div>
 
-    <div class="bg-white border-2 border-green-500 rounded-xl shadow-md hover:border-green-700 transition">
+    <div class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl hover:border-green-700 transition mb-8">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-green-100 text-green-700">
@@ -74,15 +76,16 @@ function markResponded(id) {
             <tr
               v-for="fb in props.feedbacks"
               :key="fb.id"
-              class="border-b hover:bg-gray-50 transition"
+              class="even:bg-green-50 hover:bg-green-100 transition-colors duration-150 hover:scale-[1.01] border-b"
             >
               <td class="px-4 py-3">{{ fb.user?.user_name || "Unknown" }}</td>
               <td class="px-4 py-3">{{ fb.message }}</td>
               <td class="px-4 py-3">
                 <span
-                  :class="fb.status === 'pending'
-                      ? 'text-yellow-600 font-semibold'
-                      : 'text-green-600 font-semibold'"
+                  :class="[
+                    'inline-block px-3 py-1 rounded-full text-xs font-bold',
+                    fb.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-200 text-green-800'
+                  ]"
                 >
                   <font-awesome-icon
                     :icon="fb.status === 'pending' ? 'hourglass-half' : 'check-circle'"
@@ -103,7 +106,7 @@ function markResponded(id) {
                   <textarea
                     v-model="responseInputs[fb.id]"
                     rows="2"
-                    class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-green-500 focus:border-green-500 mb-2"
+                    class="w-full border border-green-400 rounded-xl px-3 py-2 focus:ring-2 focus:ring-green-300 focus:border-green-600 mb-2 shadow-sm transition-all duration-150"
                     placeholder="Write a response..."
                   ></textarea>
 
@@ -114,7 +117,7 @@ function markResponded(id) {
                   <button
                     @click="saveResponse(fb.id)"
                     :disabled="!responseInputs[fb.id]?.trim()"
-                    class="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded shadow-sm transition disabled:opacity-50 flex items-center gap-1"
+                    class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-sm px-4 py-2 rounded-full shadow-xl transition-transform duration-150 hover:scale-105 disabled:opacity-50 flex items-center gap-1 font-semibold"
                   >
                     <font-awesome-icon icon="save" /> Save Response
                   </button>
@@ -130,7 +133,7 @@ function markResponded(id) {
                 <button
                   v-if="fb.status === 'pending'"
                   @click="markResponded(fb.id)"
-                  class="border border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-3 py-1 text-sm rounded shadow-sm transition flex items-center gap-1"
+                  class="border border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-4 py-2 text-sm rounded-full shadow transition-transform duration-150 hover:scale-105 flex items-center gap-1 font-semibold"
                 >
                   <font-awesome-icon icon="check-circle" /> Mark Responded
                 </button>

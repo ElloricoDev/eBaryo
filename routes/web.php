@@ -46,6 +46,10 @@ Route::middleware('auth', 'user')->group(function () {
     Route::get('/user/genres/select', [GenreController::class, 'select'])->name('user.genres.select');
     Route::post('/user/genres/select', [GenreController::class, 'store'])->name('user.genres.store');
     Route::post('/user/genres/skip', [GenreController::class, 'skip'])->name('user.genres.skip');
+    
+    Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
+    Route::get('/my-feedback', [FeedbackController::class, 'myFeedback'])->name('feedback.my');
+
 
     
 });
@@ -57,9 +61,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/reviews/{id}', [BookReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Feedback Routes
-    Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
     Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
-    Route::get('/my-feedback', [FeedbackController::class, 'myFeedback'])->name('feedback.my');
     Route::post('/books/{bookId}/report', [FeedbackController::class, 'reportBook'])->name('books.report');
 
     // Book Reading

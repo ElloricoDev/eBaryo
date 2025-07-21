@@ -64,12 +64,12 @@ function onAvatarChange(e) {
 <template>
   <Head title="Edit Profile" />
 
-  <div class="max-w-5xl mx-auto py-8 px-4">
+  <div class="max-w-5xl mx-auto py-10 px-4">
     <!-- Header -->
-    <div class="flex items-center mb-6 gap-3">
+    <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex items-center gap-3">
       <Link
         :href="route('admin.profile.index')"
-        class="inline-flex items-center px-4 py-2 border border-green-600 text-green-600 hover:bg-green-50 rounded-lg transition"
+        class="inline-flex items-center px-6 py-2 border border-green-600 text-green-600 hover:bg-green-50 rounded-full shadow font-semibold transition-transform duration-200 hover:scale-105 text-base"
       >
         <font-awesome-icon icon="arrow-left" class="mr-2" /> Back
       </Link>
@@ -82,62 +82,70 @@ function onAvatarChange(e) {
     <form
       @submit.prevent="submit"
       enctype="multipart/form-data"
-      class="bg-white border-2 border-green-600 rounded-2xl shadow p-6 hover:shadow-lg transition"
+      class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl p-8 hover:shadow-2xl transition"
     >
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- User Name -->
-        <div>
-          <label class="text-green-700 font-semibold"><font-awesome-icon icon="user" /> User Name</label>
-          <input v-model="form.user_name" type="text" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-green-600 focus:border-green-600" />
+        <div class="relative">
+          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="user" /> User Name</label>
+          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="user" /></span>
+          <input v-model="form.user_name" type="text" class="form-input pl-10" />
           <div v-if="form.errors.user_name" class="text-red-500 text-sm mt-1">{{ form.errors.user_name }}</div>
         </div>
 
         <!-- First Name -->
-        <div>
-          <label class="text-green-700 font-semibold"><font-awesome-icon icon="user" /> First Name</label>
-          <input v-model="form.first_name" type="text" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-green-600 focus:border-green-600" />
+        <div class="relative">
+          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="user" /> First Name</label>
+          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="user" /></span>
+          <input v-model="form.first_name" type="text" class="form-input pl-10" />
           <div v-if="form.errors.first_name" class="text-red-500 text-sm mt-1">{{ form.errors.first_name }}</div>
         </div>
 
         <!-- Middle Name -->
-        <div>
-          <label class="text-green-700 font-semibold"><font-awesome-icon icon="user" /> Middle Name</label>
-          <input v-model="form.middle_name" type="text" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-green-600 focus:border-green-600" />
+        <div class="relative">
+          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="user" /> Middle Name</label>
+          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="user" /></span>
+          <input v-model="form.middle_name" type="text" class="form-input pl-10" />
           <div v-if="form.errors.middle_name" class="text-red-500 text-sm mt-1">{{ form.errors.middle_name }}</div>
         </div>
 
         <!-- Last Name -->
-        <div>
-          <label class="text-green-700 font-semibold"><font-awesome-icon icon="user" /> Last Name</label>
-          <input v-model="form.last_name" type="text" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-green-600 focus:border-green-600" />
+        <div class="relative">
+          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="user" /> Last Name</label>
+          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="user" /></span>
+          <input v-model="form.last_name" type="text" class="form-input pl-10" />
           <div v-if="form.errors.last_name" class="text-red-500 text-sm mt-1">{{ form.errors.last_name }}</div>
         </div>
 
         <!-- Contact Number -->
-        <div>
-          <label class="text-green-700 font-semibold"><font-awesome-icon icon="phone" /> Contact Number</label>
-          <input v-model="form.contact_number" type="text" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-green-600 focus:border-green-600" />
+        <div class="relative">
+          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="phone" /> Contact Number</label>
+          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="phone" /></span>
+          <input v-model="form.contact_number" type="text" class="form-input pl-10" />
           <div v-if="form.errors.contact_number" class="text-red-500 text-sm mt-1">{{ form.errors.contact_number }}</div>
         </div>
 
         <!-- Address -->
-        <div>
-          <label class="text-green-700 font-semibold"><font-awesome-icon icon="map-marker-alt" /> Address</label>
-          <input v-model="form.address" type="text" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-green-600 focus:border-green-600" />
+        <div class="relative">
+          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="map-marker-alt" /> Address</label>
+          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="map-marker-alt" /></span>
+          <input v-model="form.address" type="text" class="form-input pl-10" />
           <div v-if="form.errors.address" class="text-red-500 text-sm mt-1">{{ form.errors.address }}</div>
         </div>
 
         <!-- Email -->
-        <div>
-          <label class="text-green-700 font-semibold"><font-awesome-icon icon="envelope" /> Email</label>
-          <input v-model="form.email" type="email" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-green-600 focus:border-green-600" />
+        <div class="relative">
+          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="envelope" /> Email</label>
+          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="envelope" /></span>
+          <input v-model="form.email" type="email" class="form-input pl-10" />
           <div v-if="form.errors.email" class="text-red-500 text-sm mt-1">{{ form.errors.email }}</div>
         </div>
 
         <!-- Student -->
-        <div>
-          <label class="text-green-700 font-semibold"><font-awesome-icon icon="graduation-cap" /> Student</label>
-          <select v-model="form.student" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring-green-600 focus:border-green-600">
+        <div class="relative">
+          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="graduation-cap" /> Student</label>
+          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="graduation-cap" /></span>
+          <select v-model="form.student" class="form-input pl-10">
             <option value="yes">Yes</option>
             <option value="no">No</option>
           </select>
@@ -145,33 +153,33 @@ function onAvatarChange(e) {
         </div>
 
         <!-- Avatar Upload -->
-        <div>
-          <label class="text-green-700 font-semibold"><font-awesome-icon icon="image" /> Avatar</label>
+        <div class="relative flex flex-col items-center justify-center">
+          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="image" /> Avatar</label>
           <input
             type="file"
-            class="mt-1 block w-full text-sm text-gray-700 border border-gray-300 rounded-md shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
+            class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
             @change="onAvatarChange"
             accept="image/*"
           />
           <div v-if="form.errors.avatar" class="text-red-500 text-sm mt-1">{{ form.errors.avatar }}</div>
-          <div v-if="avatarPreview" class="mt-3">
-            <img :src="avatarPreview" alt="Avatar Preview" class="w-20 h-20 rounded-full border border-green-600 object-cover" />
+          <div v-if="avatarPreview" class="mt-4 flex justify-center">
+            <img :src="avatarPreview" alt="Avatar Preview" class="w-24 h-24 rounded-full border-4 border-green-600 object-cover shadow-lg" />
           </div>
         </div>
       </div>
 
       <!-- Action Buttons -->
-      <div class="mt-6 flex flex-wrap gap-3">
+      <div class="mt-10 flex flex-wrap gap-4 justify-center">
         <button
           type="submit"
           :disabled="form.processing"
-          class="inline-flex items-center px-5 py-2 bg-green-600 text-white rounded-full shadow hover:bg-green-700 transition disabled:opacity-50"
+          class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-full shadow-xl font-bold text-lg transition-transform duration-200 hover:scale-105 disabled:opacity-50"
         >
           <font-awesome-icon icon="save" class="mr-2" /> {{ form.processing ? 'Saving...' : 'Update Profile' }}
         </button>
         <Link
           :href="route('admin.profile.index')"
-          class="inline-flex items-center px-5 py-2 border border-green-600 text-green-600 rounded-full hover:bg-green-50 transition"
+          class="inline-flex items-center px-8 py-3 border border-green-600 text-green-600 rounded-full hover:bg-green-50 shadow-sm font-semibold text-lg transition"
         >
           <font-awesome-icon icon="arrow-left" class="mr-2" /> Cancel
         </Link>
@@ -179,3 +187,9 @@ function onAvatarChange(e) {
     </form>
   </div>
 </template>
+
+<style scoped>
+.form-input {
+  @apply w-full border border-green-500 rounded-full px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200 transition-all duration-150;
+}
+</style>

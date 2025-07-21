@@ -65,38 +65,54 @@ const toggleStatus = (id) => {
     },
   });
 };
+
+// Add goToPage for SPA pagination
+const goToPage = (url) => {
+  if (!url) return;
+  const queryString = url.split('?')[1] || '';
+  const params = {};
+  queryString.split('&').forEach(pair => {
+    const [key, value] = pair.split('=');
+    if (key) params[key] = value;
+  });
+  router.get(route('admin.books.index'), params, {
+    preserveState: false,
+    preserveScroll: false,
+  });
+};
 </script>
 
 <template>
   <Head title="Books" />
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="flex justify-between items-center mb-6">
+  <div class="max-w-7xl mx-auto px-4 py-10">
+    <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2">
         <font-awesome-icon icon="book" /> Books
       </h1>
-      <Link :href="route('admin.books.create')" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 transition flex items-center gap-2">
+      <Link :href="route('admin.books.create')" class="bg-green-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-green-700 transition-transform duration-200 flex items-center gap-2 hover:scale-105 text-base font-semibold">
         <font-awesome-icon icon="plus" /> Add Book
       </Link>
     </div>
 
     <!-- Filter Section -->
-    <div class="bg-white border border-green-500 rounded-xl shadow mb-6 p-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
+    <div class="bg-gradient-to-br from-white via-green-50 to-green-100 border border-green-400 rounded-2xl shadow mb-8 p-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="relative">
           <label class="block text-green-700 font-medium mb-1"><font-awesome-icon icon="funnel-dollar" /> Status Filter</label>
-          <select v-model="statusFilter" class="w-full border border-gray-300 rounded px-3 py-2">
+          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="funnel-dollar" /></span>
+          <select v-model="statusFilter" class="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2 focus:ring-2 focus:ring-green-300 focus:outline-none transition-all duration-150">
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
         </div>
         <div class="flex items-end">
-          <button @click="filterBooks" class="bg-green-600 text-white w-full py-2 rounded hover:bg-green-700 transition flex items-center gap-2">
+          <button @click="filterBooks" class="bg-green-600 text-white w-full py-2 rounded-full hover:bg-green-700 transition-transform duration-150 flex items-center gap-2 font-semibold shadow hover:scale-105">
             <font-awesome-icon icon="search" /> Filter
           </button>
         </div>
         <div class="flex items-end">
-          <button @click="clearFilters" class="border border-gray-400 text-gray-700 w-full py-2 rounded hover:bg-gray-100 transition flex items-center gap-2">
+          <button @click="clearFilters" class="border border-gray-400 text-gray-700 w-full py-2 rounded-full hover:bg-gray-100 transition-transform duration-150 flex items-center gap-2 font-semibold shadow hover:scale-105">
             <font-awesome-icon icon="xmark-circle" /> Clear Filters
           </button>
         </div>
@@ -104,9 +120,9 @@ const toggleStatus = (id) => {
     </div>
 
     <!-- Book Table -->
-    <div class="bg-white border border-green-500 rounded-xl shadow overflow-x-auto">
+    <div class="bg-white border-2 border-green-400 rounded-2xl shadow-lg overflow-x-auto">
       <table class="min-w-full table-auto">
-        <thead class="bg-green-100 text-green-800">
+        <thead class="bg-green-100 text-green-800 sticky top-0 z-10">
           <tr>
             <th class="px-4 py-3 text-left"><font-awesome-icon icon="hashtag" /> ID</th>
             <th class="px-4 py-3 text-left"><font-awesome-icon icon="book" /> Title</th>
@@ -120,13 +136,16 @@ const toggleStatus = (id) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="book in books.data" :key="book.id" class="border-t">
-            <td class="px-4 py-2">{{ book.id }}</td>
+          <tr v-for="book in books.data" :key="book.id" class="even:bg-green-50 hover:bg-green-100 transition-colors duration-150 hover:scale-[1.01] border-t">
+            <td class="px-4 py-2 font-semibold">{{ book.id }}</td>
             <td class="px-4 py-2">{{ book.title }}</td>
             <td class="px-4 py-2">{{ book.author }}</td>
             <td class="px-4 py-2">{{ book.category ? book.category.name : '—' }}</td>
             <td class="px-4 py-2">
-              <span :class="book.status === 'active' ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'">
+              <span :class="[
+                'inline-block px-3 py-1 rounded-full text-xs font-bold',
+                book.status === 'active' ? 'bg-green-200 text-green-800' : 'bg-red-100 text-red-600'
+              ]">
                 <font-awesome-icon :icon="book.status === 'active' ? 'check-circle' : 'xmark-circle'" class="mr-1" />
                 {{ book.status.charAt(0).toUpperCase() + book.status.slice(1) }}
               </span>
@@ -135,38 +154,41 @@ const toggleStatus = (id) => {
             <td class="px-4 py-2">{{ book.reviews_count }}</td>
             <td class="px-4 py-2">{{ book.average_rating !== null ? book.average_rating : '—' }}</td>
             <td class="px-4 py-2 text-right whitespace-nowrap">
-              <Link :href="route('admin.books.show', book.id)" class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded text-sm mr-1 flex items-center gap-1">
+              <Link :href="route('admin.books.show', book.id)" class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-full text-sm mr-1 flex items-center gap-1 transition-transform duration-150 hover:scale-105 shadow">
                 <font-awesome-icon icon="eye" /> View
               </Link>
-              <Link :href="route('admin.books.edit', book.id)" class="text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded text-sm mr-1 flex items-center gap-1">
+              <Link :href="route('admin.books.edit', book.id)" class="text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-full text-sm mr-1 flex items-center gap-1 transition-transform duration-150 hover:scale-105 shadow">
                 <font-awesome-icon icon="pencil-alt" /> Edit
               </Link>
               <button @click="toggleStatus(book.id)"
-                :class="book.status === 'active' ? 'bg-gray-500 hover:bg-gray-600' : 'bg-green-600 hover:bg-green-700'"
-                class="text-white px-3 py-1 rounded text-sm mr-1 flex items-center gap-1">
+                :class="[
+                  'text-white px-3 py-1 rounded-full text-sm mr-1 flex items-center gap-1 transition-transform duration-150 shadow',
+                  book.status === 'active' ? 'bg-gray-500 hover:bg-gray-600' : 'bg-green-600 hover:bg-green-700',
+                  'hover:scale-105'
+                ]">
                 <font-awesome-icon :icon="book.status === 'active' ? 'pause-circle' : 'play-circle'" />
                 {{ book.status === 'active' ? 'Deactivate' : 'Activate' }}
               </button>
-              <button @click="handleDelete(book.id)" class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm flex items-center gap-1">
+              <button @click="handleDelete(book.id)" class="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-full text-sm flex items-center gap-1 transition-transform duration-150 hover:scale-105 shadow">
                 <font-awesome-icon icon="trash" /> Delete
               </button>
             </td>
           </tr>
           <tr v-if="books.data.length === 0">
-            <td colspan="6" class="text-center text-gray-500 py-6">No books found.</td>
+            <td colspan="9" class="text-center text-gray-500 py-6">No books found.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <!-- Pagination -->
-    <div v-if="books.links && books.links.length > 3" class="mt-6 flex justify-center">
-      <nav class="flex items-center space-x-2">
+    <div v-if="books.links && books.links.length > 3" class="mt-8 flex justify-center">
+      <nav class="flex items-center space-x-2 bg-white rounded-xl shadow px-4 py-2">
         <!-- Previous Page -->
         <Link 
           v-if="books.prev_page_url"
           :href="books.prev_page_url"
-          class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition"
         >
           Previous
         </Link>
@@ -179,16 +201,16 @@ const toggleStatus = (id) => {
 
         <!-- Page Numbers -->
         <template v-for="(link, index) in books.links" :key="index">
-          <Link 
-            v-if="link.url && !link.active && link.label !== '&laquo; Previous' && link.label !== 'Next &raquo;'"
-            :href="link.url"
-            class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          <button
+            v-if="link.url && !link.active && !link.label.includes('Previous') && !link.label.includes('Next') && !link.label.includes('&laquo;') && !link.label.includes('&raquo;')"
+            @click="goToPage(link.url)"
+            class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-green-100 transition"
           >
             {{ link.label }}
-          </Link>
-          <span 
-            v-else-if="link.active"
-            class="px-3 py-2 text-sm font-medium text-white bg-green-600 border border-green-600 rounded-md"
+          </button>
+          <span
+            v-else-if="link.active && !link.label.includes('Previous') && !link.label.includes('Next') && !link.label.includes('&laquo;') && !link.label.includes('&raquo;')"
+            class="px-3 py-2 text-sm font-medium text-white bg-green-600 border border-green-600 rounded-md shadow"
           >
             {{ link.label }}
           </span>
@@ -198,7 +220,7 @@ const toggleStatus = (id) => {
         <Link 
           v-if="books.next_page_url"
           :href="books.next_page_url"
-          class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition"
         >
           Next
         </Link>

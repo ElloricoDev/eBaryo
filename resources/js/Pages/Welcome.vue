@@ -91,14 +91,14 @@ const testimonials = props.testimonials || [];
 <template>
     <Head title="Welcome" />
     <GuestLayout>
-        <section class="px-4 py-2 relative" id="home">
+        <section class="px-4 py-2 relative bg-gradient-to-br from-green-50 via-white to-green-100 min-h-[90vh]">
             <div class="pointer-events-none select-none">
                 <font-awesome-icon
                     v-for="book in floatingBooks"
                     :key="book.id"
                     :id="`floating-book-${book.id}`"
                     icon="book"
-                    class="text-green-200 text-5xl opacity-60 absolute"
+                    class="text-green-200 text-5xl opacity-60 absolute drop-shadow-xl"
                     :class="book.style"
                     :style="{ transition: 'transform 0.3s', zIndex: 0 }"
                 />
@@ -106,7 +106,8 @@ const testimonials = props.testimonials || [];
             <div class="text-center mb-12 animate-fade-in relative">
                 <h1 class="text-4xl md:text-5xl font-bold mb-4 text-green-700">
                     <span
-                        class="inline-block bg-green-100 px-4 py-3 rounded-xl shadow-sm animate-slide-down"
+                        class="inline-block bg-white/70 backdrop-blur-lg px-8 py-6 rounded-2xl shadow-2xl animate-slide-down border border-green-200"
+                        style="box-shadow: 0 8px 32px 0 rgba(16,185,129,0.10);"
                     >
                         <font-awesome-icon
                             icon="book"
@@ -115,24 +116,24 @@ const testimonials = props.testimonials || [];
                     </span>
                 </h1>
                 <p
-                    class="text-lg text-gray-600 max-w-xl mx-auto mb-6 animate-fade-in delay-150"
+                    class="text-lg text-gray-600 max-w-xl mx-auto mb-8 animate-fade-in delay-150"
                 >
                     Discover, read, and access books for your community —
                     anytime, anywhere.
                 </p>
                 <div
-                    class="flex flex-col md:flex-row justify-center gap-4 animate-fade-in delay-300"
+                    class="flex flex-col md:flex-row justify-center gap-6 animate-fade-in delay-300"
                 >
                     <Link
                         :href="route('login')"
-                        class="w-full md:w-auto bg-green-600 text-white px-6 py-2 rounded shadow hover:bg-green-700 focus:bg-green-800 transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400 scale-100 hover:scale-105 active:scale-95 animate-pulse-cta"
+                        class="w-full md:w-auto bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-8 py-3 rounded-full shadow-xl font-bold text-lg transition-transform duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400 scale-100 hover:scale-105 active:scale-95 animate-pulse-cta"
                         aria-label="Login"
                     >
                         <font-awesome-icon icon="sign-in-alt" /> Login
                     </Link>
                     <Link
                         :href="route('register')"
-                        class="w-full md:w-auto border border-green-600 text-green-600 px-6 py-2 rounded shadow hover:bg-green-50 focus:bg-green-100 transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400 scale-100 hover:scale-105 active:scale-95 animate-pulse-cta"
+                        class="w-full md:w-auto border-2 border-green-600 text-green-600 bg-white/80 px-8 py-3 rounded-full shadow-xl font-bold text-lg hover:bg-green-50 focus:bg-green-100 transition-transform duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400 scale-100 hover:scale-105 active:scale-95 animate-pulse-cta"
                         aria-label="Register"
                     >
                         <font-awesome-icon icon="user-plus" /> Register
@@ -161,7 +162,17 @@ const testimonials = props.testimonials || [];
                 </div>
             </div>
 
-            <div class="my-12 border-t border-green-200"></div>
+            <div class="my-16">
+                <svg height="40" width="100%" viewBox="0 0 100 10" preserveAspectRatio="none" class="w-full">
+                    <defs>
+                        <linearGradient id="divider-gradient" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#6ee7b7" />
+                            <stop offset="100%" stop-color="#34d399" />
+                        </linearGradient>
+                    </defs>
+                    <rect x="0" y="4" width="100" height="2" fill="url(#divider-gradient)" />
+                </svg>
+            </div>
 
             <section id="about" class="mt-16 animate-fade-in">
                 <div class="max-w-2xl mx-auto text-center">
@@ -178,7 +189,11 @@ const testimonials = props.testimonials || [];
                 </div>
             </section>
 
-            <div class="my-12 border-t border-green-200"></div>
+            <div class="my-16">
+                <svg height="40" width="100%" viewBox="0 0 100 10" preserveAspectRatio="none" class="w-full">
+                    <rect x="0" y="4" width="100" height="2" fill="url(#divider-gradient)" />
+                </svg>
+            </div>
 
             <section id="features" class="mt-16 animate-fade-in">
                 <h2
@@ -187,10 +202,10 @@ const testimonials = props.testimonials || [];
                     <font-awesome-icon icon="star" /> Features
                 </h2>
                 <div
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                 >
                     <div
-                        class="bg-white border-t-4 border-green-600 rounded-2xl shadow transition hover:scale-105 hover:shadow-md p-5 animate-slide-up ripple-card"
+                        class="bg-gradient-to-br from-white via-green-50 to-green-100 border-t-4 border-green-600 rounded-2xl shadow-xl transition-transform duration-200 hover:scale-105 hover:shadow-2xl p-7 animate-slide-up ripple-card"
                         tabindex="0"
                     >
                         <h3 class="text-lg font-semibold text-green-700 mb-2">
@@ -202,7 +217,7 @@ const testimonials = props.testimonials || [];
                         </p>
                     </div>
                     <div
-                        class="bg-white border-t-4 border-green-600 rounded-2xl shadow transition hover:scale-105 hover:shadow-md p-5 animate-slide-up delay-150 ripple-card"
+                        class="bg-gradient-to-br from-white via-green-50 to-green-100 border-t-4 border-green-600 rounded-2xl shadow-xl transition-transform duration-200 hover:scale-105 hover:shadow-2xl p-7 animate-slide-up delay-150 ripple-card"
                         tabindex="0"
                     >
                         <h3 class="text-lg font-semibold text-green-700 mb-2">
@@ -213,9 +228,10 @@ const testimonials = props.testimonials || [];
                             Browse and read books online, anytime and anywhere,
                             from any device.
                         </p>
+                        <span class="inline-block mt-3 px-3 py-1 rounded-full bg-green-200 text-green-800 text-xs font-bold">New</span>
                     </div>
                     <div
-                        class="bg-white border-t-4 border-green-600 rounded-2xl shadow transition hover:scale-105 hover:shadow-md p-5 animate-slide-up delay-300 ripple-card"
+                        class="bg-gradient-to-br from-white via-green-50 to-green-100 border-t-4 border-green-600 rounded-2xl shadow-xl transition-transform duration-200 hover:scale-105 hover:shadow-2xl p-7 animate-slide-up delay-300 ripple-card"
                         tabindex="0"
                     >
                         <h3 class="text-lg font-semibold text-green-700 mb-2">
@@ -229,7 +245,11 @@ const testimonials = props.testimonials || [];
                 </div>
             </section>
 
-            <div class="my-12 border-t border-green-200"></div>
+            <div class="my-16">
+                <svg height="40" width="100%" viewBox="0 0 100 10" preserveAspectRatio="none" class="w-full">
+                    <rect x="0" y="4" width="100" height="2" fill="url(#divider-gradient)" />
+                </svg>
+            </div>
 
             <section id="testimonials" class="mt-16 animate-fade-in">
                 <h2
@@ -238,15 +258,15 @@ const testimonials = props.testimonials || [];
                     <font-awesome-icon icon="quote-left" /> What Our Users Say
                 </h2>
                 <div
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                 >
                     <div v-if="testimonials.length === 0" class="col-span-3 text-center text-gray-500">
                         No testimonials yet.
                     </div>
                     <div
-                        v-for="(testimonial, idx) in testimonials"
-                        :key="testimonial.id"
-                        class="bg-green-100 border-l-4 border-green-600 rounded-2xl text-center p-6 shadow animate-slide-up"
+                         v-for="(testimonial, idx) in testimonials"
+                         :key="testimonial.id"
+                        class="bg-gradient-to-br from-green-50 via-white to-green-100 border-l-4 border-green-600 rounded-2xl text-center p-8 shadow-xl animate-slide-up transition-transform duration-200 hover:scale-105 hover:shadow-2xl"
                         :class="{'delay-150': idx === 1, 'delay-300': idx === 2}"
                     >
                         <div class="flex justify-center mb-2">
@@ -268,7 +288,11 @@ const testimonials = props.testimonials || [];
                 </div>
             </section>
 
-            <div class="my-12 border-t border-green-200"></div>
+            <div class="my-16">
+                <svg height="40" width="100%" viewBox="0 0 100 10" preserveAspectRatio="none" class="w-full">
+                    <rect x="0" y="4" width="100" height="2" fill="url(#divider-gradient)" />
+                </svg>
+            </div>
 
             <section class="mt-16 text-center animate-fade-in">
                 <div class="max-w-xl mx-auto mb-6">
@@ -286,7 +310,7 @@ const testimonials = props.testimonials || [];
                 <button
                     v-show="showBackToTop"
                     @click="scrollToTop"
-                    class="fixed bottom-6 right-6 bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 focus:bg-green-800 transition z-50 focus:outline-none focus:ring-2 focus:ring-green-400 animate-btt"
+                    class="fixed bottom-6 right-6 bg-gradient-to-r from-green-600 to-green-500 text-white p-4 rounded-full shadow-2xl hover:bg-green-700 focus:bg-green-800 transition z-50 focus:outline-none focus:ring-2 focus:ring-green-400 animate-btt border-4 border-green-200 hover:scale-110"
                     aria-label="Back to top"
                 >
                     <svg

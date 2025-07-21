@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\UserControllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,10 +12,12 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $categories = Category::all();
         $genres = $user->genres()->pluck('name')->toArray();
         return inertia('User/Profile/Index', [
             'user' => $user,
             'genres' => $genres,
+            'categories' => $categories,
         ]);
     }
 

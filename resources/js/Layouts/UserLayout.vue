@@ -179,7 +179,7 @@ const closeBrowseDropdown = () => {
                         </button>
                         <ul
                             v-show="browseDropdown"
-                            class="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg border z-50 overflow-hidden"
+                            class="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg border z-50 "
                             @mouseleave="closeBrowseDropdown"
                         >
                             <li

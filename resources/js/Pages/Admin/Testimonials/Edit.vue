@@ -3,6 +3,7 @@ import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { useForm } from '@inertiajs/vue3';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faQuoteLeft, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
 defineOptions({layout:AdminLayout});
 
 
@@ -16,11 +17,22 @@ const form = useForm({
 });
 
 function submit() {
-    form.put(route('admin.testimonials.update', props.testimonial.id));
+    form.put(route('admin.testimonials.update', props.testimonial.id), {
+        onSuccess: () => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Testimonial updated!',
+                text: 'The testimonial has been updated successfully.',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+        }
+    });
 }
 </script>
 
 <template>
+    <Head title="Edit Testimonials"/>
     <div class="p-6 max-w-xl mx-auto">
         <Link :href="route('admin.testimonials.index')" class="inline-flex items-center gap-2 text-gray-600 hover:text-green-700 mb-4">
             <font-awesome-icon icon="fa-arrow-left" /> Back

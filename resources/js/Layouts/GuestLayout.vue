@@ -70,13 +70,13 @@ library.add(
 <template>
     <div class="min-h-screen flex flex-col bg-gray-100">
         <nav
-            class="bg-gradient-to-r from-green-700 via-green-600 to-green-500 shadow-lg border-b fixed w-full z-40"
+            class="bg-gradient-to-r from-green-700 via-green-600 to-green-500 shadow-2xl border-b fixed w-full z-40 h-20 flex items-center"
         >
             <div
-                class="container mx-auto px-4 flex flex-wrap items-center justify-between h-16"
+                class="container mx-auto px-6 flex flex-wrap items-center justify-between h-20"
             >
                 <Link
-                    class="text-white font-bold flex items-center gap-2 text-lg transition-transform hover:scale-105"
+                    class="text-white font-bold flex items-center gap-2 text-2xl transition-transform hover:scale-110 focus:scale-110 duration-200"
                     :href="route('welcome')"
                 >
                     <font-awesome-icon icon="book" class="text-2xl" />
@@ -164,11 +164,11 @@ library.add(
         <transition name="slide">
             <aside
                 v-if="toggle"
-                class="fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-60 flex flex-col md:hidden transition-transform duration-300 rounded-l-2xl"
+                class="fixed top-0 right-0 h-full w-72 bg-gradient-to-br from-green-50 via-white to-green-100 shadow-2xl z-60 flex flex-col md:hidden transition-transform duration-300 rounded-l-2xl border-l-4 border-green-200"
                 style="z-index: 60"
             >
                 <div
-                    class="flex flex-col items-center gap-2 px-4 h-28 border-b justify-center bg-gradient-to-r from-green-100 to-green-50"
+                    class="flex flex-col items-center gap-2 px-4 h-32 border-b-2 border-green-200 justify-center bg-gradient-to-r from-green-100 to-green-50"
                 >
                     <font-awesome-icon
                         icon="user-circle"
@@ -194,7 +194,7 @@ library.add(
                                     toggle = false;
                                 }
                             "
-                            class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400 w-full text-left"
+                            class="text-green-700 px-3 py-2 rounded-md hover:bg-green-100 focus:bg-green-200 transition flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-400 w-full text-left font-semibold"
                         >
                             <font-awesome-icon icon="house" /> Home
                         </button>
@@ -254,37 +254,35 @@ library.add(
 
         <div class="h-16"></div>
 
-        <main class="flex-grow mx-auto px-4">
+        <main class="flex-grow mx-auto px-6  py-8">
             <slot />
         </main>
 
         <footer
-            class="bg-green-600 text-white text-center py-3 mt-auto shadow-sm border-t border-green-700"
+            class="bg-gradient-to-r from-green-700 via-green-600 to-green-500 text-white text-center py-6 mt-auto shadow-2xl border-t-2 border-green-700"
         >
-            <div
-                class="flex flex-col md:flex-row items-center justify-center gap-2"
-            >
-                <small class="flex items-center gap-1"
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 px-6">
+                <small class="flex items-center gap-1 text-base font-medium"
                     ><font-awesome-icon icon="copyright" />
                     {{ new Date().getFullYear() }} eBaryo Library. All rights
                     reserved.</small
                 >
-                <div class="flex gap-3 mt-1 md:mt-0">
+                <div class="flex gap-4 mt-2 md:mt-0 border-l-2 border-green-400 pl-4">
                     <a
                         href="#"
-                        class="hover:text-green-300 transition"
+                        class="hover:text-green-300 transition-transform duration-150 hover:scale-125"
                         aria-label="Facebook"
                         ><font-awesome-icon :icon="['fab', 'facebook']"
                     /></a>
                     <a
                         href="#"
-                        class="hover:text-green-300 transition"
+                        class="hover:text-green-300 transition-transform duration-150 hover:scale-125"
                         aria-label="Twitter"
                         ><font-awesome-icon :icon="['fab', 'twitter']"
                     /></a>
                     <a
                         href="#"
-                        class="hover:text-green-300 transition"
+                        class="hover:text-green-300 transition-transform duration-150 hover:scale-125"
                         aria-label="Instagram"
                         ><font-awesome-icon :icon="['fab', 'instagram']"
                     /></a>

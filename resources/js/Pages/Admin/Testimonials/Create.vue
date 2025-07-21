@@ -3,6 +3,7 @@ import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { useForm } from '@inertiajs/vue3';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faQuoteLeft, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
 defineOptions({layout:AdminLayout});
 const form = useForm({
     author_name: '',
@@ -12,11 +13,22 @@ const form = useForm({
 });
 
 function submit() {
-    form.post(route('admin.testimonials.store'));
+    form.post(route('admin.testimonials.store'), {
+        onSuccess: () => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Testimonial created!',
+                text: 'The testimonial has been added successfully.',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+        }
+    });
 }
 </script>
 
 <template>
+    <Head title="New Testimonial"/>
     <div class="p-6 max-w-xl mx-auto">
         <Link :href="route('admin.testimonials.index')" class="inline-flex items-center gap-2 text-gray-600 hover:text-green-700 mb-4">
             <font-awesome-icon icon="fa-arrow-left" /> Back

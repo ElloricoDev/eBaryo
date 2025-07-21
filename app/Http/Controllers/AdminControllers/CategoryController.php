@@ -80,7 +80,7 @@ class CategoryController extends Controller
         $category = Category::with('books')->findOrFail($id);
         return inertia('Admin/Category/Books', [
             'category' => $category,
-            'books' => $category->book
+            'books' => $category->books
         ]);
     }
     

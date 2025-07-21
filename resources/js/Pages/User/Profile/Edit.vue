@@ -123,7 +123,7 @@ function onAvatarChange(e) {
                         />
                         <label
                             for="user_name"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
                             :class="{
                                 '-top-5 text-xs text-green-600 font-semibold bg-white px-1':
                                     form.user_name && form.user_name.length > 0,
@@ -149,7 +149,7 @@ function onAvatarChange(e) {
                         />
                         <label
                             for="first_name"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
                             :class="{
                                 '-top-5 text-xs text-green-600 font-semibold bg-white px-1':
                                     form.first_name &&
@@ -176,7 +176,7 @@ function onAvatarChange(e) {
                         />
                         <label
                             for="middle_name"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
                             :class="{
                                 '-top-5 text-xs text-green-600 font-semibold bg-white px-1':
                                     form.middle_name &&
@@ -203,7 +203,7 @@ function onAvatarChange(e) {
                         />
                         <label
                             for="last_name"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
                             :class="{
                                 '-top-5 text-xs text-green-600 font-semibold bg-white px-1':
                                     form.last_name && form.last_name.length > 0,
@@ -233,7 +233,7 @@ function onAvatarChange(e) {
                         />
                         <label
                             for="contact_number"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
                             :class="{
                                 '-top-5 text-xs text-green-600 font-semibold bg-white px-1':
                                     form.contact_number &&
@@ -261,7 +261,7 @@ function onAvatarChange(e) {
                         />
                         <label
                             for="address"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
                             :class="{
                                 '-top-5 text-xs text-green-600 font-semibold bg-white px-1':
                                     form.address && form.address.length > 0,
@@ -288,7 +288,7 @@ function onAvatarChange(e) {
                         />
                         <label
                             for="email"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
+                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 peer-focus:font-semibold bg-white px-1"
                             :class="{
                                 '-top-5 text-xs text-green-600 font-semibold bg-white px-1':
                                     form.email && form.email.length > 0,

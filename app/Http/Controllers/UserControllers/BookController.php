@@ -296,11 +296,13 @@ class BookController extends Controller
             }
         })->filter()->values();
 
+        $categories = Category::all();
         return inertia('User/Books/Saved', [
             'books' => $books,
             'saved_books' => $savedBookIds,
             'currentlyReadingBooks' => $currentlyReadingBooks,
             'finishedBooks' => $finishedBooks,
+            'categories' => $categories,
         ]);
     }
 

@@ -40,7 +40,6 @@ library.add(
 );
 
 const { props } = usePage();
-const books = props.books || [];
 const savedBookIds = ref(
     Array.isArray(props.saved_books) ? props.saved_books : []
 );
@@ -129,24 +128,6 @@ const highestRatedBooks = computed(() => {
         .slice(0, 40);
 });
 
-const continueReadingSectionRef = ref(null);
-
-const scrollContinueReading = (direction) => {
-    const section = continueReadingSectionRef.value;
-    if (
-        section &&
-        section.$el &&
-        section.$el.querySelector(".continue-reading-list")
-    ) {
-        const list = section.$el.querySelector(".continue-reading-list");
-        const scrollAmount = 300;
-        if (direction === "prev") {
-            list.scrollBy({ left: -scrollAmount, behavior: "smooth" });
-        } else if (direction === "next") {
-            list.scrollBy({ left: scrollAmount, behavior: "smooth" });
-        }
-    }
-};
 
 const booksPerPage = 4;
 const sectionPages = {
