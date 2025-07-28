@@ -129,7 +129,7 @@ const highestRatedBooks = computed(() => {
 });
 
 
-const booksPerPage = 4;
+const booksPerPage = 7;
 const sectionPages = {
     recommended: ref(0),
     new: ref(0),

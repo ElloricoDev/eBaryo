@@ -50,7 +50,7 @@ defineOptions({
                     />
                     <label
                         for="email"
-                        class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-4 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
+                        class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
                         :class="{
                             '-top-4 text-xs text-green-600 font-semibold':
                                 form.email,

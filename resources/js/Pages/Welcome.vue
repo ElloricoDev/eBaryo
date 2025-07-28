@@ -91,7 +91,7 @@ const testimonials = props.testimonials || [];
 <template>
     <Head title="Welcome" />
     <GuestLayout>
-        <section class="px-4 py-2 relative bg-gradient-to-br from-green-50 via-white to-green-100 min-h-[90vh]">
+        <section class="px-4 py-2 relative bg-gradient-to-br from-green-50 via-white to-green-100 min-h-[90vh]" id="home">
             <div class="pointer-events-none select-none">
                 <font-awesome-icon
                     v-for="book in floatingBooks"

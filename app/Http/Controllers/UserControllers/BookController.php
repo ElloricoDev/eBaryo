@@ -8,8 +8,6 @@ use App\Models\BookReview;
 use Illuminate\Http\Request;
 use App\Models\ReadingLog;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use App\Models\User;
 use App\Models\Category;
 use Illuminate\Support\Carbon;
 

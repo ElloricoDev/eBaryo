@@ -37,7 +37,7 @@ const smoothScroll = (targetId) => {
     if (isWelcome) {
         const target = document.querySelector(targetId);
         if (target) {
-            const navbarHeight = 64;
+            const navbarHeight = 93;
             const elementPosition =
                 target.getBoundingClientRect().top + window.pageYOffset;
             const offsetPosition = elementPosition - navbarHeight;
