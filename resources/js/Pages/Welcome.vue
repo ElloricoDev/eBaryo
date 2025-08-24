@@ -158,7 +158,7 @@ const testimonials = props.testimonials || [];
                             />
                         </svg>
                     </span>
-                    <span class="text-xs text-green-500 mt-1">Scroll down</span>
+                    <span style="margin-bottom: -100px;" class="text-xs text-green-500">Scroll down</span>
                 </div>
             </div>
 
