@@ -15,7 +15,6 @@ import {
     faSearch,
     faBell,
 } from "@fortawesome/free-solid-svg-icons";
-// import logo from "@/../public/images/default.svg";
 
 const { props, url } = usePage();
 const user = props.auth?.user || {};
@@ -50,7 +49,7 @@ const isActive = (path) => {
     );
 };
 
-const pendingNotifications = computed(() => pendingFeedbackCount); // Example: use feedback count as notifications
+const pendingNotifications = computed(() => pendingFeedbackCount);
 
 library.add(
     faTachometerAlt,
