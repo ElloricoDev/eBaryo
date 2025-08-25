@@ -16,6 +16,7 @@ class Feedback extends Model
         'responded_at',
         'response',
         'notified',
+        'admin_notified',
         'type',
         'book_id',
     ];

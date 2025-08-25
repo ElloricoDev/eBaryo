@@ -87,6 +87,7 @@ Route::middleware('auth', 'admin')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::put('/respond/{id}', 'respond')->name('respond');
             Route::put('/response/{id}', 'update')->name('update');
+            Route::post('/mark-as-read', 'markAsRead')->name('mark-as-read');
         });
     
     Route::resource('testimonials', AdminTestimonialsController::class)->names('admin.testimonials');

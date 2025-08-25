@@ -4,8 +4,9 @@ namespace App\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class FeedbackUpdated
+class FeedbackUpdated implements ShouldBroadcast
 {
     use Dispatchable, SerializesModels;
 
@@ -16,5 +17,23 @@ class FeedbackUpdated
     {
         $this->userId = $userId;
         $this->type = $type;
+    }
+
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
+    public function broadcastOn(): array
+    {
+        if ($this->type === 'admin') {
+            return [new \Illuminate\Broadcasting\Channel('admin-notifications')];
+        }
+        
+        if ($this->userId) {
+            return [new \Illuminate\Broadcasting\Channel('user-feedback.' . $this->userId)];
+        }
+        
+        return [];
     }
 } 

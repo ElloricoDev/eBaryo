@@ -128,6 +128,57 @@ const highestRatedBooks = computed(() => {
         .slice(0, 40);
 });
 
+// ---- Search filtering helpers ----
+const normalizedSearch = computed(() => (search.value || "").trim().toLowerCase());
+const hasSearch = computed(() => normalizedSearch.value.length > 0);
+
+function matchesSearch(book) {
+    const q = normalizedSearch.value;
+    if (!q) return true;
+    const title = (book.title || "").toLowerCase();
+    const author = (book.author || "").toLowerCase();
+    const category = (book.category?.name || "").toLowerCase();
+    return title.includes(q) || author.includes(q) || category.includes(q);
+}
+
+const filteredRecommendedBooks = computed(() => {
+    const list = recommendedBooks.value;
+    if (!normalizedSearch.value) return list;
+    return list.filter(matchesSearch);
+});
+
+const filteredNewBooks = computed(() => {
+    const list = newBooks.value;
+    if (!normalizedSearch.value) return list;
+    return list.filter(matchesSearch);
+});
+
+const filteredHotBooks = computed(() => {
+    const list = hotBooks.value;
+    if (!normalizedSearch.value) return list;
+    return list.filter(matchesSearch);
+});
+
+const filteredMostReadBooks = computed(() => {
+    const list = mostReadBooks.value;
+    if (!normalizedSearch.value) return list;
+    return list.filter(matchesSearch);
+});
+
+const filteredHighestRatedBooks = computed(() => {
+    const list = highestRatedBooks.value;
+    if (!normalizedSearch.value) return list;
+    return list.filter(matchesSearch);
+});
+
+const totalFilteredResults = computed(() =>
+    filteredRecommendedBooks.value.length +
+    filteredNewBooks.value.length +
+    filteredHotBooks.value.length +
+    filteredMostReadBooks.value.length +
+    filteredHighestRatedBooks.value.length
+);
+
 
 const booksPerPage = 7;
 const sectionPages = {
@@ -139,9 +190,11 @@ const sectionPages = {
 };
 
 function paginatedBooks(list, section) {
+    // Support passing a ref/computed or a plain array
+    const items = Array.isArray(list) ? list : Array.isArray(list?.value) ? list.value : [];
     const page = sectionPages[section].value;
     const start = page * booksPerPage;
-    return list.slice(start, start + booksPerPage);
+    return items.slice(start, start + booksPerPage);
 }
 
 onMounted(() => {
@@ -160,6 +213,9 @@ onUnmounted(() => {
 <template>
     <Head title="Home" />
     <UserLayout>
+        <div v-if="hasSearch && totalFilteredResults === 0" class="mb-6 p-4 border border-gray-200 rounded bg-gray-50 text-gray-600">
+            No results found for "{{ search }}".
+        </div>
         <div class="relative">
             <BookSection
                 title="Continue Reading"
@@ -178,7 +234,7 @@ onUnmounted(() => {
             <BookSection
                 title="Recommended for You"
                 icon="thumbs-up"
-                :books="paginatedBooks(recommendedBooks, 'recommended')"
+                :books="paginatedBooks(filteredRecommendedBooks, 'recommended')"
                 sectionType="home"
                 :savedBookIds="savedBookIds"
                 :auth="$page.props.auth"
@@ -188,7 +244,7 @@ onUnmounted(() => {
                 bgColor="bg-yellow-50"
                 iconColor="text-yellow-600"
                 titleColor="text-yellow-700"
-                emptyMessage="No recommendations available yet. Check back later for personalized picks!"
+                :emptyMessage="hasSearch ? 'No results in Recommended.' : 'No recommendations available yet. Check back later for personalized picks!'"
                 emptyIcon="thumbs-up"
                 @save="saveBook"
                 @unsave="unsaveBook"
@@ -198,11 +254,11 @@ onUnmounted(() => {
             <BookSection
                 title="New Books for This Month"
                 icon="star"
-                :books="newBooks"
+                :books="paginatedBooks(filteredNewBooks, 'new')"
                 sectionType="new"
                 :savedBookIds="savedBookIds"
                 :auth="$page.props.auth"
-                emptyMessage="There is no new book for this month."
+                :emptyMessage="hasSearch ? 'No results in New Books.' : 'There is no new book for this month.'"
                 emptyIcon="star"
                 @save="saveBook"
                 @unsave="unsaveBook"
@@ -212,11 +268,11 @@ onUnmounted(() => {
             <BookSection
                 title="Hot Books"
                 icon="fire"
-                :books="hotBooks"
+                :books="paginatedBooks(filteredHotBooks, 'hot')"
                 sectionType="hot"
                 :savedBookIds="savedBookIds"
                 :auth="$page.props.auth"
-                emptyMessage="No trending books right now. Start reading to see what's popular!"
+                :emptyMessage="hasSearch ? 'No results in Hot Books.' : 'No trending books right now. Start reading to see what\'s popular!'"
                 emptyIcon="fire"
                 iconColor="text-red-500"
                 titleColor="text-green-700"
@@ -228,11 +284,11 @@ onUnmounted(() => {
             <BookSection
                 title="Most Read Books"
                 icon="chart-line"
-                :books="mostReadBooks"
+                :books="paginatedBooks(filteredMostReadBooks, 'mostread')"
                 sectionType="mostread"
                 :savedBookIds="savedBookIds"
                 :auth="$page.props.auth"
-                emptyMessage="No reading statistics available yet. Be the first to read a book!"
+                :emptyMessage="hasSearch ? 'No results in Most Read.' : 'No reading statistics available yet. Be the first to read a book!'"
                 emptyIcon="chart-line"
                 iconColor="text-blue-600"
                 titleColor="text-green-700"
@@ -244,11 +300,11 @@ onUnmounted(() => {
             <BookSection
                 title="Highest Ratings"
                 icon="trophy"
-                :books="highestRatedBooks"
+                :books="paginatedBooks(filteredHighestRatedBooks, 'highestrated')"
                 sectionType="highestrated"
                 :savedBookIds="savedBookIds"
                 :auth="$page.props.auth"
-                emptyMessage="No highly rated books yet."
+                :emptyMessage="hasSearch ? 'No results in Highest Ratings.' : 'No highly rated books yet.'"
                 emptyIcon="trophy"
                 iconColor="text-yellow-600"
                 titleColor="text-green-700"

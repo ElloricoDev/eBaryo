@@ -27,6 +27,7 @@ class FeedbackController extends Controller
             'user_id' => auth()->id(),
             'message' => $request->message,
             'status' => 'pending',
+            'admin_notified' => false,
         ]);
         // Broadcast to admin
         event(new FeedbackUpdated(null, 'admin'));
@@ -65,6 +66,7 @@ class FeedbackController extends Controller
             'status' => 'pending',
             'type' => 'book_report',
             'book_id' => $bookId,
+            'admin_notified' => false,
         ]);
 
         return back()->with('success', 'Book report submitted successfully. Thank you for helping us maintain quality content.');

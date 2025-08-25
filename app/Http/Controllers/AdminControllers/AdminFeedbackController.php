@@ -21,6 +21,14 @@ class AdminFeedbackController extends Controller
         ]);
     }
 
+    public function markAsRead()
+    {
+        // Mark all pending feedbacks as notified
+        \App\Models\Feedback::where('status', 'pending')->where('admin_notified', false)->update(['admin_notified' => true]);
+        
+        return response()->json(['success' => true]);
+    }
+
     public function respond($id)
     {
         $feedback = Feedback::findOrFail($id);

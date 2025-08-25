@@ -93,10 +93,22 @@ const submitSearch = () => {
     );
 };
 
+let searchDebounceId = null;
 watch(searchQuery, (val) => {
     if (val === "") {
+        if (searchDebounceId) {
+            clearTimeout(searchDebounceId);
+            searchDebounceId = null;
+        }
         window.dispatchEvent(new CustomEvent("user-search", { detail: "" }));
+        return;
     }
+    if (searchDebounceId) clearTimeout(searchDebounceId);
+    searchDebounceId = setTimeout(() => {
+        window.dispatchEvent(
+            new CustomEvent("user-search", { detail: val })
+        );
+    }, 300);
 });
 
 const toggle = ref(false);

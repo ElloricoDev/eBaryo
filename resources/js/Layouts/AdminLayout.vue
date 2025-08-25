@@ -1,5 +1,5 @@
 <script setup>
-import { usePage, Link } from "@inertiajs/vue3";
+import { usePage, Link, router } from "@inertiajs/vue3";
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -14,23 +14,43 @@ import {
     faSignOutAlt,
     faSearch,
     faBell,
+    faTimes,
+    faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
 
 const { props, url } = usePage();
 const user = props.auth?.user || {};
 const pendingFeedbackCount = props.pendingFeedbackCount || 0;
 const showDropdown = ref(false);
+const showNotificationDropdown = ref(false);
 
 const dropdownRef = ref(null);
+const notificationDropdownRef = ref(null);
 
 const handleClickOutside = (event) => {
     if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
         showDropdown.value = false;
     }
+    if (notificationDropdownRef.value && !notificationDropdownRef.value.contains(event.target)) {
+        showNotificationDropdown.value = false;
+    }
 };
 
 onMounted(() => {
     document.addEventListener("click", handleClickOutside);
+    
+    // Set up real-time notifications for admin
+    if (window.Echo) {
+        window.Echo.private('admin-notifications').listen(
+            'FeedbackUpdated',
+            (e) => {
+                if (e.type === 'admin') {
+                    // Reload the page to update notification count
+                    window.Inertia.reload({ only: ['pendingFeedbackCount'] });
+                }
+            }
+        );
+    }
 });
 onUnmounted(() => {
     document.removeEventListener("click", handleClickOutside);
@@ -38,6 +58,46 @@ onUnmounted(() => {
 
 const toggleDropdown = () => {
     showDropdown.value = !showDropdown.value;
+    showNotificationDropdown.value = false;
+};
+
+const toggleNotificationDropdown = async () => {
+    showNotificationDropdown.value = !showNotificationDropdown.value;
+    showDropdown.value = false;
+    
+    // If opening the dropdown and there are pending notifications, mark them as read
+    if (showNotificationDropdown.value && pendingFeedbackCount > 0) {
+        try {
+            await fetch(route('admin.feedback.mark-as-read'), {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                },
+            });
+        } catch (error) {
+            console.error('Error marking notifications as read:', error);
+        }
+    }
+};
+
+const handleNotificationClick = async () => {
+    showNotificationDropdown.value = false;
+    
+    // Mark notifications as read
+    try {
+        await fetch(route('admin.feedback.mark-as-read'), {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+            },
+        });
+    } catch (error) {
+        console.error('Error marking notifications as read:', error);
+    }
+    
+    router.visit(route('admin.feedback.index'));
 };
 
 const isActive = (path) => {
@@ -61,7 +121,9 @@ library.add(
     faCog,
     faSignOutAlt,
     faSearch,
-    faBell
+    faBell,
+    faTimes,
+    faEnvelope
 );
 </script>
 
@@ -182,13 +244,76 @@ library.add(
                     </div>
                 </div>
                 <div class="flex items-center gap-6">
-                    <button class="relative focus:outline-none group">
-                        <font-awesome-icon icon="bell" class="text-green-600 w-6 h-6" />
-                        <span v-if="pendingFeedbackCount > 0" class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 animate-bounce shadow">
-                            {{ pendingFeedbackCount }}
-                        </span>
-                        <span class="sr-only">Notifications</span>
-                    </button>
+                    <div class="relative" ref="notificationDropdownRef">
+                        <button 
+                            @click="toggleNotificationDropdown"
+                            class="relative focus:outline-none group p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                            <font-awesome-icon icon="bell" class="text-green-600 w-6 h-6" />
+                            <span v-if="pendingFeedbackCount > 0" class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 animate-bounce shadow">
+                                {{ pendingFeedbackCount }}
+                            </span>
+                            <span class="sr-only">Notifications</span>
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <transition name="fade-slide">
+                            <div
+                                v-if="showNotificationDropdown"
+                                class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border z-50 animate-fade-in"
+                            >
+                                <div class="p-4 border-b border-gray-200">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-lg font-semibold text-gray-800">Notifications</h3>
+                                        <button 
+                                            @click="showNotificationDropdown = false"
+                                            class="text-gray-400 hover:text-gray-600 transition-colors"
+                                        >
+                                            <font-awesome-icon icon="times" class="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="max-h-64 overflow-y-auto">
+                                    <div v-if="pendingFeedbackCount > 0" class="p-4">
+                                        <div class="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors cursor-pointer"
+                                             @click="handleNotificationClick">
+                                            <div class="flex-shrink-0">
+                                                <font-awesome-icon icon="envelope" class="text-red-600 w-5 h-5" />
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-gray-900">
+                                                    New Feedback Pending
+                                                </p>
+                                                <p class="text-xs text-gray-600 mt-1">
+                                                    You have {{ pendingFeedbackCount }} pending feedback{{ pendingFeedbackCount > 1 ? 's' : '' }} to review
+                                                </p>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                                                    {{ pendingFeedbackCount }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div v-else class="p-4 text-center">
+                                        <font-awesome-icon icon="bell" class="text-gray-400 w-8 h-8 mx-auto mb-2" />
+                                        <p class="text-gray-500 text-sm">No new notifications</p>
+                                    </div>
+                                </div>
+                                
+                                <div v-if="pendingFeedbackCount > 0" class="p-3 border-t border-gray-200">
+                                    <button
+                                        @click="handleNotificationClick"
+                                        class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                                    >
+                                        View All Feedback
+                                    </button>
+                                </div>
+                            </div>
+                        </transition>
+                    </div>
                     <div class="relative" ref="dropdownRef">
                         <button
                             @click="toggleDropdown"
@@ -269,6 +394,34 @@ library.add(
 .fade-slide-leave-from {
     opacity: 1;
     transform: translateY(0);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(-25%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+        transform: none;
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+.animate-bounce {
+    animation: bounce 1s infinite;
 }
 </style>
 
