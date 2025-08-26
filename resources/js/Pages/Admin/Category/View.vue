@@ -16,7 +16,7 @@ const category = props.category;
 
 <template>
     <Head :title="`View Category: ${category.name}`" />
-    <div class="max-w-4xl mx-auto py-10 px-4">
+    <div class="max-w-4xl mx-auto  px-4">
         <!-- Header -->
         <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2">
@@ -24,7 +24,7 @@ const category = props.category;
             </h1>
             <Link
                 :href="route('admin.categories.index')"
-                class="inline-flex items-center bg-green-600 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:bg-green-700 transition-transform duration-200 hover:scale-105 text-base"
+                class="inline-flex items-center bg-green-600 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:bg-green-700 text-base"
             >
                 <font-awesome-icon icon="arrow-left" class="mr-2" /> Back to Categories
             </Link>

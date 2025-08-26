@@ -52,14 +52,14 @@ function markResponded(id) {
 
 <template>
   <Head title="Feedback Management" />
-  <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto  px-4 sm:px-6 lg:px-8">
     <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex items-center gap-2">
       <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2">
         <font-awesome-icon icon="comments" /> Feedback Management
       </h1>
     </div>
 
-    <div class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl hover:border-green-700 transition mb-8">
+    <div class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl hover:border-green-700 mb-8">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-green-100 text-green-700">
@@ -76,7 +76,7 @@ function markResponded(id) {
             <tr
               v-for="fb in props.feedbacks"
               :key="fb.id"
-              class="even:bg-green-50 hover:bg-green-100 transition-colors duration-150 hover:scale-[1.01] border-b"
+              class="even:bg-green-50 hover:bg-green-100 border-b"
             >
               <td class="px-4 py-3">{{ fb.user?.user_name || "Unknown" }}</td>
               <td class="px-4 py-3">{{ fb.message }}</td>
@@ -106,7 +106,7 @@ function markResponded(id) {
                   <textarea
                     v-model="responseInputs[fb.id]"
                     rows="2"
-                    class="w-full border border-green-400 rounded-xl px-3 py-2 focus:ring-2 focus:ring-green-300 focus:border-green-600 mb-2 shadow-sm transition-all duration-150"
+                    class="w-full border border-green-400 rounded-xl px-3 py-2 focus:ring-2 focus:ring-green-300 focus:border-green-600 mb-2 shadow-sm"
                     placeholder="Write a response..."
                   ></textarea>
 
@@ -117,7 +117,7 @@ function markResponded(id) {
                   <button
                     @click="saveResponse(fb.id)"
                     :disabled="!responseInputs[fb.id]?.trim()"
-                    class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-sm px-4 py-2 rounded-full shadow-xl transition-transform duration-150 hover:scale-105 disabled:opacity-50 flex items-center gap-1 font-semibold"
+                    class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-sm px-4 py-2 rounded-full shadow-xl disabled:opacity-50 flex items-center gap-1 font-semibold"
                   >
                     <font-awesome-icon icon="save" /> Save Response
                   </button>
@@ -133,7 +133,7 @@ function markResponded(id) {
                 <button
                   v-if="fb.status === 'pending'"
                   @click="markResponded(fb.id)"
-                  class="border border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-4 py-2 text-sm rounded-full shadow transition-transform duration-150 hover:scale-105 flex items-center gap-1 font-semibold"
+                  class="border border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-4 py-2 text-sm rounded-full shadow flex items-center gap-1 font-semibold"
                 >
                   <font-awesome-icon icon="check-circle" /> Mark Responded
                 </button>

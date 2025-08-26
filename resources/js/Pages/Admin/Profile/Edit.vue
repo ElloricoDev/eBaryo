@@ -64,12 +64,12 @@ function onAvatarChange(e) {
 <template>
   <Head title="Edit Profile" />
 
-  <div class="max-w-5xl mx-auto py-10 px-4">
+  <div class="max-w-5xl mx-auto  px-4">
     <!-- Header -->
     <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex items-center gap-3">
       <Link
         :href="route('admin.profile.index')"
-        class="inline-flex items-center px-6 py-2 border border-green-600 text-green-600 hover:bg-green-50 rounded-full shadow font-semibold transition-transform duration-200 hover:scale-105 text-base"
+        class="inline-flex items-center px-6 py-2 border border-green-600 text-green-600 hover:bg-green-50 rounded-full shadow font-semibold text-base"
       >
         <font-awesome-icon icon="arrow-left" class="mr-2" /> Back
       </Link>
@@ -82,7 +82,7 @@ function onAvatarChange(e) {
     <form
       @submit.prevent="submit"
       enctype="multipart/form-data"
-      class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl p-8 hover:shadow-2xl transition"
+      class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl p-8"
     >
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- User Name -->
@@ -173,13 +173,13 @@ function onAvatarChange(e) {
         <button
           type="submit"
           :disabled="form.processing"
-          class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-full shadow-xl font-bold text-lg transition-transform duration-200 hover:scale-105 disabled:opacity-50"
+          class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-full shadow-xl font-bold text-lg disabled:opacity-50"
         >
           <font-awesome-icon icon="save" class="mr-2" /> {{ form.processing ? 'Saving...' : 'Update Profile' }}
         </button>
         <Link
           :href="route('admin.profile.index')"
-          class="inline-flex items-center px-8 py-3 border border-green-600 text-green-600 rounded-full hover:bg-green-50 shadow-sm font-semibold text-lg transition"
+          class="inline-flex items-center px-8 py-3 border border-green-600 text-green-600 rounded-full hover:bg-green-50 shadow-sm font-semibold text-lg"
         >
           <font-awesome-icon icon="arrow-left" class="mr-2" /> Cancel
         </Link>
@@ -190,6 +190,6 @@ function onAvatarChange(e) {
 
 <style scoped>
 .form-input {
-  @apply w-full border border-green-500 rounded-full px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200 transition-all duration-150;
+  @apply w-full border border-green-500 rounded-full px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200;
 }
 </style>

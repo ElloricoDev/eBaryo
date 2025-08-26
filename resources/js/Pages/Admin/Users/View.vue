@@ -17,11 +17,11 @@ const props = defineProps({
 <template>
   <Head title="User Details" />
 
-  <div class="max-w-5xl mx-auto px-4 py-10">
+  <div class="max-w-5xl mx-auto px-4">
     <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col md:flex-row md:items-center gap-4">
       <Link
         :href="route('admin.users.index')"
-        class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-full shadow-lg transition-transform duration-200 hover:scale-105"
+        class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-full shadow-lg"
       >
         <font-awesome-icon icon="arrow-left" /> Back
       </Link>
@@ -50,31 +50,31 @@ const props = defineProps({
       <div class="p-8">
         <table class="w-full table-auto">
           <tbody class="divide-y divide-gray-200">
-            <tr class="even:bg-green-50 transition-colors">
+            <tr class="even:bg-green-50">
               <th class="text-green-700 text-left font-semibold pr-6 py-3 w-1/3"><font-awesome-icon icon="user" /> First Name</th>
               <td class="font-medium text-gray-800">{{ props.user.first_name || 'N/A' }}</td>
             </tr>
-            <tr class="even:bg-green-50 transition-colors">
+            <tr class="even:bg-green-50">
               <th class="text-green-700 text-left font-semibold pr-6 py-3"><font-awesome-icon icon="user" /> Middle Name</th>
               <td>{{ props.user.middle_name || 'N/A' }}</td>
             </tr>
-            <tr class="even:bg-green-50 transition-colors">
+            <tr class="even:bg-green-50">
               <th class="text-green-700 text-left font-semibold pr-6 py-3"><font-awesome-icon icon="user" /> Last Name</th>
               <td>{{ props.user.last_name || 'N/A' }}</td>
             </tr>
-            <tr class="even:bg-green-50 transition-colors">
+            <tr class="even:bg-green-50">
               <th class="text-green-700 text-left font-semibold pr-6 py-3"><font-awesome-icon icon="phone" /> Contact Number</th>
               <td>{{ props.user.contact_number || 'N/A' }}</td>
             </tr>
-            <tr class="even:bg-green-50 transition-colors">
+            <tr class="even:bg-green-50">
               <th class="text-green-700 text-left font-semibold pr-6 py-3"><font-awesome-icon icon="map-marker-alt" /> Address</th>
               <td>{{ props.user.address || 'N/A' }}</td>
             </tr>
-            <tr class="even:bg-green-50 transition-colors">
+            <tr class="even:bg-green-50">
               <th class="text-green-700 text-left font-semibold pr-6 py-3"><font-awesome-icon icon="envelope" /> Email</th>
               <td>{{ props.user.email || 'N/A' }}</td>
             </tr>
-            <tr class="even:bg-green-50 transition-colors">
+            <tr class="even:bg-green-50">
               <th class="text-green-700 text-left font-semibold pr-6 py-3"><font-awesome-icon icon="calendar" /> Registered At</th>
               <td>{{ props.user.created_at ? new Date(props.user.created_at).toLocaleString() : 'N/A' }}</td>
             </tr>

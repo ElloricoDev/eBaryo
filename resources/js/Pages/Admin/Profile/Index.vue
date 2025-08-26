@@ -21,7 +21,7 @@ const user = props.user
 <template>
   <Head title="My Profile" />
 
-  <div class="max-w-4xl mx-auto py-10 px-4">
+  <div class="max-w-4xl mx-auto px-4">
     <!-- Header -->
     <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex items-center gap-2">
       <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2">
@@ -31,7 +31,7 @@ const user = props.user
 
     <!-- Profile Card -->
     <div
-      class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl p-8 hover:shadow-2xl transition"
+      class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl p-8"
     >
       <!-- Avatar -->
       <div class="text-center mb-6">
@@ -78,7 +78,7 @@ const user = props.user
       <!-- Edit Button -->
       <Link
         :href="route('admin.profile.edit')"
-        class="block w-full text-center bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold mt-8 py-3 rounded-full shadow-xl transition-transform duration-200 hover:scale-105 text-lg"
+        class="block w-full text-center bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold mt-8 py-3 rounded-full shadow-xl text-lg"
       >
         <font-awesome-icon icon="pencil-alt" class="mr-1" /> Edit Profile
       </Link>

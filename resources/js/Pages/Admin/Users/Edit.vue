@@ -43,12 +43,12 @@ const submit = () => {
 <template>
   <Head title="Edit User" />
 
-  <div class="max-w-6xl mx-auto px-4 py-10">
+  <div class="max-w-6xl mx-auto px-4">
     <!-- Header -->
     <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col md:flex-row md:items-center gap-4">
       <Link
         :href="route('admin.users.index')"
-        class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-full shadow-lg transition-transform duration-200 hover:scale-105"
+        class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-full shadow-lg"
       >
         <font-awesome-icon icon="arrow-left" /> Back
       </Link>
@@ -68,7 +68,7 @@ const submit = () => {
             <input
               v-model="form.first_name"
               type="text"
-              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-150"
+              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none"
               :class="{ 'border-red-500': form.errors.first_name }"
             />
             <p v-if="form.errors.first_name" class="text-red-500 text-sm mt-1">{{ form.errors.first_name }}</p>
@@ -81,7 +81,7 @@ const submit = () => {
             <input
               v-model="form.middle_name"
               type="text"
-              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-150"
+              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none"
               :class="{ 'border-red-500': form.errors.middle_name }"
             />
             <p v-if="form.errors.middle_name" class="text-red-500 text-sm mt-1">{{ form.errors.middle_name }}</p>
@@ -94,7 +94,7 @@ const submit = () => {
             <input
               v-model="form.last_name"
               type="text"
-              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-150"
+              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none"
               :class="{ 'border-red-500': form.errors.last_name }"
             />
             <p v-if="form.errors.last_name" class="text-red-500 text-sm mt-1">{{ form.errors.last_name }}</p>
@@ -109,7 +109,7 @@ const submit = () => {
             <input
               v-model="form.user_name"
               type="text"
-              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-150"
+              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none"
               :class="{ 'border-red-500': form.errors.user_name }"
             />
             <p v-if="form.errors.user_name" class="text-red-500 text-sm mt-1">{{ form.errors.user_name }}</p>
@@ -122,7 +122,7 @@ const submit = () => {
             <input
               v-model="form.contact_number"
               type="text"
-              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-150"
+              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none"
             />
           </div>
 
@@ -133,7 +133,7 @@ const submit = () => {
             <input
               v-model="form.address"
               type="text"
-              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-150"
+              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none"
             />
           </div>
 
@@ -144,7 +144,7 @@ const submit = () => {
             <input
               v-model="form.email"
               type="email"
-              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none transition-all duration-150"
+              class="w-full border border-green-500 rounded-full pl-10 pr-4 py-2 shadow-sm focus:ring-2 focus:ring-green-200 focus:outline-none"
               :class="{ 'border-red-500': form.errors.email }"
             />
             <p v-if="form.errors.email" class="text-red-500 text-sm mt-1">{{ form.errors.email }}</p>
@@ -158,7 +158,7 @@ const submit = () => {
         <div class="pt-4">
           <button
             type="submit"
-            class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold px-6 py-3 rounded-full shadow-xl transition-transform duration-200 inline-flex items-center gap-2 justify-center hover:scale-105"
+            class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold px-6 py-3 rounded-full shadow-xl inline-flex items-center gap-2 justify-center"
             :disabled="form.processing"
           >
             <font-awesome-icon icon="user-edit" /> {{ form.processing ? 'Saving...' : 'Update User' }}

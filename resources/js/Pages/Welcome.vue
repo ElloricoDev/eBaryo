@@ -109,10 +109,9 @@ const testimonials = props.testimonials || [];
                         class="inline-block bg-white/70 backdrop-blur-lg px-8 py-6 rounded-2xl shadow-2xl animate-slide-down border border-green-200"
                         style="box-shadow: 0 8px 32px 0 rgba(16,185,129,0.10);"
                     >
-                        <font-awesome-icon
-                            icon="book"
-                            class="mr-2 text-green-700"
-                        />Welcome to eBaryo Library
+                        
+                        <img src="/favicon1.png" alt="eBaryo logo" class="w-12 h-12 md:w-14 md:h-14 inline-block align-middle mr-2" />
+                        Welcome to eBaryo Library
                     </span>
                 </h1>
                 <p

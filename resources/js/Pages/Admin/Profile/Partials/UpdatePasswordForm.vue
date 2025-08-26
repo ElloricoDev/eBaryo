@@ -59,7 +59,7 @@ const submit = () => {
           <input
             v-model="form.current_password"
             type="password"
-            class="w-full rounded-full border border-green-500 shadow-sm focus:ring-2 focus:ring-green-300 focus:border-green-600 pl-10 py-2 transition-all duration-150"
+            class="w-full rounded-full border border-green-500 shadow-sm focus:ring-2 focus:ring-green-300 focus:border-green-600 pl-10 py-2"
           />
           <div v-if="form.errors.current_password" class="text-red-500 text-sm mt-1">
             {{ form.errors.current_password }}
@@ -74,7 +74,7 @@ const submit = () => {
           <input
             v-model="form.password"
             type="password"
-            class="w-full rounded-full border border-green-500 shadow-sm focus:ring-2 focus:ring-green-300 focus:border-green-600 pl-10 py-2 transition-all duration-150"
+            class="w-full rounded-full border border-green-500 shadow-sm focus:ring-2 focus:ring-green-300 focus:border-green-600 pl-10 py-2"
           />
           <div v-if="form.errors.password" class="text-red-500 text-sm mt-1">
             {{ form.errors.password }}
@@ -89,14 +89,14 @@ const submit = () => {
           <input
             v-model="form.password_confirmation"
             type="password"
-            class="w-full rounded-full border border-green-500 shadow-sm focus:ring-2 focus:ring-green-300 focus:border-green-600 pl-10 py-2 transition-all duration-150"
+            class="w-full rounded-full border border-green-500 shadow-sm focus:ring-2 focus:ring-green-300 focus:border-green-600 pl-10 py-2"
           />
         </div>
 
         <button
           type="submit"
           :disabled="form.processing"
-          class="w-full inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold rounded-full shadow-xl text-lg transition-transform duration-200 hover:scale-105 disabled:opacity-50"
+          class="w-full inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold rounded-full shadow-xl text-lg disabled:opacity-50"
         >
           <font-awesome-icon icon="arrow-rotate-right" class="mr-2" />
           {{ form.processing ? 'Updating...' : 'Update Password' }}

@@ -79,7 +79,7 @@ library.add(
                     class="text-white font-bold flex items-center gap-2 text-2xl transition-transform hover:scale-110 focus:scale-110 duration-200"
                     :href="route('welcome')"
                 >
-                    <font-awesome-icon icon="book" class="text-2xl" />
+                <img src="/favicon1.png" alt="" class="w-8 h-8 md:w-10 md:h-10" />
                     <span>eBaryo Library</span>
                 </Link>
                 <button

@@ -45,14 +45,14 @@ const confirmDelete = (id) => {
 
 <template>
   <Head title="Users" />
-  <div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="max-w-7xl mx-auto px-4">
     <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2">
         <font-awesome-icon icon="person" /> Users
       </h1>
       <Link
         :href="route('admin.users.create')"
-        class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-full shadow-lg transition-transform duration-200 hover:scale-105 text-base"
+        class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-full shadow-lg text-base"
       >
         <font-awesome-icon icon="plus" /> Create User
       </Link>
@@ -79,7 +79,7 @@ const confirmDelete = (id) => {
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
-          <tr v-for="(user, index) in usersList" :key="user.id" class="even:bg-green-50 hover:bg-green-100 transition-colors duration-150 hover:scale-[1.01]">
+          <tr v-for="(user, index) in usersList" :key="user.id" class="even:bg-green-50 hover:bg-green-100">
             <td class="px-4 py-3 font-semibold">{{ index + 1 }}</td>
             <td class="px-4 py-3">{{ user.user_name }}</td>
             <td class="px-4 py-3">{{ user.email }}</td>
@@ -99,19 +99,19 @@ const confirmDelete = (id) => {
             <td class="px-4 py-3 space-x-1">
               <Link
                 :href="route('admin.users.show', user.id)"
-                class="inline-flex items-center gap-1 text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-full text-sm shadow transition-transform duration-150 hover:scale-105"
+                class="inline-flex items-center gap-1 text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-full text-sm shadow"
               >
                 <font-awesome-icon icon="eye" /> View
               </Link>
               <Link
                 :href="route('admin.users.edit', user.id)"
-                class="inline-flex items-center gap-1 text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-full text-sm shadow transition-transform duration-150 hover:scale-105"
+                class="inline-flex items-center gap-1 text-white bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded-full text-sm shadow"
               >
                 <font-awesome-icon icon="pencil-alt" /> Edit
               </Link>
               <button
                 @click="confirmDelete(user.id)"
-                class="inline-flex items-center gap-1 text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full text-sm shadow transition-transform duration-150 hover:scale-105"
+                class="inline-flex items-center gap-1 text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full text-sm shadow"
               >
                 <font-awesome-icon icon="trash" /> Delete
               </button>

@@ -31,7 +31,7 @@ const submit = () => {
 </script>
 
 <template>
-  <div class="bg-gradient-to-br from-white via-red-50 to-red-100 border-2 border-red-400 rounded-2xl shadow-2xl transition hover:shadow-2xl mt-10 mb-8">
+  <div class="bg-gradient-to-br from-white via-red-50 to-red-100 border-2 border-red-400 rounded-2xl shadow-2xl mt-10 mb-8">
     <!-- Header -->
     <div class="bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-4 flex items-center gap-2 rounded-t-2xl shadow">
       <font-awesome-icon icon="user-slash" />
@@ -51,7 +51,7 @@ const submit = () => {
             v-model="form.password"
             type="password"
             placeholder="Enter your password to confirm"
-            class="w-full rounded-full border border-red-400 shadow-sm focus:ring-2 focus:ring-red-300 focus:border-red-600 pl-10 py-2 transition-all duration-150"
+            class="w-full rounded-full border border-red-400 shadow-sm focus:ring-2 focus:ring-red-300 focus:border-red-600 pl-10 py-2"
           />
           <div v-if="form.errors.password" class="text-red-500 text-sm mt-1">
             {{ form.errors.password }}
@@ -62,7 +62,7 @@ const submit = () => {
         <button
           type="submit"
           :disabled="form.processing"
-          class="w-full inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold rounded-full shadow-xl text-lg transition-transform duration-200 hover:scale-105 disabled:opacity-50"
+          class="w-full inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold rounded-full shadow-xl text-lg disabled:opacity-50"
         >
           <font-awesome-icon icon="trash" class="mr-2" />
           {{ form.processing ? 'Deleting...' : 'Delete Account' }}

@@ -3,7 +3,7 @@
   <div class="max-w-6xl mx-auto px-4 py-10">
     <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
       <Link :href="route('admin.books.index')"
-        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-bold rounded-full shadow-lg hover:from-green-600 hover:to-green-800 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 hover:scale-105"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-bold rounded-full shadow-lg hover:from-green-600 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
       >
         <font-awesome-icon icon="arrow-left" class="text-lg" />
         <span class="hidden sm:inline">Back to Books</span>
@@ -98,7 +98,7 @@
         <div>
           <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="image" /> Cover Image</label>
           <div class="relative">
-            <input type="file" @change="onCoverChange" accept="image/*" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200 transition-all duration-150" />
+            <input type="file" @change="onCoverChange" accept="image/*" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200" />
           </div>
           <p v-if="form.errors.cover_image" class="text-red-600 text-sm mt-1">{{ form.errors.cover_image }}</p>
           <div v-if="coverPreview" class="mt-2">
@@ -110,7 +110,7 @@
         <div>
           <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="file" /> Ebook File</label>
           <div class="relative">
-            <input type="file" @change="onEbookChange" accept=".pdf,.epub,.mobi,.txt,.docx,.azw3,.fb2,.djvu,.rtf,.html,.htm" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200 transition-all duration-150" />
+            <input type="file" @change="onEbookChange" accept=".pdf,.epub,.mobi,.txt,.docx,.azw3,.fb2,.djvu,.rtf,.html,.htm" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200" />
           </div>
           <p v-if="ebookName" class="text-sm text-gray-600 mt-1">Selected: {{ ebookName }}</p>
           <p v-if="form.errors.ebook_file" class="text-red-600 text-sm mt-1">{{ form.errors.ebook_file }}</p>
@@ -122,10 +122,10 @@
 
       <!-- Buttons -->
       <div class="mt-8 flex gap-4">
-        <button type="submit" class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold px-8 py-3 rounded-full shadow-xl transition-transform duration-200 inline-flex items-center gap-2 justify-center text-lg hover:scale-105" :disabled="form.processing">
+        <button type="submit" class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold px-8 py-3 rounded-full shadow-xl inline-flex items-center gap-2 justify-center text-lg" :disabled="form.processing">
           <font-awesome-icon icon="save" /> {{ form.processing ? 'Saving...' : 'Update Book' }}
         </button>
-        <Link :href="route('admin.books.index')" class="px-8 py-3 border border-green-600 text-green-700 hover:bg-green-600 hover:text-white font-semibold rounded-full shadow-sm transition flex items-center gap-2 text-lg">
+        <Link :href="route('admin.books.index')" class="px-8 py-3 border border-green-600 text-green-700 hover:bg-green-600 hover:text-white font-semibold rounded-full shadow-sm flex items-center gap-2 text-lg">
           <font-awesome-icon icon="xmark" /> Cancel
         </Link>
       </div>
@@ -202,18 +202,18 @@ const submit = () => {
 
 <style scoped>
 .btn-primary {
-  @apply bg-green-600 text-white font-semibold px-4 py-2 rounded-full shadow hover:bg-green-700 transition;
+  @apply bg-green-600 text-white font-semibold px-4 py-2 rounded-full shadow hover:bg-green-700;
 }
 .btn-outline {
-  @apply border border-green-600 text-green-600 font-semibold px-4 py-2 rounded-full hover:bg-green-100 transition;
+  @apply border border-green-600 text-green-600 font-semibold px-4 py-2 rounded-full hover:bg-green-100;
 }
 .form-input {
-  @apply w-full border border-green-500 rounded-full px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200 transition-all duration-150;
+  @apply w-full border border-green-500 rounded-full px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200;
 }
 .form-select {
-  @apply w-full border border-green-500 rounded-full px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200 transition-all duration-150;
+  @apply w-full border border-green-500 rounded-full px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200;
 }
 .form-textarea {
-  @apply w-full border border-green-500 rounded-full px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200 transition-all duration-150;
+  @apply w-full border border-green-500 rounded-full px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200;
 }
 </style>

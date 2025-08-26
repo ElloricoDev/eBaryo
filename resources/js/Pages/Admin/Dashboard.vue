@@ -50,6 +50,7 @@ const uploadsChartData = {
 
 const uploadsChartOptions = {
   responsive: true,
+  animation: false,
   plugins: {
     legend: { display: false },
     title: { display: true, text: 'Ebook Uploads Over Time' }
@@ -62,7 +63,7 @@ const uploadsChartOptions = {
 
 <template>
   <Head title="Dashboard" />
-  <div class="p-6">
+  <div class="p-2">
     <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex items-center gap-3">
       <span class="bg-green-600 text-white rounded-full p-2 shadow flex items-center justify-center">
         <font-awesome-icon icon="tachometer-alt" class="w-6 h-6" />
@@ -71,7 +72,7 @@ const uploadsChartOptions = {
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4 transition-transform duration-200 hover:scale-105">
+      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
         <span class="bg-green-100 text-green-600 rounded-full p-3 shadow flex items-center justify-center">
           <font-awesome-icon icon="users" class="text-xl" />
         </span>
@@ -80,7 +81,7 @@ const uploadsChartOptions = {
           <p class="text-2xl font-bold text-green-700">{{ props.totalUsers }}</p>
         </div>
       </div>
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4 transition-transform duration-200 hover:scale-105">
+      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
         <span class="bg-green-100 text-green-600 rounded-full p-3 shadow flex items-center justify-center">
           <font-awesome-icon icon="book" class="text-xl" />
         </span>
@@ -89,7 +90,7 @@ const uploadsChartOptions = {
           <p class="text-2xl font-bold text-green-700">{{ props.totalBooks }}</p>
         </div>
       </div>
-      <div class="bg-white border-2 border-blue-400 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4 transition-transform duration-200 hover:scale-105">
+      <div class="bg-white border-2 border-blue-400 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
         <span class="bg-blue-100 text-blue-500 rounded-full p-3 shadow flex items-center justify-center">
           <font-awesome-icon icon="book" class="text-xl" />
         </span>
@@ -98,7 +99,7 @@ const uploadsChartOptions = {
           <p class="text-2xl font-bold text-blue-500">{{ props.newBooksThisMonth }}</p>
         </div>
       </div>
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4 transition-transform duration-200 hover:scale-105">
+      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
         <span class="bg-green-100 text-green-600 rounded-full p-3 shadow flex items-center justify-center">
           <font-awesome-icon icon="tags" class="text-xl" />
         </span>
@@ -110,7 +111,7 @@ const uploadsChartOptions = {
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4 transition-transform duration-200 hover:scale-105">
+      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
         <span class="bg-green-100 text-green-600 rounded-full p-3 shadow flex items-center justify-center">
           <font-awesome-icon icon="user" class="text-xl" />
         </span>
@@ -119,7 +120,7 @@ const uploadsChartOptions = {
           <p class="text-2xl font-bold text-green-700">{{ props.activeReaders }}</p>
         </div>
       </div>
-      <div class="bg-white border-2 border-red-400 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4 transition-transform duration-200 hover:scale-105">
+      <div class="bg-white border-2 border-red-400 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
         <span class="bg-red-100 text-red-500 rounded-full p-3 shadow flex items-center justify-center">
           <font-awesome-icon icon="comments" class="text-xl" />
         </span>
@@ -143,7 +144,7 @@ const uploadsChartOptions = {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="user in props.recentUsers" :key="user.id" class="border-b even:bg-green-50 hover:bg-green-100 transition-colors">
+              <tr v-for="user in props.recentUsers" :key="user.id" class="border-b even:bg-green-50 hover:bg-green-100">
                 <td class="p-2">{{ user.user_name }}</td>
                 <td class="p-2">{{ user.email }}</td>
                 <td class="p-2">{{ new Date(user.created_at).toLocaleDateString() }}</td>
@@ -168,7 +169,7 @@ const uploadsChartOptions = {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="book in props.recentBooks" :key="book.id" class="border-b even:bg-green-50 hover:bg-green-100 transition-colors">
+              <tr v-for="book in props.recentBooks" :key="book.id" class="border-b even:bg-green-50 hover:bg-green-100">
                 <td class="p-2">{{ book.title }}</td>
                 <td class="p-2">{{ book.author }}</td>
                 <td class="p-2">{{ new Date(book.created_at).toLocaleDateString() }}</td>
@@ -194,7 +195,7 @@ const uploadsChartOptions = {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in props.mostReadBooks" :key="item.book_id" class="border-b even:bg-green-50 hover:bg-green-100 transition-colors">
+              <tr v-for="item in props.mostReadBooks" :key="item.book_id" class="border-b even:bg-green-50 hover:bg-green-100">
                 <td class="p-2">{{ item.book?.title || 'Unknown' }}</td>
                 <td class="p-2">{{ item.read_count }}</td>
               </tr>
@@ -217,7 +218,7 @@ const uploadsChartOptions = {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in props.mostActiveUsers" :key="item.user_id" class="border-b even:bg-green-50 hover:bg-green-100 transition-colors">
+              <tr v-for="item in props.mostActiveUsers" :key="item.user_id" class="border-b even:bg-green-50 hover:bg-green-100">
                 <td class="p-2">{{ item.user?.user_name || 'Unknown' }}</td>
                 <td class="p-2">{{ item.read_count }}</td>
               </tr>

@@ -173,8 +173,8 @@ const closeBrowseDropdown = () => {
                         class="text-white font-bold flex items-center gap-2 text-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300"
                         :href="route('home')"
                     >
-                        <font-awesome-icon icon="book" class="text-2xl" />
-                        <span>eBaryo</span>
+                        <img src="/favicon1.png" alt="" class="w-8 h-8 md:w-10 md:h-10" />
+                        <span>eBaryo Library</span>
                     </Link>
                     <div class="relative hidden md:block">
                         <button

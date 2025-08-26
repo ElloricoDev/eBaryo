@@ -8,11 +8,15 @@ use App\Http\Controllers\AdminControllers\UserController;
 use App\Http\Controllers\AdminControllers\AdminSettingsController;
 use App\Http\Controllers\AdminControllers\AdminFeedbackController;
 use App\Http\Controllers\AdminControllers\AdminTestimonialsController;
+use App\Http\Controllers\AdminControllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::middleware('auth', 'admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Admin Search Route
+    Route::get('/admin/search', [SearchController::class, 'search'])->name('admin.search');
 
     //Admin Profile
     Route::controller(ProfileController::class)

@@ -25,10 +25,10 @@ const isEpub = computed(() => fileExt.value === 'epub');
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto py-10 px-4">
+  <div class="max-w-6xl mx-auto px-4">
     <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
       <Link :href="route('admin.books.index')"
-        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-bold rounded-full shadow-lg hover:from-green-600 hover:to-green-800 transition-transform duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 hover:scale-105"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-bold rounded-full shadow-lg hover:from-green-600 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
       >
         <font-awesome-icon icon="arrow-left" class="text-lg" />
         <span class="hidden sm:inline">Back to Books</span>
@@ -91,7 +91,7 @@ const isEpub = computed(() => fileExt.value === 'epub');
           <div class="mt-4 text-base">
             <div class="font-semibold text-green-700 mb-1 flex items-center gap-2"><font-awesome-icon icon="file" /> Ebook File:</div>
             <div v-if="book.ebook_file">
-              <a :href="book.ebook_file" target="_blank" class="text-green-700 underline flex items-center gap-1 font-semibold hover:text-green-900 transition">
+              <a :href="book.ebook_file" target="_blank" class="text-green-700 underline flex items-center gap-1 font-semibold hover:text-green-900">
                 <font-awesome-icon icon="download" /> Download Ebook
               </a>
             </div>
