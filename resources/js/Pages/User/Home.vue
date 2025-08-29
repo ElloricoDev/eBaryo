@@ -9,7 +9,6 @@ import {
     faSearch,
     faHome,
     faStar,
-    faFire,
     faChartLine,
     faTrophy,
     faThumbsUp,
@@ -26,7 +25,6 @@ library.add(
     faSearch,
     faHome,
     faStar,
-    faFire,
     faChartLine,
     faTrophy,
     faThumbsUp,
@@ -110,10 +108,6 @@ const recommendedBooks = computed(() => {
     return (props.recommendedBooks || []).slice(0, 40);
 });
 
-const hotBooks = computed(() => {
-    return (props.hotBooks || []).slice(0, 40);
-});
-
 const mostReadBooks = computed(() => {
     return (props.mostReadBooks || []).slice(0, 40);
 });
@@ -153,12 +147,6 @@ const filteredNewBooks = computed(() => {
     return list.filter(matchesSearch);
 });
 
-const filteredHotBooks = computed(() => {
-    const list = hotBooks.value;
-    if (!normalizedSearch.value) return list;
-    return list.filter(matchesSearch);
-});
-
 const filteredMostReadBooks = computed(() => {
     const list = mostReadBooks.value;
     if (!normalizedSearch.value) return list;
@@ -174,7 +162,6 @@ const filteredHighestRatedBooks = computed(() => {
 const totalFilteredResults = computed(() =>
     filteredRecommendedBooks.value.length +
     filteredNewBooks.value.length +
-    filteredHotBooks.value.length +
     filteredMostReadBooks.value.length +
     filteredHighestRatedBooks.value.length
 );
@@ -184,7 +171,6 @@ const booksPerPage = 7;
 const sectionPages = {
     recommended: ref(0),
     new: ref(0),
-    hot: ref(0),
     mostread: ref(0),
     highestrated: ref(0),
 };
@@ -264,22 +250,7 @@ onUnmounted(() => {
                 @unsave="unsaveBook"
             />
         </div>
-        <div class="relative">
-            <BookSection
-                title="Hot Books"
-                icon="fire"
-                :books="paginatedBooks(filteredHotBooks, 'hot')"
-                sectionType="hot"
-                :savedBookIds="savedBookIds"
-                :auth="$page.props.auth"
-                :emptyMessage="hasSearch ? 'No results in Hot Books.' : 'No trending books right now. Start reading to see what\'s popular!'"
-                emptyIcon="fire"
-                iconColor="text-red-500"
-                titleColor="text-green-700"
-                @save="saveBook"
-                @unsave="unsaveBook"
-            />
-        </div>
+        
         <div class="relative">
             <BookSection
                 title="Most Read Books"

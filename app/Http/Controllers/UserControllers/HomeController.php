@@ -48,13 +48,7 @@ class HomeController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        // Hot Books (most read in last 7 days)
-        $hotBookIds = ReadingLog::where('created_at', '>=', Carbon::now()->subDays(7))
-            ->selectRaw('book_id, COUNT(*) as read_count')
-            ->groupBy('book_id')
-            ->orderByDesc('read_count')
-            ->pluck('book_id');
-        $hotBooks = Book::with('category')->whereIn('id', $hotBookIds)->get();
+        // Hot Books removed
 
         // Most Read Books (all time)
         $mostReadBookCounts = ReadingLog::selectRaw('book_id, COUNT(*) as read_count')
@@ -86,7 +80,6 @@ class HomeController extends Controller
         };
         $books = $attachRatings($books);
         $newBooks = $attachRatings($newBooks);
-        $hotBooks = $attachRatings($hotBooks);
         $mostReadBooks = $attachRatings($mostReadBooks);
         $highestRatedBooks = $attachRatings($highestRatedBooks);
         // Filter out books with no reviews (reviews_count == 0)
@@ -127,7 +120,6 @@ class HomeController extends Controller
         };
         $books = $attachReadCount($books);
         $newBooks = $attachReadCount($newBooks);
-        $hotBooks = $attachReadCount($hotBooks);
         $mostReadBooks = $attachReadCount($mostReadBooks);
         $highestRatedBooks = $attachReadCount($highestRatedBooks);
         $recommendedBooks = $attachReadCount($recommendedBooks);
@@ -147,7 +139,6 @@ class HomeController extends Controller
         };
         $books = $attachProgress($books);
         $newBooks = $attachProgress($newBooks);
-        $hotBooks = $attachProgress($hotBooks);
         $mostReadBooks = $attachProgress($mostReadBooks);
         $highestRatedBooks = $attachProgress($highestRatedBooks);
         $recommendedBooks = $attachProgress($recommendedBooks);
@@ -174,7 +165,6 @@ class HomeController extends Controller
             'continueReadingList' => $continueReadingList,
             'saved_books' => $savedBookIds,
             'newBooks' => $newBooks,
-            'hotBooks' => $hotBooks,
             'mostReadBooks' => $mostReadBooks,
             'highestRatedBooks' => $highestRatedBooks,
             'recommendedBooks' => $recommendedBooks,

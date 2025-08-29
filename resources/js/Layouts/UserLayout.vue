@@ -88,9 +88,18 @@ const categories = props.categories || [];
 const browseDropdown = ref(false);
 
 const submitSearch = () => {
-    window.dispatchEvent(
-        new CustomEvent("user-search", { detail: searchQuery.value })
-    );
+    try {
+        // Prefer server-side search on the Books listing
+        const q = (searchQuery.value || "").trim();
+        if (q.length > 0) {
+            Inertia.visit(route('books.index', { q }));
+            return;
+        }
+        Inertia.visit(route('books.index'));
+    } catch (e) {
+        // Fallback to client event if route helper is unavailable
+        window.dispatchEvent(new CustomEvent('user-search', { detail: searchQuery.value }));
+    }
 };
 
 let searchDebounceId = null;

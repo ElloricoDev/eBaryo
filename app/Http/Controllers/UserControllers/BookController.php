@@ -16,6 +16,7 @@ class BookController extends Controller
     public function index(Request $request)
     {
         $categoryId = $request->input('category');
+        $q = trim((string) $request->input('q', ''));
         $user = Auth::user();
         $savedBookIds = $user ? $user->savedBooks()->pluck('book_id')->toArray() : [];
 
@@ -23,29 +24,34 @@ class BookController extends Controller
         if ($categoryId) {
             $baseQuery = $baseQuery->where('category_id', $categoryId);
         }
+        if ($q !== '') {
+            $baseQuery = $baseQuery->where(function($qb) use ($q) {
+                $qb->where('title', 'like', "%{$q}%")
+                   ->orWhere('author', 'like', "%{$q}%")
+                   ->orWhereHas('category', function($qc) use ($q) {
+                       $qc->where('name', 'like', "%{$q}%");
+                   });
+            });
+        }
         $books = $baseQuery->latest()->get();
 
         // New Books (last 30 days)
         $newBooks = Book::with('category')->where('status', 'active')
-            ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
+            ->when($categoryId, fn($qb) => $qb->where('category_id', $categoryId))
+            ->when($q !== '', function($qb) use ($q) {
+                $qb->where(function($q2) use ($q) {
+                    $q2->where('title', 'like', "%{$q}%")
+                       ->orWhere('author', 'like', "%{$q}%")
+                       ->orWhereHas('category', function($qc) use ($q) {
+                           $qc->where('name', 'like', "%{$q}%");
+                       });
+                });
+            })
             ->where('created_at', '>=', Carbon::now()->subDays(30))
             ->orderByDesc('created_at')
             ->get();
 
-        // Hot Books (most read in last 7 days)
-        $hotBookIds = ReadingLog::where('created_at', '>=', Carbon::now()->subDays(7))
-            ->when($categoryId, function($q) use ($categoryId) {
-                $q->whereHas('book', function($b) use ($categoryId) {
-                    $b->where('category_id', $categoryId);
-                });
-            })
-            ->selectRaw('book_id, COUNT(*) as read_count')
-            ->groupBy('book_id')
-            ->orderByDesc('read_count')
-            ->pluck('book_id');
-        $hotBooks = Book::with('category')->whereIn('id', $hotBookIds)
-            ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
-            ->get();
+        // Hot Books removed
 
         // Most Read Books (all time)
         $mostReadBookCounts = ReadingLog::when($categoryId, function($q) use ($categoryId) {
@@ -58,12 +64,30 @@ class BookController extends Controller
             ->pluck('read_count', 'book_id');
         $mostReadBookIds = $mostReadBookCounts->keys();
         $mostReadBooks = Book::with('category')->whereIn('id', $mostReadBookIds)
-            ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
+            ->when($categoryId, fn($qb) => $qb->where('category_id', $categoryId))
+            ->when($q !== '', function($qb) use ($q) {
+                $qb->where(function($q2) use ($q) {
+                    $q2->where('title', 'like', "%{$q}%")
+                       ->orWhere('author', 'like', "%{$q}%")
+                       ->orWhereHas('category', function($qc) use ($q) {
+                           $qc->where('name', 'like', "%{$q}%");
+                       });
+                });
+            })
             ->get();
 
         // Highest Rated Books (at least 1 review)
         $highestRatedBooks = Book::with('category')->whereHas('reviews')
-            ->when($categoryId, fn($q) => $q->where('category_id', $categoryId))
+            ->when($categoryId, fn($qb) => $qb->where('category_id', $categoryId))
+            ->when($q !== '', function($qb) use ($q) {
+                $qb->where(function($q2) use ($q) {
+                    $q2->where('title', 'like', "%{$q}%")
+                       ->orWhere('author', 'like', "%{$q}%")
+                       ->orWhereHas('category', function($qc) use ($q) {
+                           $qc->where('name', 'like', "%{$q}%");
+                       });
+                });
+            })
             ->withAvg('reviews', 'rating')
             ->orderByDesc('reviews_avg_rating')
             ->get();
@@ -84,7 +108,6 @@ class BookController extends Controller
         };
         $books = $attachRatings($books);
         $newBooks = $attachRatings($newBooks);
-        $hotBooks = $attachRatings($hotBooks);
         $mostReadBooks = $attachRatings($mostReadBooks);
         $highestRatedBooks = $attachRatings($highestRatedBooks);
         $highestRatedBooks = $highestRatedBooks->filter(function($book) {
@@ -100,7 +123,6 @@ class BookController extends Controller
         };
         $books = $attachReadCount($books);
         $newBooks = $attachReadCount($newBooks);
-        $hotBooks = $attachReadCount($hotBooks);
         $mostReadBooks = $attachReadCount($mostReadBooks);
         $highestRatedBooks = $attachReadCount($highestRatedBooks);
 
@@ -119,7 +141,6 @@ class BookController extends Controller
         };
         $books = $attachProgress($books);
         $newBooks = $attachProgress($newBooks);
-        $hotBooks = $attachProgress($hotBooks);
         $mostReadBooks = $attachProgress($mostReadBooks);
         $highestRatedBooks = $attachProgress($highestRatedBooks);
 
@@ -130,11 +151,11 @@ class BookController extends Controller
             'books' => $books,
             'saved_books' => $savedBookIds,
             'newBooks' => $newBooks,
-            'hotBooks' => $hotBooks,
             'mostReadBooks' => $mostReadBooks,
             'highestRatedBooks' => $highestRatedBooks,
             'categories' => $categories,
             'selectedCategory' => $selectedCategory,
+            'q' => $q,
         ]);
     }
 

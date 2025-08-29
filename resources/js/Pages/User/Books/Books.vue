@@ -6,7 +6,6 @@ import { ref } from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
     faStar,
-    faFire,
     faChartLine,
     faTrophy,
     faChevronRight,
@@ -15,7 +14,6 @@ import {
 
 library.add(
     faStar,
-    faFire,
     faChartLine,
     faTrophy,
     faChevronRight,
@@ -24,11 +22,11 @@ library.add(
 
 const { props } = usePage();
 const newBooks = props.newBooks || [];
-const hotBooks = props.hotBooks || [];
 const mostReadBooks = props.mostReadBooks || [];
 const highestRatedBooks = props.highestRatedBooks || [];
 const categories = props.categories || [];
 const selectedCategory = props.selectedCategory || null;
+const q = props.q || "";
 const savedBookIds = ref(
     Array.isArray(props.saved_books) ? props.saved_books : []
 );
@@ -36,9 +34,10 @@ const auth = props.auth || {};
 
 const handleCategoryChange = (e) => {
     const categoryId = e.target.value;
-    router.visit(
-        route("books.index", categoryId ? { category: categoryId } : {})
-    );
+    const params = {};
+    if (categoryId) params.category = categoryId;
+    if (q && q.length > 0) params.q = q;
+    router.visit(route("books.index", params));
 };
 
 const saveBook = (book) => {
@@ -80,6 +79,7 @@ const unsaveBook = (book) => {
                 class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4"
             >
                 <h1 class="text-2xl font-bold text-green-700">Browse Books</h1>
+                <p v-if="q" class="text-sm text-gray-600">Search: "{{ q }}"</p>
                 <div>
                     <label
                         for="category"
@@ -113,20 +113,6 @@ const unsaveBook = (book) => {
                 :auth="auth"
                 emptyMessage="There is no new book for this month."
                 emptyIcon="star"
-                @save="saveBook"
-                @unsave="unsaveBook"
-            />
-            <BookSection
-                title="Hot Books"
-                icon="fire"
-                :books="hotBooks"
-                sectionType="hot"
-                :savedBookIds="savedBookIds"
-                :auth="auth"
-                emptyMessage="No trending books right now. Start reading to see what's popular!"
-                emptyIcon="fire"
-                iconColor="text-red-500"
-                titleColor="text-green-700"
                 @save="saveBook"
                 @unsave="unsaveBook"
             />

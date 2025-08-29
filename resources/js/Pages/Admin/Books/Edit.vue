@@ -19,7 +19,6 @@
         <!-- Title -->
         <div class="relative">
           <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="book" /> Title</label>
-          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="book" /></span>
           <input v-model="form.title" type="text" class="form-input pl-10" />
           <p v-if="form.errors.title" class="text-red-600 text-sm mt-1">{{ form.errors.title }}</p>
         </div>
@@ -27,7 +26,6 @@
         <!-- Author -->
         <div class="relative">
           <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="user" /> Author</label>
-          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="user" /></span>
           <input v-model="form.author" type="text" class="form-input pl-10" />
           <p v-if="form.errors.author" class="text-red-600 text-sm mt-1">{{ form.errors.author }}</p>
         </div>
@@ -35,7 +33,6 @@
         <!-- ISBN -->
         <div class="relative">
           <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="barcode" /> ISBN</label>
-          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="barcode" /></span>
           <input v-model="form.isbn" type="text" class="form-input pl-10" />
           <p v-if="form.errors.isbn" class="text-red-600 text-sm mt-1">{{ form.errors.isbn }}</p>
         </div>
@@ -43,7 +40,6 @@
         <!-- Published Year -->
         <div class="relative">
           <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="calendar" /> Published Year</label>
-          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="calendar" /></span>
           <input v-model="form.published_year" type="number" class="form-input pl-10" />
           <p v-if="form.errors.published_year" class="text-red-600 text-sm mt-1">{{ form.errors.published_year }}</p>
         </div>
@@ -51,7 +47,6 @@
         <!-- Publisher -->
         <div class="relative">
           <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="building" /> Publisher</label>
-          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="building" /></span>
           <input v-model="form.publisher" type="text" class="form-input pl-10" />
           <p v-if="form.errors.publisher" class="text-red-600 text-sm mt-1">{{ form.errors.publisher }}</p>
         </div>
@@ -59,7 +54,6 @@
         <!-- Language -->
         <div class="relative">
           <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="language" /> Language</label>
-          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="language" /></span>
           <input v-model="form.language" type="text" class="form-input pl-10" />
           <p v-if="form.errors.language" class="text-red-600 text-sm mt-1">{{ form.errors.language }}</p>
         </div>
@@ -67,7 +61,6 @@
         <!-- Category -->
         <div class="relative">
           <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="tags" /> Category</label>
-          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="tags" /></span>
           <select v-model="form.category_id" class="form-select pl-10">
             <option value="">Select Category</option>
             <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
@@ -78,7 +71,6 @@
         <!-- Status -->
         <div class="relative">
           <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="info-circle" /> Status</label>
-          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="info-circle" /></span>
           <select v-model="form.status" class="form-select pl-10">
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -89,7 +81,6 @@
         <!-- Description -->
         <div class="md:col-span-2 relative">
           <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="align-left" /> Description</label>
-          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="align-left" /></span>
           <textarea v-model="form.description" rows="3" class="form-textarea pl-10"></textarea>
           <p v-if="form.errors.description" class="text-red-600 text-sm mt-1">{{ form.errors.description }}</p>
         </div>
