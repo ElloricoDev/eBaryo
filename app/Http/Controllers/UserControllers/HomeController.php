@@ -4,6 +4,7 @@ namespace App\Http\Controllers\UserControllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Book;
+use App\Models\BookReview;
 use App\Models\ReadingLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
@@ -154,7 +155,7 @@ class HomeController extends Controller
         // Fetch all reviews written by the user (for reviewsWritten stat)
         $reviews = [];
         if ($user) {
-            $reviews = \App\Models\BookReview::where('user_id', $user->id)->get();
+            $reviews = BookReview::where('user_id', $user->id)->get();
         }
 
         $categories = Category::all();
