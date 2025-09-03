@@ -47,7 +47,8 @@ watch(
     }
 );
 
-const isMobile = computed(() => window.innerWidth <= 640);
+// Fix isMobile reactivity
+const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth <= 640 : false);
 const showDropdown = ref(false);
 const dropdownRef = ref(null);
 
@@ -82,16 +83,19 @@ function closeAll() {
     emit("close");
 }
 
+function handleResize() {
+    isMobile.value = window.innerWidth <= 640;
+}
+
 onMounted(() => {
     if (props.show) document.body.classList.add("overflow-hidden");
-    window.addEventListener("resize", () => {
-        isMobile.value = window.innerWidth <= 640;
-    });
+    window.addEventListener("resize", handleResize);
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleKeydown);
 });
 onBeforeUnmount(() => {
     document.body.classList.remove("overflow-hidden");
+    window.removeEventListener("resize", handleResize);
     document.removeEventListener("mousedown", handleClickOutside);
     document.removeEventListener("keydown", handleKeydown);
 });
@@ -117,6 +121,9 @@ const reasonOptions = [
             ></div>
             <div
                 class="relative animate-fade-in bg-white bg-opacity-95 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden z-10 pointer-events-auto"
+                role="dialog"
+                aria-modal="true"
+                :aria-label="`Report Book: ${book?.title || ''}`"
             >
                 <div
                     class="absolute inset-0 -z-10 bg-gradient-to-br from-green-50 via-white to-green-100 animate-gradient-move"
@@ -130,6 +137,7 @@ const reasonOptions = [
                     <button
                         class="text-white focus:outline-none focus:ring-2 focus:ring-white rounded"
                         @click="closeAll"
+                        aria-label="Close report modal"
                     >
                         &times;
                     </button>
@@ -139,8 +147,7 @@ const reasonOptions = [
                     <p class="text-sm text-gray-600 mb-4">
                         Provide a reason for reporting "<strong>{{
                             book.title
-                        }}</strong
-                        >":
+                        }}</strong>":
                     </p>
                     <label class="block text-green-700 font-semibold mb-1"
                         >Reason <span class="text-red-500">*</span></label
@@ -200,6 +207,7 @@ const reasonOptions = [
                         rows="3"
                         class="w-full border border-green-300 rounded shadow-sm focus:border-green-600 focus:ring-2 focus:ring-green-200 transition"
                         placeholder="Any additional info..."
+                        maxlength="1000"
                     ></textarea>
                     <div class="text-sm text-gray-500 mt-1">
                         {{ localDescription.length }}/1000 characters

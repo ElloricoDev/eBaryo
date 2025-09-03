@@ -1,126 +1,156 @@
 <template>
   <Head title="Edit Book" />
-  <div class="max-w-6xl mx-auto px-4 py-10">
-    <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-      <Link :href="route('admin.books.index')"
-        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-bold rounded-full shadow-lg hover:from-green-600 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
-      >
-        <font-awesome-icon icon="arrow-left" class="text-lg" />
-        <span class="hidden sm:inline">Back to Books</span>
-        <span class="sm:hidden">Back</span>
-      </Link>
-      <h1 class="text-2xl font-bold text-green-600 flex items-center gap-2">
-        <font-awesome-icon icon="pencil-alt" /> Edit Book
-      </h1>
-    </div>
-
-    <form @submit.prevent="submit" enctype="multipart/form-data" class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl p-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Title -->
-        <div class="relative">
-          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="book" /> Title</label>
-          <input v-model="form.title" type="text" class="form-input pl-10" />
-          <p v-if="form.errors.title" class="text-red-600 text-sm mt-1">{{ form.errors.title }}</p>
-        </div>
-
-        <!-- Author -->
-        <div class="relative">
-          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="user" /> Author</label>
-          <input v-model="form.author" type="text" class="form-input pl-10" />
-          <p v-if="form.errors.author" class="text-red-600 text-sm mt-1">{{ form.errors.author }}</p>
-        </div>
-
-        <!-- ISBN -->
-        <div class="relative">
-          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="barcode" /> ISBN</label>
-          <input v-model="form.isbn" type="text" class="form-input pl-10" />
-          <p v-if="form.errors.isbn" class="text-red-600 text-sm mt-1">{{ form.errors.isbn }}</p>
-        </div>
-
-        <!-- Published Year -->
-        <div class="relative">
-          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="calendar" /> Published Year</label>
-          <input v-model="form.published_year" type="number" class="form-input pl-10" />
-          <p v-if="form.errors.published_year" class="text-red-600 text-sm mt-1">{{ form.errors.published_year }}</p>
-        </div>
-
-        <!-- Publisher -->
-        <div class="relative">
-          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="building" /> Publisher</label>
-          <input v-model="form.publisher" type="text" class="form-input pl-10" />
-          <p v-if="form.errors.publisher" class="text-red-600 text-sm mt-1">{{ form.errors.publisher }}</p>
-        </div>
-
-        <!-- Language -->
-        <div class="relative">
-          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="language" /> Language</label>
-          <input v-model="form.language" type="text" class="form-input pl-10" />
-          <p v-if="form.errors.language" class="text-red-600 text-sm mt-1">{{ form.errors.language }}</p>
-        </div>
-
-        <!-- Category -->
-        <div class="relative">
-          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="tags" /> Category</label>
-          <select v-model="form.category_id" class="form-select pl-10">
-            <option value="">Select Category</option>
-            <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-          </select>
-          <p v-if="form.errors.category_id" class="text-red-600 text-sm mt-1">{{ form.errors.category_id }}</p>
-        </div>
-
-        <!-- Status -->
-        <div class="relative">
-          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="info-circle" /> Status</label>
-          <select v-model="form.status" class="form-select pl-10">
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-          <p v-if="form.errors.status" class="text-red-600 text-sm mt-1">{{ form.errors.status }}</p>
-        </div>
-
-        <!-- Description -->
-        <div class="md:col-span-2 relative">
-          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="align-left" /> Description</label>
-          <textarea v-model="form.description" rows="3" class="form-textarea pl-10"></textarea>
-          <p v-if="form.errors.description" class="text-red-600 text-sm mt-1">{{ form.errors.description }}</p>
-        </div>
-
-        <!-- Cover Image -->
-        <div>
-          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="image" /> Cover Image</label>
-          <div class="relative">
-            <input type="file" @change="onCoverChange" accept="image/*" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200" />
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Hero Header -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center">
+            <font-awesome-icon icon="pencil-alt" class="w-8 h-8 text-white" />
           </div>
-          <p v-if="form.errors.cover_image" class="text-red-600 text-sm mt-1">{{ form.errors.cover_image }}</p>
-          <div v-if="coverPreview" class="mt-2">
-            <img :src="coverPreview" alt="Cover Preview" class="w-20 h-20 object-cover rounded border border-green-600" />
+          <div>
+            <h1 class="text-3xl font-bold text-slate-800">Edit Book</h1>
+            <p class="text-slate-600 mt-1">Update book information and details</p>
           </div>
         </div>
-
-        <!-- Ebook File -->
-        <div>
-          <label class="text-green-700 font-semibold mb-1 block"><font-awesome-icon icon="file" /> Ebook File</label>
-          <div class="relative">
-            <input type="file" @change="onEbookChange" accept=".pdf,.epub,.mobi,.txt,.docx,.azw3,.fb2,.djvu,.rtf,.html,.htm" class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200" />
-          </div>
-          <p v-if="ebookName" class="text-sm text-gray-600 mt-1">Selected: {{ ebookName }}</p>
-          <p v-if="form.errors.ebook_file" class="text-red-600 text-sm mt-1">{{ form.errors.ebook_file }}</p>
-          <div v-if="book.ebook_file && !ebookName" class="mt-2">
-            <a :href="book.ebook_file" target="_blank" class="text-blue-600 underline text-sm">Current Ebook</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Buttons -->
-      <div class="mt-8 flex gap-4">
-        <button type="submit" class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold px-8 py-3 rounded-full shadow-xl inline-flex items-center gap-2 justify-center text-lg" :disabled="form.processing">
-          <font-awesome-icon icon="save" /> {{ form.processing ? 'Saving...' : 'Update Book' }}
-        </button>
-        <Link :href="route('admin.books.index')" class="px-8 py-3 border border-green-600 text-green-700 hover:bg-green-600 hover:text-white font-semibold rounded-full shadow-sm flex items-center gap-2 text-lg">
-          <font-awesome-icon icon="xmark" /> Cancel
+        <Link :href="route('admin.books.index')"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-colors"
+        >
+          <font-awesome-icon icon="arrow-left" class="w-4 h-4" /> Back to Books
         </Link>
       </div>
-    </form>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+      <form @submit.prevent="submit" enctype="multipart/form-data" class="space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Title -->
+          <div>
+            <label class="block text-slate-700 font-semibold mb-2">Book Title</label>
+            <input v-model="form.title" type="text" placeholder="Enter book title"
+              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors"
+              :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.title}" />
+            <p v-if="form.errors.title" class="text-red-500 text-sm mt-2">{{ form.errors.title }}</p>
+          </div>
+
+          <!-- Author -->
+          <div>
+            <label class="block text-slate-700 font-semibold mb-2">Author</label>
+            <input v-model="form.author" type="text" placeholder="Enter author name"
+              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors"
+              :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.author}" />
+            <p v-if="form.errors.author" class="text-red-500 text-sm mt-2">{{ form.errors.author }}</p>
+          </div>
+
+          <!-- ISBN -->
+          <div>
+            <label class="block text-slate-700 font-semibold mb-2">ISBN</label>
+            <input v-model="form.isbn" type="text" placeholder="Enter ISBN"
+              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors"
+              :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.isbn}" />
+            <p v-if="form.errors.isbn" class="text-red-500 text-sm mt-2">{{ form.errors.isbn }}</p>
+          </div>
+
+          <!-- Published Year -->
+          <div>
+            <label class="block text-slate-700 font-semibold mb-2">Published Year</label>
+            <input v-model="form.published_year" type="number" placeholder="Enter published year"
+              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors"
+              :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.published_year}" />
+            <p v-if="form.errors.published_year" class="text-red-500 text-sm mt-2">{{ form.errors.published_year }}</p>
+          </div>
+
+          <!-- Publisher -->
+          <div>
+            <label class="block text-slate-700 font-semibold mb-2">Publisher</label>
+            <input v-model="form.publisher" type="text" placeholder="Enter publisher"
+              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors"
+              :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.publisher}" />
+            <p v-if="form.errors.publisher" class="text-red-500 text-sm mt-2">{{ form.errors.publisher }}</p>
+          </div>
+
+          <!-- Language -->
+          <div>
+            <label class="block text-slate-700 font-semibold mb-2">Language</label>
+            <input v-model="form.language" type="text" placeholder="Enter language"
+              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors"
+              :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.language}" />
+            <p v-if="form.errors.language" class="text-red-500 text-sm mt-2">{{ form.errors.language }}</p>
+          </div>
+
+          <!-- Category -->
+          <div>
+            <label class="block text-slate-700 font-semibold mb-2">Category</label>
+            <select v-model="form.category_id"
+              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors"
+              :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.category_id}">
+              <option value="">Select Category</option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+            </select>
+            <p v-if="form.errors.category_id" class="text-red-500 text-sm mt-2">{{ form.errors.category_id }}</p>
+          </div>
+
+          <!-- Status -->
+          <div>
+            <label class="block text-slate-700 font-semibold mb-2">Status</label>
+            <select v-model="form.status"
+              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors"
+              :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.status}">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <p v-if="form.errors.status" class="text-red-500 text-sm mt-2">{{ form.errors.status }}</p>
+          </div>
+
+          <!-- Description -->
+          <div class="md:col-span-2">
+            <label class="block text-slate-700 font-semibold mb-2">Description</label>
+            <textarea v-model="form.description" rows="4" placeholder="Enter book description"
+              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors resize-none"
+              :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.description}"></textarea>
+            <p v-if="form.errors.description" class="text-red-500 text-sm mt-2">{{ form.errors.description }}</p>
+          </div>
+
+          <!-- Cover Image -->
+          <div>
+            <label class="block text-slate-700 font-semibold mb-2">Cover Image</label>
+            <input type="file" @change="onCoverChange" accept="image/*"
+              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-yellow-100 file:text-yellow-700 hover:file:bg-yellow-200" />
+            <p v-if="form.errors.cover_image" class="text-red-500 text-sm mt-2">{{ form.errors.cover_image }}</p>
+            <div v-if="coverPreview" class="mt-3">
+              <img :src="coverPreview" alt="Cover Preview" class="w-24 h-32 object-cover rounded-xl border border-slate-200 shadow-sm" />
+            </div>
+          </div>
+
+          <!-- Ebook File -->
+          <div>
+            <label class="block text-slate-700 font-semibold mb-2">Ebook File</label>
+            <input type="file" @change="onEbookChange" accept=".pdf,.epub,.mobi,.txt,.docx,.azw3,.fb2,.djvu,.rtf,.html,.htm"
+              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-yellow-100 file:text-yellow-700 hover:file:bg-yellow-200" />
+            <p v-if="ebookName" class="text-sm text-slate-600 mt-2">Selected: {{ ebookName }}</p>
+            <p v-if="form.errors.ebook_file" class="text-red-500 text-sm mt-2">{{ form.errors.ebook_file }}</p>
+            <div v-if="book.ebook_file && !ebookName" class="mt-2">
+              <a :href="book.ebook_file" target="_blank" class="text-blue-600 underline text-sm hover:text-blue-800">Current Ebook</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="flex gap-4 pt-4">
+          <button type="submit" 
+            class="flex-1 bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white font-semibold py-3 rounded-2xl transition-all duration-200 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="form.processing">
+            <font-awesome-icon icon="save" class="w-4 h-4" />
+            {{ form.processing ? 'Updating...' : 'Update Book' }}
+          </button>
+          <Link :href="route('admin.books.index')" 
+            class="px-8 py-3 border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold rounded-2xl transition-all duration-200 flex items-center gap-2">
+            <font-awesome-icon icon="xmark" class="w-4 h-4" /> Cancel
+          </Link>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 

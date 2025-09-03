@@ -38,119 +38,101 @@ const submit = () => {
 </script>
 
 <template>
-    <div
-        class="relative animate-fade-in bg-white bg-opacity-90 border-2 border-green-600 rounded-2xl shadow-xl mb-6 overflow-hidden"
-    >
-        <div
-            class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-green-50 to-white animate-gradient-move"
-        ></div>
-        <div
-            class="bg-green-600 text-white px-4 py-3 rounded-t-2xl flex items-center gap-2 font-medium"
-        >
-            <font-awesome-icon icon="shield-halved" /> Update Password
-        </div>
-        <div class="border-t border-green-100"></div>
-        <div class="p-6">
-            <div
-                v-if="isGoogleUser"
-                class="bg-blue-100 text-blue-800 px-4 py-3 rounded mb-4 text-sm"
-            >
-                You cannot change your password because you signed in using
-                Google.
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 hover:shadow-md transition-shadow duration-300">
+        <!-- Header -->
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center">
+                <font-awesome-icon icon="shield-halved" class="text-white text-xl" />
             </div>
-            <form v-else @submit.prevent="submit" class="space-y-4">
-                <div class="relative">
-                    <input
-                        v-model="form.current_password"
-                        type="password"
-                        id="current_password"
-                        class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent"
-                        placeholder="Current Password"
-                    />
-                    <label
-                        for="current_password"
-                        class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"
-                    >
-                        <font-awesome-icon icon="key" /> Current Password
-                    </label>
-                    <div
-                        v-if="form.errors.current_password"
-                        class="text-red-500 text-sm mt-1"
-                    >
-                        {{ form.errors.current_password }}
-                    </div>
-                </div>
-
-                <div class="relative">
-                    <input
-                        v-model="form.password"
-                        type="password"
-                        id="new_password"
-                        class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent"
-                        placeholder="New Password"
-                    />
-                    <label
-                        for="new_password"
-                        class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"
-                    >
-                        <font-awesome-icon icon="key" /> New Password
-                    </label>
-                    <div
-                        v-if="form.errors.password"
-                        class="text-red-500 text-sm mt-1"
-                    >
-                        {{ form.errors.password }}
-                    </div>
-                </div>
-
-                <div class="relative">
-                    <input
-                        v-model="form.password_confirmation"
-                        type="password"
-                        id="password_confirmation"
-                        class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent"
-                        placeholder="Confirm New Password"
-                    />
-                    <label
-                        for="password_confirmation"
-                        class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"
-                    >
-                        <font-awesome-icon icon="key" /> Confirm New Password
-                    </label>
-                </div>
-
-                <button
-                    type="submit"
-                    class="bg-green-600 hover:bg-green-700 focus:bg-green-800 text-white w-full py-2 px-4 rounded shadow-sm font-semibold flex items-center justify-center gap-2 animate-pulse-cta focus:outline-none focus:ring-2 focus:ring-green-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                    :disabled="form.processing"
-                >
-                    <font-awesome-icon icon="arrow-rotate-right" />
-                    <span v-if="form.processing">
-                        <svg
-                            class="inline w-4 h-4 animate-spin mr-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <circle
-                                class="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                stroke-width="4"
-                            ></circle>
-                            <path
-                                class="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8v8z"
-                            ></path>
-                        </svg>
-                        Updating...
-                    </span>
-                    <span v-else>Update Password</span>
-                </button>
-            </form>
+            <div>
+                <h3 class="text-xl font-bold text-slate-800">Update Password</h3>
+                <p class="text-slate-600 text-sm">Keep your account secure with a strong password</p>
+            </div>
         </div>
+
+        <!-- Google User Notice -->
+        <div v-if="isGoogleUser" class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-2xl text-blue-800">
+            <div class="flex items-center gap-3">
+                <font-awesome-icon icon="info-circle" class="text-blue-600" />
+                <div>
+                    <div class="font-semibold">Google Account</div>
+                    <div class="text-sm">You cannot change your password because you signed in using Google.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password Form -->
+        <form v-else @submit.prevent="submit" class="space-y-6">
+            <!-- Current Password -->
+            <div class="space-y-2">
+                <label for="current_password" class="block text-sm font-semibold text-slate-700">
+                    <font-awesome-icon icon="key" class="mr-2 text-green-600" />
+                    Current Password
+                </label>
+                <input
+                    v-model="form.current_password"
+                    type="password"
+                    id="current_password"
+                    class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 bg-transparent focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 placeholder-slate-400"
+                    placeholder="Enter your current password"
+                />
+                <div v-if="form.errors.current_password" class="text-red-500 text-sm">
+                    {{ form.errors.current_password }}
+                </div>
+            </div>
+
+            <!-- New Password -->
+            <div class="space-y-2">
+                <label for="new_password" class="block text-sm font-semibold text-slate-700">
+                    <font-awesome-icon icon="key" class="mr-2 text-green-600" />
+                    New Password
+                </label>
+                <input
+                    v-model="form.password"
+                    type="password"
+                    id="new_password"
+                    class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 bg-transparent focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 placeholder-slate-400"
+                    placeholder="Enter your new password"
+                />
+                <div v-if="form.errors.password" class="text-red-500 text-sm">
+                    {{ form.errors.password }}
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="space-y-2">
+                <label for="password_confirmation" class="block text-sm font-semibold text-slate-700">
+                    <font-awesome-icon icon="key" class="mr-2 text-green-600" />
+                    Confirm New Password
+                </label>
+                <input
+                    v-model="form.password_confirmation"
+                    type="password"
+                    id="password_confirmation"
+                    class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 bg-transparent focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 placeholder-slate-400"
+                    placeholder="Confirm your new password"
+                />
+            </div>
+
+            <!-- Submit Button -->
+            <button
+                type="submit"
+                :disabled="form.processing"
+                class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-4 px-6 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-green-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <span v-if="!form.processing" class="flex items-center justify-center gap-3">
+                    <font-awesome-icon icon="arrow-rotate-right" />
+                    Update Password
+                </span>
+                <span v-else class="flex items-center justify-center gap-3">
+                    <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                    </svg>
+                    Updating...
+                </span>
+            </button>
+        </form>
     </div>
 </template>
 

@@ -38,14 +38,19 @@ defineOptions({ inheritAttrs: false });
             }
         "
     >
-        <img
-            :src="avatarUrl"
-            class="book-image-main"
-            alt="Book Cover"
-            @error="event.target.src = '/images/default.svg'"
-        />
+        <div class="relative">
+            <img
+                :src="avatarUrl"
+                class="book-image-main"
+                alt="Book Cover"
+                @error="(e) => { const t = e?.target; if (t && t.tagName) t.src = '/images/default.svg'; }"
+            />
+            <div class="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gradient-to-t from-black/10 to-transparent"></div>
+            <span class="sr-only">Open {{ book.title }}</span>
+        </div>
         <h4
-            class="text-xs sm:text-sm font-medium text-center mt-2 line-clamp-2 break-words max-w-[120px] mx-auto"
+            class="book-title"
+            :title="book.title"
         >
             {{ book.title }}
         </h4>
@@ -63,6 +68,10 @@ defineOptions({ inheritAttrs: false });
     overflow: visible;
     margin: 0 6px;
 }
+.book-image-link:focus-visible .book-image-main {
+    outline: 3px solid rgba(16, 185, 129, 0.6);
+    outline-offset: 3px;
+}
 .book-image-main {
     width: 140px;
     height: 200px;
@@ -77,5 +86,22 @@ defineOptions({ inheritAttrs: false });
 .group:hover .book-image-main {
     transform: scale(1.04);
     box-shadow: 0 4px 16px 0 rgba(16, 185, 129, 0.18);
+}
+.book-title {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    max-width: 140px;
+}
+@media (min-width: 640px) {
+    .book-image-main { width: 160px; height: 220px; }
+    .book-title { max-width: 160px; font-size: 0.95rem; }
 }
 </style>

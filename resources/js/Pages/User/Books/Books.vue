@@ -74,36 +74,53 @@ const unsaveBook = (book) => {
 <template>
     <Head title="Browse Books" />
     <UserLayout>
-        <div class="mx-auto px-4">
-            <div
-                class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4"
-            >
-                <h1 class="text-2xl font-bold text-green-700">Browse Books</h1>
-                <p v-if="q" class="text-sm text-gray-600">Search: "{{ q }}"</p>
-                <div>
-                    <label
-                        for="category"
-                        class="mr-2 font-semibold text-green-700"
-                        >Category:</label
-                    >
-                    <select
-                        id="category"
-                        class="border border-green-300 rounded px-3 py-2 focus:border-green-600 focus:ring-2 focus:ring-green-200"
-                        @change="handleCategoryChange"
-                        :value="selectedCategory?.id || ''"
-                    >
-                        <option value="">All Categories</option>
-                        <option
-                            v-for="cat in categories"
-                            :key="cat.id"
-                            :value="cat.id"
+        <!-- Hero Header Section -->
+        <div class="mb-12 bg-gradient-to-br from-blue-50 via-white to-indigo-50 rounded-3xl p-8 border border-blue-100 shadow-sm">
+            <div class="text-center max-w-4xl mx-auto">
+                <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4">
+                    Discover Amazing Books 📚
+                </h1>
+                <p class="text-xl text-slate-600 mb-8 leading-relaxed">
+                    Explore our collection of carefully curated books across all genres
+                </p>
+                
+                <!-- Enhanced Search and Filter Controls -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div class="relative">
+                        <label for="category" class="block text-sm font-medium text-slate-700 mb-2 text-left">
+                            Category Filter
+                        </label>
+                        <select
+                            id="category"
+                            class="appearance-none bg-white border border-blue-300 rounded-2xl px-6 py-3 pr-10 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 shadow-sm hover:shadow-md"
+                            @change="handleCategoryChange"
+                            :value="selectedCategory?.id || ''"
                         >
-                            {{ cat.name }}
-                        </option>
-                    </select>
+                            <option value="">All Categories</option>
+                            <option
+                                v-for="cat in categories"
+                                :key="cat.id"
+                                :value="cat.id"
+                            >
+                                {{ cat.name }}
+                            </option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div v-if="q" class="bg-amber-50 border border-amber-200 rounded-2xl px-6 py-3">
+                        <span class="text-amber-800 font-medium">Search: "{{ q }}"</span>
+                    </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Book Sections with Enhanced Spacing -->
+        <div class="space-y-16">
             <BookSection
                 title="New Books"
                 icon="star"
@@ -113,9 +130,16 @@ const unsaveBook = (book) => {
                 :auth="auth"
                 emptyMessage="There is no new book for this month."
                 emptyIcon="star"
+                badgeText="Fresh"
+                badgeColor="bg-gradient-to-r from-blue-400 to-indigo-400"
+                borderColor="border-blue-300"
+                bgColor="bg-gradient-to-br from-blue-50 to-indigo-50"
+                iconColor="text-blue-600"
+                titleColor="text-slate-800"
                 @save="saveBook"
                 @unsave="unsaveBook"
             />
+            
             <BookSection
                 title="Most Read Books"
                 icon="chart-line"
@@ -125,11 +149,16 @@ const unsaveBook = (book) => {
                 :auth="auth"
                 emptyMessage="No reading statistics available yet. Be the first to read a book!"
                 emptyIcon="chart-line"
-                iconColor="text-blue-600"
-                titleColor="text-green-700"
+                badgeText="Popular"
+                badgeColor="bg-gradient-to-r from-purple-400 to-pink-400"
+                borderColor="border-purple-300"
+                bgColor="bg-gradient-to-br from-purple-50 to-pink-50"
+                iconColor="text-purple-600"
+                titleColor="text-slate-800"
                 @save="saveBook"
                 @unsave="unsaveBook"
             />
+            
             <BookSection
                 title="Highest Ratings"
                 icon="trophy"
@@ -139,8 +168,12 @@ const unsaveBook = (book) => {
                 :auth="auth"
                 emptyMessage="No highly rated books yet."
                 emptyIcon="trophy"
-                iconColor="text-yellow-600"
-                titleColor="text-green-700"
+                badgeText="Top Rated"
+                badgeColor="bg-gradient-to-r from-amber-400 to-yellow-400"
+                borderColor="border-amber-300"
+                bgColor="bg-gradient-to-br from-amber-50 to-yellow-50"
+                iconColor="text-amber-600"
+                titleColor="text-slate-800"
                 @save="saveBook"
                 @unsave="unsaveBook"
             />

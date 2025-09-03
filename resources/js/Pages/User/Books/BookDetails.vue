@@ -24,6 +24,9 @@ import {
     faArrowUp,
     faStar,
     faCircleXmark,
+    faInfoCircle,
+    faFileText,
+    faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import StarRating from "@/Components/StarRating.vue";
@@ -48,10 +51,12 @@ library.add(
     faCircle,
     faArrowUp,
     faStar,
-    faCircleXmark
+    faCircleXmark,
+    faInfoCircle,
+    faFileText,
+    faExclamationTriangle,
 );
 
-defineOptions({ layout: UserLayout });
 const { props } = usePage();
 const book = props.book;
 const savedBookIds = ref(props.saved_books || []);
@@ -59,9 +64,9 @@ const isSaved = computed(() => savedBookIds.value.includes(book.id));
 const showReader = ref(false);
 const readerSection = ref(null);
 const showScrollTop = ref(false);
-const reviews = ref([]);
-const averageRating = ref(0);
-const reviewCount = ref(0);
+const reviews = ref(props.book.reviews || []);
+const averageRating = ref(props.book.average_rating || 0);
+const reviewCount = ref(props.book.reviews_count || 0);
 const newRating = ref(0);
 const newReview = ref("");
 const submittingReview = ref(false);
@@ -220,47 +225,36 @@ const submitReport = async () => {
         return;
     }
     isSubmittingReport.value = true;
-    try {
-        const response = await fetch(`/books/${book.id}/report`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
+    router.post(
+        route("books.report", { bookId: book.id }),
+        {
+            reason: reportReason.value,
+            description: reportDescription.value,
+        },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                Swal.fire({
+                    icon: "success",
+                    title: "Report submitted",
+                    text: "Thank you for your feedback!",
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+                closeReportModal();
             },
-            body: JSON.stringify({
-                reason: reportReason.value,
-                description: reportDescription.value,
-            }),
-        });
-        if (response.ok) {
-            Swal.fire({
-                icon: "success",
-                title: "Report submitted",
-                text: "Thank you for your feedback!",
-                timer: 1500,
-                showConfirmButton: false,
-            });
-            closeReportModal();
-        } else {
-            const data = await response.json();
-            Swal.fire({
-                icon: "error",
-                title: "Failed to submit report",
-                text: data.message || "Please try again.",
-            });
+            onError: (errors) => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Failed to submit report",
+                    text: errors.reason || errors.description || "Please try again.",
+                });
+            },
+            onFinish: () => {
+                isSubmittingReport.value = false;
+            },
         }
-    } catch (error) {
-        Swal.fire({
-            icon: "error",
-            title: "Failed to submit report",
-            text: "Please try again.",
-        });
-    } finally {
-        isSubmittingReport.value = false;
-    }
+    );
 };
 
 const scrollToTop = () => {
@@ -272,22 +266,33 @@ const handleWindowScroll = () => {
 };
 
 const fetchReviews = async () => {
-    const res = await fetch(`/books/${book.id}/reviews`);
-    if (res.ok) {
-        const data = await res.json();
-        reviews.value = data.reviews;
-        averageRating.value = data.average_rating;
-        reviewCount.value = data.review_count;
-        userReview.value = data.user_review;
-        if (userReview.value) {
-            newRating.value = userReview.value.rating;
-            newReview.value = userReview.value.review;
-            editingReview.value = false;
+    try {
+        console.log('Fetching reviews for book:', book.id);
+        const res = await fetch(`/books/${book.id}/reviews`);
+        if (res.ok) {
+            const data = await res.json();
+            console.log('Reviews data received:', data);
+            reviews.value = data.reviews || [];
+            averageRating.value = data.average_rating || 0;
+            reviewCount.value = data.review_count || 0;
+            userReview.value = data.user_review || null;
+            
+            console.log('Updated reviews:', reviews.value.length, 'Average rating:', averageRating.value, 'Review count:', reviewCount.value);
+            
+            if (userReview.value) {
+                newRating.value = userReview.value.rating;
+                newReview.value = userReview.value.review;
+                editingReview.value = false;
+            } else {
+                newRating.value = 0;
+                newReview.value = "";
+                editingReview.value = true;
+            }
         } else {
-            newRating.value = 0;
-            newReview.value = "";
-            editingReview.value = true;
+            console.error('Failed to fetch reviews:', res.status, res.statusText);
         }
+    } catch (error) {
+        console.error('Error fetching reviews:', error);
     }
 };
 
@@ -330,393 +335,274 @@ const handleReadClick = () => {
 
 <template>
     <Head :title="book.title" />
-    <div class="relative min-h-screen mx-auto px-4 overflow-x-hidden">
-        <div class="animate-fade-in bg-opacity-90 rounded-2xl shadow-xl p-6">
-            <div class="mb-4">
-                <button
-                    @click="goBack"
-                    class="block mb-4 text-green-700 font-bold flex items-center gap-2"
-                >
-                    <font-awesome-icon icon="arrow-left" class="text-lg" />
-                    Back
-                </button>
-            </div>
+    <UserLayout>
+        <!-- Back Button -->
+        <div class="mb-6">
+            <button @click="goBack" class="text-green-700 font-bold flex items-center gap-2 hover:text-green-800 transition-colors">
+                <font-awesome-icon icon="arrow-left" class="text-lg" />
+                Back to Library
+            </button>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <img
-                        :src="book.cover_image || '/images/default.svg'"
-                        :alt="book.title"
-                        class="book-details-cover mb-4 shadow"
-                    />
+        <!-- Book Details Container -->
+        <div class="max-w-7xl mx-auto">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 hover:shadow-md transition-shadow duration-300">
+                <!-- Book Header -->
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4 flex items-center justify-center gap-3">
+                        <font-awesome-icon icon="book" class="text-green-600" />
+                        {{ book.title }}
+                    </h1>
+                    <p class="text-xl text-slate-600">by {{ book.author }}</p>
+                </div>
 
-                    <div class="space-y-2">
-                        <button
-                            v-if="book.ebook_file && isVerified"
-                            @click="handleReadClick"
-                            class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 focus:bg-green-800 text-white font-semibold px-4 py-2 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-green-400 animate-pulse-cta"
-                        >
-                            <font-awesome-icon
-                                icon="book-open"
-                                class="h-5 w-5"
-                            />
-                            <span>
-                                <template
-                                    v-if="
-                                        book.progress &&
-                                        book.progress > 0 &&
-                                        book.progress < 1
-                                    "
-                                    >Continue Reading</template
-                                >
-                                <template v-else>Start Reading</template>
-                            </span>
-                        </button>
-                        <button
-                            v-if="book.ebook_file && user && !isVerified"
-                            disabled
-                            class="w-full flex items-center justify-center gap-2 bg-gray-300 text-gray-500 font-semibold px-4 py-2 rounded-lg shadow cursor-not-allowed"
-                        >
-                            <font-awesome-icon
-                                icon="book-open"
-                                class="h-5 w-5"
-                            />
-                            Verify your email to read
-                        </button>
-                        <button
-                            v-if="!isSaved"
-                            @click="saveBook"
-                            class="w-full flex items-center justify-center gap-2 border border-green-600 text-green-700 hover:bg-green-50 focus:bg-green-100 font-semibold px-4 py-2 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-green-400"
-                        >
-                            <font-awesome-icon
-                                icon="bookmark"
-                                class="h-5 w-5"
-                            />
-                            Save
-                        </button>
-                        <button
-                            v-else
-                            @click="unsaveBook"
-                            class="w-full flex items-center justify-center gap-2 border border-yellow-500 text-yellow-600 hover:bg-yellow-50 focus:bg-yellow-100 font-semibold px-4 py-2 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                        >
-                            <font-awesome-icon
-                                icon="bookmark"
-                                class="h-5 w-5"
-                            />
-                            <font-awesome-icon
-                                icon="xmark"
-                                class="h-4 w-4 text-yellow-600"
-                            />
-                            Unsave
-                        </button>
-                        <button
-                            @click="reportBook"
-                            class="w-full flex items-center justify-center gap-2 border border-red-500 text-red-600 hover:bg-red-50 focus:bg-red-100 font-semibold px-4 py-2 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-red-400"
-                        >
-                            <font-awesome-icon icon="flag" class="h-5 w-5" />
-                            Report
-                        </button>
+                <!-- Main Content Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    <!-- Left Column - Book Cover & Actions -->
+                    <div class="lg:col-span-1">
+                        <div class="sticky top-24">
+                            <!-- Book Cover -->
+                            <div class="text-center mb-8">
+                                <img :src="book.cover_image || '/images/default.svg'" :alt="book.title"
+                                    class="book-details-cover mx-auto shadow-2xl" />
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="space-y-4">
+                                <!-- Read Button -->
+                                <button v-if="book.ebook_file && isVerified" @click="handleReadClick"
+                                    class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-6 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-green-200">
+                                    <font-awesome-icon icon="book-open" class="h-5 w-5" />
+                                    <span>
+                                        <template v-if="book.progress && book.progress > 0 && book.progress < 1">
+                                            Continue Reading
+                                        </template>
+                                        <template v-else>Start Reading</template>
+                                    </span>
+                                </button>
+
+                                <!-- Email Verification Required -->
+                                <button v-if="book.ebook_file && user && !isVerified" disabled
+                                    class="w-full flex items-center justify-center gap-3 bg-slate-300 text-slate-500 font-semibold px-6 py-4 rounded-2xl cursor-not-allowed">
+                                    <font-awesome-icon icon="book-open" class="h-5 w-5" />
+                                    Verify your email to read
+                                </button>
+
+                                <!-- Save/Unsave Button -->
+                                <button v-if="!isSaved" @click="saveBook"
+                                    class="w-full flex items-center justify-center gap-3 border-2 border-green-600 text-green-700 hover:bg-green-50 focus:bg-green-100 font-semibold px-6 py-4 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-200">
+                                    <font-awesome-icon icon="bookmark" class="h-5 w-5" />
+                                    Save to Library
+                                </button>
+                                <button v-else @click="unsaveBook"
+                                    class="w-full flex items-center justify-center gap-3 border-2 border-amber-500 text-amber-600 hover:bg-amber-50 focus:bg-amber-100 font-semibold px-6 py-4 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-amber-200">
+                                    <font-awesome-icon icon="bookmark" class="h-5 w-5" />
+                                    <font-awesome-icon icon="xmark" class="h-4 w-4" />
+                                    Remove from Library
+                                </button>
+
+                                <!-- Report Button -->
+                                <button @click="reportBook"
+                                    class="w-full flex items-center justify-center gap-3 border-2 border-red-500 text-red-600 hover:bg-red-50 focus:bg-red-100 font-semibold px-6 py-4 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-red-200">
+                                    <font-awesome-icon icon="flag" class="h-5 w-5" />
+                                    Report Issue
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Book Information -->
+                    <div class="lg:col-span-2 space-y-8">
+                        <!-- Book Details -->
+                        <div class="bg-slate-50 rounded-2xl p-6">
+                            <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <font-awesome-icon icon="info-circle" class="text-green-600" />
+                                Book Information
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-green-600 font-semibold flex items-center gap-2">
+                                        <font-awesome-icon icon="user" />
+                                        Author:
+                                    </span>
+                                    <span class="text-slate-700">{{ book.author }}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-green-600 font-semibold flex items-center gap-2">
+                                        <font-awesome-icon icon="barcode" />
+                                        ISBN:
+                                    </span>
+                                    <span class="text-slate-700">{{ book.isbn || "N/A" }}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-green-600 font-semibold flex items-center gap-2">
+                                        <font-awesome-icon icon="calendar" />
+                                        Published:
+                                    </span>
+                                    <span class="text-slate-700">{{ book.published_year || "N/A" }}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-green-600 font-semibold flex items-center gap-2">
+                                        <font-awesome-icon icon="building" />
+                                        Publisher:
+                                    </span>
+                                    <span class="text-slate-700">{{ book.publisher || "N/A" }}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-green-600 font-semibold flex items-center gap-2">
+                                        <font-awesome-icon icon="language" />
+                                        Language:
+                                    </span>
+                                    <span class="text-slate-700">{{ book.language || "N/A" }}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-green-600 font-semibold flex items-center gap-2">
+                                        <font-awesome-icon icon="tag" />
+                                        Category:
+                                    </span>
+                                    <span class="text-slate-700">{{ book.category?.name || "N/A" }}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-green-600 font-semibold flex items-center gap-2">
+                                        <font-awesome-icon icon="circle" :class="book.status === 'active' ? 'text-green-500' : 'text-red-500'" />
+                                        Status:
+                                    </span>
+                                    <span :class="book.status === 'active' ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'">
+                                        {{ book.status }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Book Description -->
+                        <div class="bg-slate-50 rounded-2xl p-6">
+                            <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <font-awesome-icon icon="file-text" class="text-green-600" />
+                                Description
+                            </h3>
+                            <div class="prose max-w-none text-slate-700 leading-relaxed" v-html="book.description || '<em>No description provided.</em>'"></div>
+                        </div>
+
+                        <!-- File Availability -->
+                        <div v-if="!book.ebook_file" class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center">
+                            <font-awesome-icon icon="exclamation-triangle" class="text-amber-600 text-2xl mb-3" />
+                            <p class="text-amber-800 font-medium">No eBook file available for this book.</p>
+                        </div>
+
+                        <!-- Metadata -->
+                        <div class="text-sm text-slate-500 space-y-1">
+                            <p>Added: {{ new Date(book.created_at).toLocaleString() }}</p>
+                            <p>Last Updated: {{ new Date(book.updated_at).toLocaleString() }}</p>
+                        </div>
                     </div>
                 </div>
-
-                <div class="md:col-span-2" id="book-content">
-                    <h2
-                        class="text-2xl font-bold text-green-700 mb-3 flex items-center gap-2"
-                    >
-                        <font-awesome-icon icon="book" class="h-6 w-6" />
-                        {{ book.title }}
-                    </h2>
-
-                    <div class="border-t border-green-200 my-4"></div>
-
-                    <p>
-                        <span
-                            class="text-green-600 inline-flex items-center gap-1"
-                            ><font-awesome-icon icon="user" /> Author:</span
-                        >
-                        {{ book.author }}
-                    </p>
-                    <p>
-                        <span
-                            class="text-green-600 inline-flex items-center gap-1"
-                            ><font-awesome-icon icon="barcode" /> ISBN:</span
-                        >
-                        {{ book.isbn || "N/A" }}
-                    </p>
-                    <p>
-                        <span
-                            class="text-green-600 inline-flex items-center gap-1"
-                            ><font-awesome-icon icon="calendar" /> Published
-                            Year:</span
-                        >
-                        {{ book.published_year || "N/A" }}
-                    </p>
-                    <p>
-                        <span
-                            class="text-green-600 inline-flex items-center gap-1"
-                            ><font-awesome-icon icon="building" />
-                            Publisher:</span
-                        >
-                        {{ book.publisher || "N/A" }}
-                    </p>
-                    <p>
-                        <span
-                            class="text-green-600 inline-flex items-center gap-1"
-                            ><font-awesome-icon icon="language" />
-                            Language:</span
-                        >
-                        {{ book.language || "N/A" }}
-                    </p>
-                    <p>
-                        <span
-                            class="text-green-600 inline-flex items-center gap-1"
-                            ><font-awesome-icon icon="tag" /> Category:</span
-                        >
-                        {{ book.category?.name || "N/A" }}
-                    </p>
-                    <p>
-                        <span
-                            class="text-green-600 inline-flex items-center gap-1"
-                            ><font-awesome-icon
-                                icon="circle"
-                                :class="
-                                    book.status === 'active'
-                                        ? 'text-green-500'
-                                        : 'text-red-500'
-                                "
-                            />
-                            Status:</span
-                        >
-                        <span
-                            :class="
-                                book.status === 'active'
-                                    ? 'text-green-600 font-semibold'
-                                    : 'text-red-600 font-semibold'
-                            "
-                        >
-                            {{ book.status }}
-                        </span>
-                    </p>
-
-                    <div class="border-t border-green-200 my-4"></div>
-
-                    <p class="mt-4">
-                        <strong class="text-green-600">Description:</strong>
-                    </p>
-                    <div
-                        class="mb-3 prose max-w-none"
-                        v-html="
-                            book.description ||
-                            '<em>No description provided.</em>'
-                        "
-                    ></div>
-
-                    <p class="text-sm text-gray-500">
-                        Added: {{ new Date(book.created_at).toLocaleString() }}
-                    </p>
-                    <p class="text-sm text-gray-500">
-                        Last Updated:
-                        {{ new Date(book.updated_at).toLocaleString() }}
-                    </p>
-
-                    <span v-if="!book.ebook_file" class="text-red-600"
-                        >No eBook file available.</span
-                    >
-                </div>
             </div>
 
-            <div class="mt-8">
-                <h3
-                    class="text-xl font-bold text-green-700 mb-2 flex items-center gap-2"
-                >
+            <!-- Ratings & Reviews Section -->
+            <div class="mt-12 bg-white rounded-3xl shadow-sm border border-slate-200 p-8 hover:shadow-md transition-shadow duration-300">
+                <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
                     <font-awesome-icon icon="star" class="text-yellow-400" />
                     Ratings & Reviews
                 </h3>
-                <div v-if="book.average_rating && book.reviews_count > 0">
-                    <StarRating
-                        :rating="book.average_rating"
-                        :highlight="true"
-                    />
-                    <span class="text-sm text-gray-700 font-semibold ml-1">{{
-                        book.average_rating
-                    }}</span>
-                    <span class="text-xs text-gray-500 ml-1"
-                        >({{ book.reviews_count }} review{{
-                            book.reviews_count > 1 ? "s" : ""
-                        }})</span
-                    >
-                </div>
-                <div v-else>
-                    <span class="text-xs text-gray-400">No ratings yet</span>
-                </div>
-                <div v-if="reviews.length" class="space-y-4 mb-6">
-                    <div
-                        v-for="review in reviews"
-                        :key="review.id"
-                        class="bg-green-50 rounded-lg p-4 shadow"
-                    >
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="font-semibold text-green-700">{{
-                                review.user?.user_name || "User"
-                            }}</span>
-                            <span class="flex items-center gap-1">
-                                <font-awesome-icon
-                                    v-for="n in 5"
-                                    :key="n"
-                                    icon="star"
-                                    :class="
-                                        n <= review.rating
-                                            ? 'text-yellow-400'
-                                            : 'text-gray-300'
-                                    "
-                                />
-                            </span>
-                            <span class="text-xs text-gray-400 ml-auto">
-                                Posted:
-                                {{
-                                    new Date(
-                                        review.created_at
-                                    ).toLocaleDateString()
-                                }}
-                                <span
-                                    v-if="
-                                        review.updated_at &&
-                                        review.updated_at !== review.created_at
-                                    "
-                                >
-                                    | Updated:
-                                    {{
-                                        new Date(
-                                            review.updated_at
-                                        ).toLocaleDateString()
-                                    }}</span
-                                >
-                            </span>
+
+                <!-- Overall Rating -->
+                <div class="mb-8 p-6 bg-slate-50 rounded-2xl">
+                    <div class="flex items-center gap-4">
+                        <StarRating :rating="averageRating" :highlight="true" />
+                        <div>
+                            <span class="text-2xl font-bold text-slate-700">{{ averageRating || 0 }}</span>
+                            <span class="text-slate-500 ml-2">/ 5</span>
+                            <div class="text-sm text-slate-600">({{ reviewCount || 0 }} review{{ reviewCount !== 1 ? 's' : '' }})</div>
                         </div>
-                        <div class="text-gray-700">{{ review.review }}</div>
                     </div>
                 </div>
-                <div v-else class="text-gray-400 mb-6">
-                    No reviews yet. Be the first to review this book!
-                </div>
-                <div
-                    v-if="isVerified"
-                    class="bg-white rounded-lg p-4 shadow border border-green-100"
-                >
-                    <h4 class="font-semibold mb-2">
-                        {{
-                            userReview && !editingReview
-                                ? "Your Review"
-                                : userReview
-                                ? "Edit Your Review"
-                                : "Leave a Review"
-                        }}
-                    </h4>
-                    <div v-if="userReview && !editingReview">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span
-                                v-for="n in 5"
-                                :key="n"
-                                class="cursor-pointer"
-                            >
-                                <font-awesome-icon
-                                    icon="star"
-                                    :class="
-                                        n <= userReview.rating
-                                            ? 'text-yellow-400'
-                                            : 'text-gray-300'
-                                    "
-                                    size="lg"
-                                />
+
+                <!-- Reviews List -->
+                <div v-if="reviews.length" class="space-y-6 mb-8">
+                    <div v-for="review in reviews" :key="review.id" class="bg-slate-50 rounded-2xl p-6">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="font-semibold text-slate-700">{{ review.user?.user_name || "User" }}</span>
+                            <div class="flex items-center gap-1">
+                                <font-awesome-icon v-for="n in 5" :key="n" icon="star" :class="n <= review.rating ? 'text-yellow-400' : 'text-slate-300'" />
+                            </div>
+                            <span class="text-xs text-slate-400 ml-auto">
+                                {{ new Date(review.created_at).toLocaleDateString() }}
                             </span>
-                            <span class="ml-2 text-gray-600"
-                                >{{ userReview.rating }} / 5</span
-                            >
                         </div>
-                        <div class="mb-2 text-gray-700">
-                            {{ userReview.review }}
+                        <div class="text-slate-700">{{ review.review }}</div>
+                    </div>
+                </div>
+
+                <!-- No Reviews Message -->
+                <div v-else class="text-center py-12 text-slate-500">
+                    <font-awesome-icon icon="star" class="text-4xl mb-4 text-slate-300" />
+                    <p class="text-lg">No reviews yet. Be the first to review this book!</p>
+                </div>
+
+                <!-- Review Form -->
+                <div v-if="isVerified" class="bg-slate-50 rounded-2xl p-6">
+                    <h4 class="font-semibold mb-4 text-lg text-slate-800">
+                        {{ userReview && !editingReview ? "Your Review" : userReview ? "Edit Your Review" : "Leave a Review" }}
+                    </h4>
+                    
+                    <div v-if="userReview && !editingReview">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span v-for="n in 5" :key="n">
+                                <font-awesome-icon icon="star" :class="n <= userReview.rating ? 'text-yellow-400' : 'text-slate-300'" size="lg" />
+                            </span>
+                            <span class="ml-2 text-slate-600">{{ userReview.rating }} / 5</span>
                         </div>
-                        <button
-                            @click="editingReview = true"
-                            class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 focus:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-400"
-                        >
+                        <div class="mb-4 text-slate-700">{{ userReview.review }}</div>
+                        <button @click="editingReview = true"
+                            class="bg-green-600 text-white px-6 py-3 rounded-2xl shadow-sm hover:bg-green-700 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-200">
                             Edit Review
                         </button>
                     </div>
+                    
                     <div v-else>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span
-                                v-for="n in 5"
-                                :key="n"
-                                @click="newRating = n"
-                                class="cursor-pointer"
-                            >
-                                <font-awesome-icon
-                                    icon="star"
-                                    :class="
-                                        n <= newRating
-                                            ? 'text-yellow-400'
-                                            : 'text-gray-300'
-                                    "
-                                    size="lg"
-                                />
+                        <div class="flex items-center gap-2 mb-4">
+                            <span v-for="n in 5" :key="n" @click="newRating = n" class="cursor-pointer hover:scale-110 transition-transform">
+                                <font-awesome-icon icon="star" :class="n <= newRating ? 'text-yellow-400' : 'text-slate-300'" size="lg" />
                             </span>
-                            <span class="ml-2 text-gray-600">{{
-                                newRating ? `${newRating} / 5` : "Select rating"
-                            }}</span>
+                            <span class="ml-3 text-slate-600 font-medium">
+                                {{ newRating ? `${newRating} / 5` : "Select rating" }}
+                            </span>
                         </div>
-                        <textarea
-                            v-model="newReview"
-                            rows="3"
-                            class="w-full border border-green-300 rounded shadow-sm focus:border-green-600 focus:ring-2 focus:ring-green-200 transition mb-2"
-                            placeholder="Write your review (optional)..."
-                        ></textarea>
-                        <button
-                            @click="submitReview"
-                            :disabled="submittingReview"
-                            class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 focus:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50"
-                        >
-                            {{
-                                submittingReview
-                                    ? userReview
-                                        ? "Updating..."
-                                        : "Submitting..."
-                                    : userReview
-                                    ? "Update Review"
-                                    : "Submit Review"
-                            }}
+                        <textarea v-model="newReview" rows="4"
+                            class="w-full border-2 border-slate-200 rounded-2xl shadow-sm focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 p-4 mb-4 resize-none"
+                            placeholder="Write your review (optional)..."></textarea>
+                        <button @click="submitReview" :disabled="submittingReview"
+                            class="bg-green-600 text-white px-8 py-3 rounded-2xl shadow-sm hover:bg-green-700 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-200 disabled:opacity-50">
+                            {{ submittingReview ? (userReview ? "Updating..." : "Submitting...") : (userReview ? "Update Review" : "Submit Review") }}
                         </button>
                     </div>
                 </div>
-                <div v-else-if="user" class="text-yellow-600">
-                    Please verify your email to leave a review.
+
+                <!-- Email Verification Required Message -->
+                <div v-else-if="user" class="text-center py-8 bg-amber-50 border border-amber-200 rounded-2xl">
+                    <font-awesome-icon icon="exclamation-triangle" class="text-amber-600 text-2xl mb-3" />
+                    <p class="text-amber-800">Please verify your email to leave a review.</p>
                 </div>
-                <div v-else class="text-gray-500">
-                    Please log in to leave a review.
+
+                <!-- Login Required Message -->
+                <div v-else class="text-center py-8 bg-slate-50 border border-slate-200 rounded-2xl">
+                    <font-awesome-icon icon="user" class="text-slate-600 text-2xl mb-3" />
+                    <p class="text-slate-700">Please log in to leave a review.</p>
                 </div>
             </div>
-            <button
-                v-show="showScrollTop"
-                @click="scrollToTop"
-                class="fixed bottom-6 right-6 bg-green-600 text-white rounded-full p-3 shadow-lg z-50"
-                style="transition: opacity 0.3s"
-            >
-                <font-awesome-icon icon="arrow-up" class="h-5 w-5" />
-            </button>
         </div>
-    </div>
 
-    <ReportModal
-        :show="showReportModal"
-        :book="book"
-        :reason="reportReason"
-        :description="reportDescription"
-        :loading="isSubmittingReport"
-        @close="closeReportModal"
-        @submit="submitReport"
-        @update:reason="(val) => (reportReason = val)"
-        @update:description="(val) => (reportDescription = val)"
-    />
+        <!-- Scroll to Top Button -->
+        <button v-show="showScrollTop" @click="scrollToTop"
+            class="fixed bottom-8 right-8 bg-green-600 text-white rounded-full p-4 shadow-lg z-50 hover:bg-green-700 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-green-200">
+            <font-awesome-icon icon="arrow-up" class="h-5 w-5" />
+        </button>
+
+        <!-- Report Modal -->
+        <ReportModal :show="showReportModal" :book="book" :reason="reportReason" :description="reportDescription"
+            :loading="isSubmittingReport" @close="closeReportModal" @submit="submitReport"
+            @update:reason="(val) => (reportReason = val)" @update:description="(val) => (reportDescription = val)" />
+    </UserLayout>
 </template>
 
 <style scoped>
@@ -724,46 +610,58 @@ const handleReadClick = () => {
     0% {
         background-position: 0% 50%;
     }
+
     50% {
         background-position: 100% 50%;
     }
+
     100% {
         background-position: 0% 50%;
     }
 }
+
 .animate-gradient-move {
     background-size: 200% 200%;
     animation: gradient-move 8s ease-in-out infinite;
 }
+
 @keyframes fade-in {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
 }
+
 .animate-fade-in {
     animation: fade-in 1s both;
 }
+
 @keyframes pulse-cta {
+
     0%,
     100% {
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
     }
+
     50% {
         box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
     }
 }
+
 .animate-pulse-cta {
     animation: pulse-cta 2s infinite;
 }
+
 input:focus,
 button:focus,
 a:focus {
     outline: 2px solid #34d399;
     outline-offset: 2px;
 }
+
 .book-details-cover {
     width: 250px;
     height: auto;

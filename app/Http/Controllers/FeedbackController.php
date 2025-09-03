@@ -7,14 +7,27 @@ use App\Models\Feedback;
 use Inertia\Inertia;
 use App\Events\FeedbackUpdated;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 
 class FeedbackController extends Controller
 {
     public function create()
     {
         $categories = Category::all();
+        $feedbacks = Feedback::where('user_id', Auth::id())->orderByDesc('created_at')->get();
+        $newResponses = $feedbacks->where('status', 'responded')->where('notified', false);
+
+        // Mark as notified
+        if ($newResponses->count() > 0) {
+            Feedback::whereIn('id', $newResponses->pluck('id'))->update(['notified' => true]);
+            // Broadcast to user (in case of real-time update)
+            event(new FeedbackUpdated(Auth::id(), 'user'));
+        }
+
         return Inertia::render('User/Feedback',[
             'categories' => $categories,
+            'feedbacks' => $feedbacks,
+            'hasNewResponses' => $newResponses->count() > 0,
         ]);
     }
 
@@ -22,11 +35,13 @@ class FeedbackController extends Controller
     {
         $request->validate([
             'message' => 'required|string|max:2000',
+            'type' => 'nullable|string|in:general,testimonial,bug_report,feature_request,report',
         ]);
         $feedback = Feedback::create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'message' => $request->message,
             'status' => 'pending',
+            'type' => $request->input('type', 'general'),
             'admin_notified' => false,
         ]);
         // Broadcast to admin
@@ -34,24 +49,7 @@ class FeedbackController extends Controller
         return redirect()->route('feedback.create')->with('success', 'Thank you for your feedback!');
     }
 
-    public function myFeedback()
-    {
-        $feedbacks = Feedback::where('user_id', auth()->id())->orderByDesc('created_at')->get();
-        $newResponses = $feedbacks->where('status', 'responded')->where('notified', false);
-        // Mark as notified
-        Feedback::whereIn('id', $newResponses->pluck('id'))->update(['notified' => true]);
-        // Broadcast to user (in case of real-time update)
-        if ($newResponses->count() > 0) {
-            event(new FeedbackUpdated(auth()->id(), 'user'));
-        }
-
-        $categories = Category::all();
-        return Inertia::render('User/MyFeedback', [
-            'feedbacks' => $feedbacks,
-            'hasNewResponses' => $newResponses->count() > 0,
-            'categories' => $categories,
-        ]);
-    }
+    // myFeedback() deprecated: listing merged into Feedback page
 
     public function reportBook(Request $request, $bookId)
     {
@@ -61,7 +59,7 @@ class FeedbackController extends Controller
         ]);
 
         Feedback::create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'message' => "Book Report - Book ID: {$bookId}\nReason: {$request->reason}\nDescription: " . ($request->description ?? 'No additional description'),
             'status' => 'pending',
             'type' => 'book_report',

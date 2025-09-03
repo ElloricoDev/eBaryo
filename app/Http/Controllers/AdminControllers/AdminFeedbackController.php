@@ -57,4 +57,35 @@ class AdminFeedbackController extends Controller
         event(new FeedbackUpdated(null, 'admin'));
         return back()->with('success', 'Response saved.');
     }
+
+    public function toggleApprove($id)
+    {
+        $feedback = Feedback::findOrFail($id);
+        $feedback->approved = !$feedback->approved;
+        $feedback->save();
+        return back()->with('success', 'Approval status updated.');
+    }
+
+    public function updateType(Request $request, $id)
+    {
+        $request->validate([
+            'type' => 'required|string|in:general,testimonial,bug_report,feature_request,report',
+        ]);
+        $feedback = Feedback::findOrFail($id);
+        $feedback->type = $request->type;
+        $feedback->save();
+        return back()->with('success', 'Feedback type updated.');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'feedback_ids' => 'required|array',
+            'feedback_ids.*' => 'exists:feedback,id'
+        ]);
+
+        Feedback::whereIn('id', $validated['feedback_ids'])->delete();
+
+        return redirect()->back()->with('success', 'Selected feedback has been deleted successfully.');
+    }
 }

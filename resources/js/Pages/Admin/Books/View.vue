@@ -25,77 +25,130 @@ const isEpub = computed(() => fileExt.value === 'epub');
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto px-4">
-    <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-      <Link :href="route('admin.books.index')"
-        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-700 text-white font-bold rounded-full shadow-lg hover:from-green-600 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
-      >
-        <font-awesome-icon icon="arrow-left" class="text-lg" />
-        <span class="hidden sm:inline">Back to Books</span>
-        <span class="sm:hidden">Back</span>
-      </Link>
-      <h1 class="text-2xl font-bold text-green-600 flex items-center gap-2">
-        <font-awesome-icon icon="eye" /> Book Details
-      </h1>
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Hero Header -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center">
+            <font-awesome-icon icon="eye" class="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-slate-800">Book Details</h1>
+            <p class="text-slate-600 mt-1">View comprehensive book information</p>
+          </div>
+        </div>
+        <Link :href="route('admin.books.index')"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-colors"
+        >
+          <font-awesome-icon icon="arrow-left" class="w-4 h-4" /> Back to Books
+        </Link>
+      </div>
     </div>
 
-    <div class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 shadow-2xl rounded-2xl mb-8 overflow-hidden">
-      <div class="grid grid-cols-1 md:grid-cols-4">
-        <div class="p-8 flex flex-col items-center justify-center bg-gray-100">
-          <img
-            v-if="book.cover_image"
-            :src="book.cover_image"
-            alt="Cover"
-            class="w-40 h-60 object-contain border-2 border-green-500 rounded-xl shadow mb-4"
-          />
-          <div v-else class="text-gray-500 text-center flex flex-col items-center justify-center h-60">
-            <font-awesome-icon icon="image" class="text-5xl mb-2" />
-            <p>No Cover</p>
+    <!-- Book Details Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-4">
+        <!-- Cover Image Section -->
+        <div class="lg:col-span-1 bg-slate-50 p-8 flex flex-col items-center justify-center">
+          <div class="relative">
+            <img
+              v-if="book.cover_image"
+              :src="book.cover_image"
+              alt="Book Cover"
+              class="w-48 h-64 object-cover rounded-xl shadow-lg border border-slate-200"
+            />
+            <div v-else class="w-48 h-64 bg-slate-200 rounded-xl flex flex-col items-center justify-center border border-slate-300">
+              <font-awesome-icon icon="image" class="text-4xl text-slate-400 mb-2" />
+              <p class="text-slate-500 text-sm">No Cover Image</p>
+            </div>
+            <div class="mt-4">
+              <span
+                :class="[
+                  'inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold',
+                  book.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                ]"
+              >
+                <font-awesome-icon :icon="book.status === 'active' ? 'check-circle' : 'file-circle-xmark'" class="w-4 h-4 mr-1" />
+                {{ book.status ? book.status.charAt(0).toUpperCase() + book.status.slice(1) : 'N/A' }}
+              </span>
+            </div>
           </div>
-          <span
-            :class="[
-              'inline-block px-4 py-1 rounded-full text-xs font-bold',
-              book.status === 'active' ? 'bg-green-200 text-green-800' : 'bg-red-100 text-red-600'
-            ]"
-          >
-            <font-awesome-icon :icon="book.status === 'active' ? 'check-circle' : 'file-circle-xmark'" class="mr-1" />
-            {{ book.status ? book.status.charAt(0).toUpperCase() + book.status.slice(1) : 'N/A' }}
-          </span>
         </div>
 
-        <div class="md:col-span-3 p-8">
-          <h3 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2">
-            <font-awesome-icon icon="book" /> {{ book.title || 'N/A' }}
-          </h3>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-base mb-6">
-            <div class="flex items-center gap-2"><font-awesome-icon icon="user" class="text-green-400" /> <span class="font-semibold text-green-700">Author:</span> <span class="ml-1">{{ book.author || 'N/A' }}</span></div>
-            <div class="flex items-center gap-2"><font-awesome-icon icon="tags" class="text-green-400" /> <span class="font-semibold text-green-700">Category:</span> <span class="ml-1">{{ book.category?.name || 'N/A' }}</span></div>
-            <div class="flex items-center gap-2"><font-awesome-icon icon="building" class="text-green-400" /> <span class="font-semibold text-green-700">Publisher:</span> <span class="ml-1">{{ book.publisher || 'N/A' }}</span></div>
-            <div class="flex items-center gap-2"><font-awesome-icon icon="language" class="text-green-400" /> <span class="font-semibold text-green-700">Language:</span> <span class="ml-1">{{ book.language || 'N/A' }}</span></div>
-            <div class="flex items-center gap-2"><font-awesome-icon icon="barcode" class="text-green-400" /> <span class="font-semibold text-green-700">ISBN:</span> <span class="ml-1">{{ book.isbn || 'N/A' }}</span></div>
-            <div class="flex items-center gap-2"><font-awesome-icon icon="calendar" class="text-green-400" /> <span class="font-semibold text-green-700">Published Year:</span> <span class="ml-1">{{ book.published_year || 'N/A' }}</span></div>
-            <div class="flex items-center gap-2"><font-awesome-icon icon="eye" class="text-green-400" /> <span class="font-semibold text-green-700">Reads:</span> <span class="ml-1">{{ book.read_count ?? 0 }}</span></div>
-            <div class="flex items-center gap-2"><font-awesome-icon icon="star" class="text-yellow-400" /> <span class="font-semibold text-green-700">Reviews:</span> <span class="ml-1">{{ book.reviews_count ?? 0 }}</span></div>
-            <div class="flex items-center gap-2"><font-awesome-icon icon="trophy" class="text-yellow-500" /> <span class="font-semibold text-green-700">Rating:</span> <span class="ml-1">
-              <span v-if="book.average_rating !== null" class="inline-block px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-bold">{{ book.average_rating }}</span>
-              <span v-else>—</span>
-            </span></div>
+        <!-- Book Information Section -->
+        <div class="lg:col-span-3 p-8">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">{{ book.title || 'N/A' }}</h2>
+            <p class="text-slate-600 text-lg">by {{ book.author || 'Unknown Author' }}</p>
           </div>
 
-          <div class="mt-4 text-base">
-            <div class="font-semibold text-green-700 mb-1 flex items-center gap-2"><font-awesome-icon icon="align-left" /> Description:</div>
-            <p class="text-gray-700 bg-green-50 rounded-lg p-4">{{ book.description || 'N/A' }}</p>
-          </div>
-
-          <div class="mt-4 text-base">
-            <div class="font-semibold text-green-700 mb-1 flex items-center gap-2"><font-awesome-icon icon="file" /> Ebook File:</div>
-            <div v-if="book.ebook_file">
-              <a :href="book.ebook_file" target="_blank" class="text-green-700 underline flex items-center gap-1 font-semibold hover:text-green-900">
-                <font-awesome-icon icon="download" /> Download Ebook
-              </a>
+          <!-- Book Details Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-slate-700 font-semibold mb-1">Category</label>
+                <div class="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-slate-700 font-medium">
+                  {{ book.category?.name || 'No Category' }}
+                </div>
+              </div>
+              <div>
+                <label class="block text-slate-700 font-semibold mb-1">Publisher</label>
+                <p class="text-slate-600">{{ book.publisher || 'N/A' }}</p>
+              </div>
+              <div>
+                <label class="block text-slate-700 font-semibold mb-1">Language</label>
+                <p class="text-slate-600">{{ book.language || 'N/A' }}</p>
+              </div>
+              <div>
+                <label class="block text-slate-700 font-semibold mb-1">ISBN</label>
+                <p class="text-slate-600 font-mono">{{ book.isbn || 'N/A' }}</p>
+              </div>
             </div>
-            <div v-else class="text-gray-500">N/A</div>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-slate-700 font-semibold mb-1">Published Year</label>
+                <p class="text-slate-600">{{ book.published_year || 'N/A' }}</p>
+              </div>
+              <div>
+                <label class="block text-slate-700 font-semibold mb-1">Read Count</label>
+                <p class="text-slate-600">{{ book.read_count ?? 0 }}</p>
+              </div>
+              <div>
+                <label class="block text-slate-700 font-semibold mb-1">Reviews</label>
+                <p class="text-slate-600">{{ book.reviews_count ?? 0 }}</p>
+              </div>
+              <div>
+                <label class="block text-slate-700 font-semibold mb-1">Average Rating</label>
+                <div v-if="book.average_rating !== null" class="inline-flex items-center px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 font-semibold">
+                  <font-awesome-icon icon="star" class="w-4 h-4 mr-1" />
+                  {{ book.average_rating }}
+                </div>
+                <p v-else class="text-slate-400">No ratings yet</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-6">
+            <label class="block text-slate-700 font-semibold mb-2">Description</label>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+              <p class="text-slate-700 leading-relaxed">{{ book.description || 'No description available' }}</p>
+            </div>
+          </div>
+
+          <!-- Ebook File -->
+          <div>
+            <label class="block text-slate-700 font-semibold mb-2">Ebook File</label>
+            <div v-if="book.ebook_file" class="inline-flex items-center gap-2">
+              <a :href="book.ebook_file" target="_blank" 
+                class="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors font-medium">
+                <font-awesome-icon icon="download" class="w-4 h-4" />
+                Download Ebook
+              </a>
+              <span class="text-slate-500 text-sm">{{ fileExt.toUpperCase() }} File</span>
+            </div>
+            <p v-else class="text-slate-400">No ebook file available</p>
           </div>
         </div>
       </div>

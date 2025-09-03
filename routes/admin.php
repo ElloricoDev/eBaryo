@@ -43,6 +43,7 @@ Route::middleware('auth', 'admin')->group(function () {
             Route::get('/edit/{id}', 'edit')->name('edit');
             Route::put('/update/{id}', 'update')->name('update');
             Route::delete('/delete/{id}', 'destroy')->name('destroy');
+            Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete');
         });
 
     //Admin Books Management Routes
@@ -57,6 +58,7 @@ Route::middleware('auth', 'admin')->group(function () {
             Route::get('/edit/{id}', 'edit')->name('edit');
             Route::put('/update/{id}', 'update')->name('update');
             Route::delete('/delete/{id}', 'destroy')->name('destroy');
+            Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete');
             Route::get('/{id}', 'show')->name('show');
         });
 
@@ -92,7 +94,9 @@ Route::middleware('auth', 'admin')->group(function () {
             Route::put('/respond/{id}', 'respond')->name('respond');
             Route::put('/response/{id}', 'update')->name('update');
             Route::post('/mark-as-read', 'markAsRead')->name('mark-as-read');
+            Route::patch('/{id}/toggle-approve', 'toggleApprove')->name('toggle-approve');
+            Route::patch('/{id}/update-type', 'updateType')->name('update-type');
+            Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete');
         });
-    
-    Route::resource('testimonials', AdminTestimonialsController::class)->names('admin.testimonials');
+
 });

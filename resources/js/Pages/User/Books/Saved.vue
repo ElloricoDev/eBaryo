@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faBookmark, faArrowLeft, faPlayCircle, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
-defineOptions({ layout: UserLayout });
 const { props } = usePage();
 const currentlyReadingBooks = props.currentlyReadingBooks || [];
 const finishedBooks = props.finishedBooks || [];
@@ -38,27 +37,51 @@ const goBack = () => {
 
 <template>
     <Head title="Saved Books" />
-    <div>
-        <button
-            @click="goBack"
-            class="block sm:hidden mb-4 text-green-700 font-bold flex items-center gap-2"
-        >
-            <font-awesome-icon icon="arrow-left" class="text-lg" />
-            Back
-        </button>
-        <div class="relative min-h-screen overflow-x-hidden">
-            <h1
-                class="text-green-700 font-bold text-2xl flex items-center gap-2 mb-6"
+    <UserLayout>
+        <!-- Back Button for Mobile -->
+        <div class="mb-6">
+            <button
+                @click="goBack"
+                class="block sm:hidden text-green-700 font-bold flex items-center gap-2 hover:text-green-800 transition-colors"
             >
-                <font-awesome-icon
-                    icon="bookmark"
-                    class="text-green-600 text-3xl"
-                />
-                My Library
-            </h1>
+                <font-awesome-icon icon="arrow-left" class="text-lg" />
+                Back
+            </button>
+        </div>
 
+        <!-- Hero Header -->
+        <div class="mb-12 bg-gradient-to-br from-green-50 via-white to-emerald-50 rounded-3xl p-8 border border-green-100 shadow-sm">
+            <div class="text-center max-w-4xl mx-auto">
+                <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4 flex items-center justify-center gap-3">
+                    <font-awesome-icon icon="bookmark" class="text-green-600" />
+                    My Personal Library
+                </h1>
+                <p class="text-xl text-slate-600 leading-relaxed mb-6">
+                    Your curated collection of books, reading progress, and completed stories
+                </p>
+                
+                <!-- Stats Cards -->
+                <div class="flex flex-wrap justify-center gap-6">
+                    <div class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-green-200">
+                        <div class="text-2xl font-bold text-green-600">{{ currentlyReadingBooks?.length || 0 }}</div>
+                        <div class="text-sm text-slate-600">Currently Reading</div>
+                    </div>
+                    <div class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-green-200">
+                        <div class="text-2xl font-bold text-green-600">{{ finishedBooks?.length || 0 }}</div>
+                        <div class="text-sm text-slate-600">Completed</div>
+                    </div>
+                    <div class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-green-200">
+                        <div class="text-2xl font-bold text-green-600">{{ savedBooks?.length || 0 }}</div>
+                        <div class="text-sm text-slate-600">Saved Books</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Book Sections with Enhanced Spacing -->
+        <div class="space-y-16">
             <!-- Currently Reading Section -->
-            <section class="mb-10">
+            <section>
                 <BookSection
                     title="Currently Reading"
                     icon="play-circle"
@@ -67,11 +90,17 @@ const goBack = () => {
                     :savedBookIds="$page.props.saved_books || []"
                     :auth="$page.props.auth"
                     emptyMessage="No books currently being read. Start reading a book and it will appear here."
+                    titleColor="text-slate-800"
+                    iconColor="text-green-600"
+                    bgColor="bg-green-50"
+                    borderColor="border-green-200"
+                    badgeText="In Progress"
+                    badgeColor="bg-gradient-to-r from-green-400 to-emerald-400"
                 />
             </section>
 
             <!-- Finished Reading Section -->
-            <section class="mb-10">
+            <section>
                 <BookSection
                     title="Finished Reading"
                     icon="check-circle"
@@ -80,6 +109,12 @@ const goBack = () => {
                     :savedBookIds="$page.props.saved_books || []"
                     :auth="$page.props.auth"
                     emptyMessage="No finished books yet. Books you finish will appear here."
+                    titleColor="text-slate-800"
+                    iconColor="text-emerald-600"
+                    bgColor="bg-emerald-50"
+                    borderColor="border-emerald-200"
+                    badgeText="Completed"
+                    badgeColor="bg-gradient-to-r from-emerald-400 to-teal-400"
                 />
             </section>
 
@@ -93,10 +128,16 @@ const goBack = () => {
                     :savedBookIds="$page.props.saved_books || []"
                     :auth="$page.props.auth"
                     emptyMessage="No saved books yet. Books you save will appear here for quick access."
+                    titleColor="text-slate-800"
+                    iconColor="text-blue-600"
+                    bgColor="bg-blue-50"
+                    borderColor="border-blue-200"
+                    badgeText="Saved"
+                    badgeColor="bg-gradient-to-r from-blue-400 to-indigo-400"
                 />
             </section>
         </div>
-    </div>
+    </UserLayout>
 </template>
 
 <style scoped>

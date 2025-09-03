@@ -199,10 +199,38 @@ onUnmounted(() => {
 <template>
     <Head title="Home" />
     <UserLayout>
-        <div v-if="hasSearch && totalFilteredResults === 0" class="mb-6 p-4 border border-gray-200 rounded bg-gray-50 text-gray-600">
-            No results found for "{{ search }}".
+        <!-- Hero Welcome Section -->
+        <div class="mb-12 bg-gradient-to-br from-green-50 via-white to-slate-50 rounded-3xl p-8 border border-green-100 shadow-sm">
+            <div class="text-center max-w-4xl mx-auto">
+                <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4">
+                    Welcome back, <span class="text-green-600">{{ $page.props.auth?.user?.user_name || 'Reader' }}</span>! 📚
+                </h1>
+                <p class="text-xl text-slate-600 mb-6 leading-relaxed">
+                    Continue your reading journey or discover new stories waiting for you
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <div class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-green-200">
+                        <div class="text-2xl font-bold text-green-600">{{ $page.props.saved_books?.length || 0 }}</div>
+                        <div class="text-sm text-slate-600">Saved Books</div>
+                    </div>
+                    <div class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-green-200">
+                        <div class="text-2xl font-bold text-green-600">{{ continueReadingList?.length || 0 }}</div>
+                        <div class="text-sm text-slate-600">In Progress</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="relative">
+
+        <!-- Search Results Alert -->
+        <div v-if="hasSearch && totalFilteredResults === 0" class="mb-8 p-6 border border-amber-200 rounded-2xl bg-amber-50 text-amber-800">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-2 bg-amber-500 rounded-full"></div>
+                <span class="font-medium">No results found for "{{ search }}".</span>
+            </div>
+        </div>
+
+        <!-- Continue Reading Section -->
+        <div class="relative mb-16">
             <BookSection
                 title="Continue Reading"
                 icon="play-circle"
@@ -211,12 +239,15 @@ onUnmounted(() => {
                 :savedBookIds="savedBookIds"
                 :auth="$page.props.auth"
                 emptyMessage="No books to continue reading. Start a new book today!"
+                titleColor="text-slate-800"
+                iconColor="text-green-600"
+                bgColor="bg-green-50"
+                borderColor="border-green-200"
             />
-
-            
         </div>
 
-        <div class="relative">
+        <!-- Recommended Books Section -->
+        <div class="relative mb-16">
             <BookSection
                 title="Recommended for You"
                 icon="thumbs-up"
@@ -225,18 +256,20 @@ onUnmounted(() => {
                 :savedBookIds="savedBookIds"
                 :auth="$page.props.auth"
                 badgeText="Top Picks"
-                badgeColor="bg-yellow-400"
-                borderColor="border-yellow-400"
-                bgColor="bg-yellow-50"
+                badgeColor="bg-gradient-to-r from-yellow-400 to-orange-400"
+                borderColor="border-yellow-300"
+                bgColor="bg-gradient-to-br from-yellow-50 to-orange-50"
                 iconColor="text-yellow-600"
-                titleColor="text-yellow-700"
+                titleColor="text-slate-800"
                 :emptyMessage="hasSearch ? 'No results in Recommended.' : 'No recommendations available yet. Check back later for personalized picks!'"
                 emptyIcon="thumbs-up"
                 @save="saveBook"
                 @unsave="unsaveBook"
             />
         </div>
-        <div class="relative">
+
+        <!-- New Books Section -->
+        <div class="relative mb-16">
             <BookSection
                 title="New Books for This Month"
                 icon="star"
@@ -246,12 +279,19 @@ onUnmounted(() => {
                 :auth="$page.props.auth"
                 :emptyMessage="hasSearch ? 'No results in New Books.' : 'There is no new book for this month.'"
                 emptyIcon="star"
+                badgeText="Fresh"
+                badgeColor="bg-gradient-to-r from-blue-400 to-indigo-400"
+                borderColor="border-blue-300"
+                bgColor="bg-gradient-to-br from-blue-50 to-indigo-50"
+                iconColor="text-blue-600"
+                titleColor="text-slate-800"
                 @save="saveBook"
                 @unsave="unsaveBook"
             />
         </div>
         
-        <div class="relative">
+        <!-- Most Read Books Section -->
+        <div class="relative mb-16">
             <BookSection
                 title="Most Read Books"
                 icon="chart-line"
@@ -261,13 +301,19 @@ onUnmounted(() => {
                 :auth="$page.props.auth"
                 :emptyMessage="hasSearch ? 'No results in Most Read.' : 'No reading statistics available yet. Be the first to read a book!'"
                 emptyIcon="chart-line"
-                iconColor="text-blue-600"
-                titleColor="text-green-700"
+                badgeText="Popular"
+                badgeColor="bg-gradient-to-r from-purple-400 to-pink-400"
+                borderColor="border-purple-300"
+                bgColor="bg-gradient-to-br from-purple-50 to-pink-50"
+                iconColor="text-purple-600"
+                titleColor="text-slate-800"
                 @save="saveBook"
                 @unsave="unsaveBook"
             />
         </div>
-        <div class="relative">
+
+        <!-- Highest Rated Books Section -->
+        <div class="relative mb-16">
             <BookSection
                 title="Highest Ratings"
                 icon="trophy"
@@ -277,8 +323,12 @@ onUnmounted(() => {
                 :auth="$page.props.auth"
                 :emptyMessage="hasSearch ? 'No results in Highest Ratings.' : 'No highly rated books yet.'"
                 emptyIcon="trophy"
-                iconColor="text-yellow-600"
-                titleColor="text-green-700"
+                badgeText="Top Rated"
+                badgeColor="bg-gradient-to-r from-amber-400 to-yellow-400"
+                borderColor="border-amber-300"
+                bgColor="bg-gradient-to-br from-amber-50 to-yellow-50"
+                iconColor="text-amber-600"
+                titleColor="text-slate-800"
                 @save="saveBook"
                 @unsave="unsaveBook"
             />

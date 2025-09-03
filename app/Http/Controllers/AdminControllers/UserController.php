@@ -12,10 +12,10 @@ class UserController extends Controller
 {
     public function index()
     {
-        $user = User::all();
+        $users = User::paginate(15);
 
         return inertia('Admin/Users/Index', [
-            'users' => $user,
+            'users' => $users,
         ]);
     }
 
@@ -87,5 +87,17 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
         return redirect()->back();
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id'
+        ]);
+
+        User::whereIn('id', $validated['user_ids'])->delete();
+
+        return redirect()->back()->with('success', 'Selected users have been deleted successfully.');
     }
 }

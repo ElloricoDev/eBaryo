@@ -16,32 +16,55 @@ const category = props.category;
 
 <template>
     <Head :title="`View Category: ${category.name}`" />
-    <div class="max-w-4xl mx-auto  px-4">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2">
-                <font-awesome-icon icon="tags" /> Category Details
-            </h1>
-            <Link
-                :href="route('admin.categories.index')"
-                class="inline-flex items-center bg-green-600 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:bg-green-700 text-base"
-            >
-                <font-awesome-icon icon="arrow-left" class="mr-2" /> Back to Categories
-            </Link>
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Hero Header -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center">
+                        <font-awesome-icon icon="tags" class="w-8 h-8 text-white" />
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-slate-800">Category Details</h1>
+                        <p class="text-slate-600 mt-1">View category information and details</p>
+                    </div>
+                </div>
+                <Link
+                    :href="route('admin.categories.index')"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-colors"
+                >
+                    <font-awesome-icon icon="arrow-left" class="w-4 h-4" /> Back to Categories
+                </Link>
+            </div>
         </div>
 
-        <!-- Card -->
-        <div class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl p-8">
-            <div class="mb-8 flex items-center gap-3">
-                <span class="inline-block px-4 py-1 rounded-full bg-green-200 text-green-800 font-bold text-lg">
-                    <font-awesome-icon icon="align-left" class="mr-1" /> {{ category.name }}
-                </span>
-            </div>
-            <div class="mb-4">
-                <h2 class="text-green-700 font-semibold flex items-center gap-1 mb-1">
-                    <font-awesome-icon icon="list" /> Description:
-                </h2>
-                <p class="text-gray-700 bg-green-50 rounded-lg p-4">{{ category.description || 'No description' }}</p>
+        <!-- Category Details Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+            <div class="space-y-6">
+                <!-- Category Name -->
+                <div>
+                    <label class="block text-slate-700 font-semibold mb-2">Category Name</label>
+                    <div class="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-xl font-semibold">
+                        <font-awesome-icon icon="align-left" class="w-4 h-4 mr-2" />
+                        {{ category.name }}
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-slate-700 font-semibold mb-2">Description</label>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                        <p class="text-slate-700 leading-relaxed">{{ category.description || 'No description provided' }}</p>
+                    </div>
+                </div>
+
+                <!-- Category ID -->
+                <div>
+                    <label class="block text-slate-700 font-semibold mb-2">Category ID</label>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2">
+                        <span class="text-slate-600 font-mono">{{ category.id }}</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

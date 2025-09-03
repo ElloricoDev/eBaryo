@@ -46,171 +46,176 @@ const submit = () => {
 <template>
     <Head title="Login" />
     <GuestLayout>
-        <div class="flex flex-col items-center justify-center">
-            <div
-                class="w-[350px] bg-white border-2 border-green-600 rounded-2xl shadow-md p-6 mt-2 transition duration-200 hover:shadow-lg hover:border-green-700 animate-slide-up"
-            >
-                <h1
-                    class="text-center text-green-700 text-2xl font-semibold mb-6"
-                >
-                    <font-awesome-icon icon="right-to-bracket" class="mr-2" />
-                    Login
-                </h1>
-                <form @submit.prevent="submit" class="space-y-5">
-                    <div class="relative">
-                        <input
-                            id="email"
-                            type="email"
-                            v-model="form.email"
-                            class="w-full border rounded-md px-3 py-3 focus:outline-none focus:ring-2 focus:ring-green-300 peer bg-transparent placeholder-transparent"
-                            :class="{ 'border-red-500': form.errors.email }"
-                            autofocus
-                            placeholder=" "
-                            aria-label="Email"
-                        />
-                        <label
-                            for="email"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-3 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
-                            :class="{
-                                '-top-6 text-xs text-green-600 font-semibold bg-white px-1':
-                                    form.email && form.email.length > 0,
-                            }"
-                        >
-                            <font-awesome-icon icon="person" /> Email
-                        </label>
-                        <div
-                            v-if="form.errors.email"
-                            class="text-sm text-red-600 mt-1"
-                        >
-                            {{ form.errors.email }}
-                        </div>
-                    </div>
-                    <div class="relative">
-                        <input
-                            :type="showPassword ? 'text' : 'password'"
-                            id="password"
-                            v-model="form.password"
-                            class="w-full border rounded-md px-3 py-3 focus:outline-none focus:ring-2 focus:ring-green-300 peer bg-transparent placeholder-transparent"
-                            :class="{ 'border-red-500': form.errors.password }"
-                            placeholder=" "
-                            aria-label="Password"
-                        />
-                        <label
-                            for="password"
-                            class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-3 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
-                            :class="{
-                                '-top-6 text-xs text-green-600 font-semibold bg-white px-1':
-                                    form.password && form.password.length > 0,
-                            }"
-                        >
-                            <font-awesome-icon icon="lock" /> Password
-                        </label>
-                        <button
-                            type="button"
-                            @click="showPassword = !showPassword"
-                            tabindex="-1"
-                            class="absolute right-3 top-3 text-green-400 hover:text-green-600 focus:outline-none"
-                            :aria-label="
-                                showPassword ? 'Hide password' : 'Show password'
-                            "
-                        >
-                            <font-awesome-icon
-                                :icon="showPassword ? 'eye-slash' : 'eye'"
-                            />
-                        </button>
-                        <div
-                            v-if="form.errors.password"
-                            class="text-sm text-red-600 mt-1"
-                        >
-                            {{ form.errors.password }}
-                        </div>
-                        <div class="text-right mt-2">
-                            <Link
-                                :href="route('password.request')"
-                                class="text-green-700 text-sm hover:underline"
-                            >
-                                <font-awesome-icon icon="envelope" /> Forgot
-                                password?
-                            </Link>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <input
-                            id="remember"
-                            type="checkbox"
-                            v-model="form.remember"
-                            class="border-green-500 text-green-600 focus:ring-green-500 rounded"
-                        />
-                        <label for="remember" class="text-green-700 text-sm"
-                            >Remember Me</label
-                        >
-                    </div>
-                    <div>
-                        <button
-                            type="submit"
-                            :disabled="form.processing"
-                            class="w-full bg-green-600 text-white py-2 px-4 rounded shadow-sm hover:bg-green-700 focus:bg-green-800 transition disabled:opacity-50 animate-pulse-cta focus:outline-none focus:ring-2 focus:ring-green-400 flex items-center justify-center gap-2"
-                            aria-label="Login"
-                        >
-                            <span v-if="!form.processing">
-                                <font-awesome-icon icon="right-to-bracket" />
-                                Login
-                            </span>
-                            <span v-else>
-                                <svg
-                                    class="animate-spin h-5 w-5 mr-2 inline-block text-white"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        class="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        stroke-width="4"
-                                    ></circle>
-                                    <path
-                                        class="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                    ></path>
-                                </svg>
-                                Logging in...
-                            </span>
-                        </button>
-                    </div>
-                    <div class="flex items-center my-2">
-                        <div class="flex-grow border-t border-green-200"></div>
-                        <span class="mx-2 text-gray-400 text-xs">or</span>
-                        <div class="flex-grow border-t border-green-200"></div>
-                    </div>
-                    <div>
-                        <a
-                            :href="route('google.redirect')"
-                            class="w-full inline-flex justify-center items-center border border-green-600 text-green-600 py-2 px-4 rounded hover:bg-green-50 focus:bg-green-100 transition focus:outline-none focus:ring-2 focus:ring-green-400"
-                            aria-label="Login with Google"
-                        >
-                            <font-awesome-icon
-                                :icon="['fab', 'google']"
-                                class="mr-2 text-red-500"
-                            />
-                            Login with Google
-                        </a>
-                    </div>
-                </form>
-                <div class="text-center mt-6">
-                    <p class="text-gray-600">Don't have an account?</p>
-                    <Link
-                        :href="route('register')"
-                        class="text-green-700 hover:underline mt-2 inline-block"
-                    >
-                        <font-awesome-icon icon="user-plus" /> Register
-                    </Link>
-                </div>
+        <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-green-50 relative overflow-hidden">
+            <!-- Background Image -->
+            <div class="absolute inset-0 z-0">
+                <img 
+                    src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                    alt="Library books background" 
+                    class="w-full h-full object-cover opacity-40"
+                />
             </div>
-        </div>
+            
+            <div class="max-w-md w-full space-y-8 relative z-10">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                            <div class="text-center mb-8">
+                                <img src="/favicon1.png" alt="eBaryo logo" class="w-12 h-12 mx-auto mb-4" />
+                                <h1 class="text-3xl font-bold text-slate-800">
+                                    Welcome back
+                                </h1>
+                                <p class="text-slate-600 mt-2">
+                                    Sign in to your account
+                                </p>
+                            </div>
+                            <form @submit.prevent="submit" class="space-y-6">
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
+                                        Email address
+                                    </label>
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        v-model="form.email"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                                        :class="{ 'border-red-500 focus:ring-red-500': form.errors.email }"
+                                        autofocus
+                                        placeholder="Enter your email"
+                                        aria-label="Email"
+                                    />
+                                    <div
+                                        v-if="form.errors.email"
+                                        class="text-sm text-red-600 mt-1"
+                                    >
+                                        {{ form.errors.email }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="password" class="block text-sm font-medium text-slate-700 mb-2">
+                                        Password
+                                    </label>
+                                    <div class="relative">
+                                        <input
+                                            :type="showPassword ? 'text' : 'password'"
+                                            id="password"
+                                            v-model="form.password"
+                                            class="w-full px-4 py-3 pr-12 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                                            :class="{ 'border-red-500 focus:ring-red-500': form.errors.password }"
+                                            placeholder="Enter your password"
+                                            aria-label="Password"
+                                        />
+                                        <button
+                                            type="button"
+                                            @click="showPassword = !showPassword"
+                                            tabindex="-1"
+                                            class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 focus:outline-none"
+                                            :aria-label="
+                                                showPassword ? 'Hide password' : 'Show password'
+                                            "
+                                        >
+                                            <font-awesome-icon
+                                                :icon="showPassword ? 'eye-slash' : 'eye'"
+                                            />
+                                        </button>
+                                    </div>
+                                    <div
+                                        v-if="form.errors.password"
+                                        class="text-sm text-red-600 mt-1"
+                                    >
+                                        {{ form.errors.password }}
+                                    </div>
+                                    <div class="text-right mt-2">
+                                        <Link
+                                            :href="route('password.request')"
+                                            class="text-sm text-green-600 hover:text-green-700 hover:underline"
+                                        >
+                                            Forgot password?
+                                        </Link>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input
+                                            id="remember"
+                                            type="checkbox"
+                                            v-model="form.remember"
+                                            class="h-4 w-4 text-green-600 focus:ring-green-500 border-slate-300 rounded"
+                                        />
+                                        <label for="remember" class="ml-2 block text-sm text-slate-700">
+                                            Remember me
+                                        </label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button
+                                        type="submit"
+                                        :disabled="form.processing"
+                                        class="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        aria-label="Login"
+                                    >
+                                        <span v-if="!form.processing">
+                                            Sign in
+                                        </span>
+                                        <span v-else class="flex items-center justify-center">
+                                            <svg
+                                                class="animate-spin h-5 w-5 mr-2"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    class="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    stroke-width="4"
+                                                ></circle>
+                                                <path
+                                                    class="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                                ></path>
+                                            </svg>
+                                            Signing in...
+                                        </span>
+                                    </button>
+                                </div>
+                                <div class="relative">
+                                    <div class="absolute inset-0 flex items-center">
+                                        <div class="w-full border-t border-slate-300" />
+                                    </div>
+                                    <div class="relative flex justify-center text-sm">
+                                        <span class="px-2 bg-white text-slate-500">Or continue with</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <a
+                                        :href="route('google.redirect')"
+                                        class="w-full inline-flex justify-center items-center border border-slate-300 text-slate-700 py-3 px-4 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                                        aria-label="Login with Google"
+                                    >
+                                        <font-awesome-icon
+                                            :icon="['fab', 'google']"
+                                            class="mr-2 text-red-500"
+                                        />
+                                        Google
+                                    </a>
+                                </div>
+                            </form>
+                            <div class="text-center mt-6">
+                                <p class="text-slate-600">
+                                    Don't have an account?
+                                    <Link
+                                        :href="route('register')"
+                                        class="text-green-600 hover:text-green-700 font-medium hover:underline"
+                                    >
+                                        Sign up
+                                    </Link>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
     </GuestLayout>
 </template>
 

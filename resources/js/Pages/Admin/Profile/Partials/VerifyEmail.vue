@@ -4,9 +4,9 @@ import { useForm, usePage } from '@inertiajs/vue3'
 import Swal from 'sweetalert2'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faEnvelope, faKey, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faKey, faPaperPlane, faCheckCircle, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faEnvelope, faKey, faPaperPlane)
+library.add(faEnvelope, faKey, faPaperPlane, faCheckCircle, faExclamationTriangle)
 
 const { props } = usePage()
 const user = props.user
@@ -48,46 +48,66 @@ const submit = () => {
 </script>
 
 <template>
-  <div class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl mb-8">
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-4 flex items-center gap-2 rounded-t-2xl shadow">
-      <font-awesome-icon icon="envelope" />
-      <span class="font-semibold text-lg">Verify Email</span>
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+        <font-awesome-icon icon="envelope" class="w-5 h-5 text-green-600" />
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-slate-800">Email Verification</h3>
+        <p class="text-slate-600 text-sm">Verify your email address to secure your account</p>
+      </div>
     </div>
 
-    <!-- Body -->
-    <div class="p-8">
-      <!-- Success Alert -->
-      <div v-if="isVerified" class="bg-green-100 text-green-800 px-4 py-3 rounded-md mb-4 font-semibold">
-        Your email is already verified.
+    <!-- Status Display -->
+    <div v-if="isVerified" class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+          <font-awesome-icon icon="check-circle" class="w-4 h-4 text-green-600" />
+        </div>
+        <div>
+          <h4 class="text-green-800 font-semibold">Email Verified</h4>
+          <p class="text-green-700 text-sm">Your email address is verified and secure</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verification Form -->
+    <div v-else>
+      <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <font-awesome-icon icon="exclamation-triangle" class="w-4 h-4 text-yellow-600" />
+          </div>
+          <div>
+            <h4 class="text-yellow-800 font-semibold">Email Not Verified</h4>
+            <p class="text-yellow-700 text-sm">Please verify your email address to secure your account</p>
+          </div>
+        </div>
       </div>
 
-      <!-- Form -->
       <form @submit.prevent="submit" class="space-y-6">
-        <div v-if="!isGoogleUser && !isVerified" class="relative">
-          <label class="block text-green-700 font-semibold mb-1">
-            <font-awesome-icon icon="key" /> Password
-          </label>
-          <span class="absolute left-3 top-10 text-green-400"><font-awesome-icon icon="key" /></span>
+        <div v-if="!isGoogleUser" class="relative">
+          <label class="block text-slate-700 font-semibold mb-2">Password Confirmation</label>
           <input
             v-model="form.password"
             type="password"
-            class="w-full rounded-full border border-green-500 shadow-sm focus:ring-2 focus:ring-green-300 focus:border-green-600 pl-10 py-2"
-            :disabled="isVerified"
-            placeholder="Enter your password"
+            class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-colors"
+            placeholder="Enter your password to verify"
           />
-          <div v-if="form.errors.password" class="text-red-500 text-sm mt-1">
+          <div v-if="form.errors.password" class="text-red-500 text-sm mt-2">
             {{ form.errors.password }}
           </div>
         </div>
 
         <button
           type="submit"
-          :disabled="submitting || form.processing || isVerified"
-          class="w-full inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold rounded-full shadow-xl text-lg disabled:opacity-50"
+          :disabled="submitting || form.processing"
+          class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-2xl transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <font-awesome-icon icon="paper-plane" class="mr-2" />
-          {{ submitting || form.processing ? 'Sending...' : 'Send Verification Email' }}
+          <font-awesome-icon icon="paper-plane" class="w-4 h-4" />
+          {{ submitting || form.processing ? 'Sending Verification Email...' : 'Send Verification Email' }}
         </button>
       </form>
     </div>

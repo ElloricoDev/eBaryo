@@ -13,6 +13,7 @@ class Feedback extends Model
         'user_id',
         'message',
         'status',
+        'approved',
         'responded_at',
         'response',
         'notified',

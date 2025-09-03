@@ -33,53 +33,65 @@ function submit() {
 <template>
     <Head title="Create new category" />
 
-    <div class="max-w-7xl mx-auto  px-4">
-        <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h1 class="text-2xl font-bold text-green-700 flex items-center gap-2">
-                <font-awesome-icon icon="tags" /> Create New Category
-            </h1>
-            <Link
-                :href="route('admin.categories.index')"
-                class="inline-flex items-center bg-green-600 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:bg-green-700 text-base"
-            >
-                <font-awesome-icon icon="arrow-left" class="mr-2" /> Back to Categories
-            </Link>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Hero Header -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center">
+                        <font-awesome-icon icon="tags" class="w-8 h-8 text-white" />
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-slate-800">Create New Category</h1>
+                        <p class="text-slate-600 mt-1">Add a new category to organize your books</p>
+                    </div>
+                </div>
+                <Link
+                    :href="route('admin.categories.index')"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-colors"
+                >
+                    <font-awesome-icon icon="arrow-left" class="w-4 h-4" /> Back to Categories
+                </Link>
+            </div>
         </div>
 
+        <!-- Form -->
         <div class="flex justify-center">
-            <div class="w-full max-w-xl">
-                <div class="bg-gradient-to-br from-white via-green-50 to-green-100 border-2 border-green-400 rounded-2xl shadow-2xl p-8">
-                    <form @submit.prevent="submit">
+            <div class="w-full max-w-2xl">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                    <form @submit.prevent="submit" class="space-y-6">
                         <!-- Name -->
-                        <div class="mb-8 relative">
-                            <label for="name" class="block font-semibold text-green-700 mb-1">
-                                <font-awesome-icon icon="align-left" class="mr-1" /> Name
+                        <div>
+                            <label for="name" class="block text-slate-700 font-semibold mb-2">
+                                Category Name
                             </label>
                             <input
                                 v-model="form.name"
                                 id="name"
                                 type="text"
-                                class="w-full px-10 py-2 rounded-full border border-green-500 shadow-sm focus:ring-2 focus:ring-green-300 focus:border-green-600"
-                                :class="{'border-red-500': form.errors.name, 'border-green-600': !form.errors.name}"
+                                placeholder="Enter category name"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-colors"
+                                :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.name}"
                             />
-                            <p v-if="form.errors.name" class="text-red-500 text-sm mt-1">
+                            <p v-if="form.errors.name" class="text-red-500 text-sm mt-2">
                                 {{ form.errors.name }}
                             </p>
                         </div>
 
                         <!-- Description -->
-                        <div class="mb-8 relative">
-                            <label for="description" class="block font-semibold text-green-700 mb-1">
-                                <font-awesome-icon icon="list" class="mr-1" /> Description
+                        <div>
+                            <label for="description" class="block text-slate-700 font-semibold mb-2">
+                                Description
                             </label>
                             <textarea
                                 v-model="form.description"
                                 id="description"
-                                rows="3"
-                                class="w-full px-10 py-2 rounded-xl border border-green-500 shadow-sm focus:ring-2 focus:ring-green-300 focus:border-green-600"
-                                :class="{'border-red-500': form.errors.description, 'border-green-600': !form.errors.description}"
+                                rows="4"
+                                placeholder="Enter category description (optional)"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-colors resize-none"
+                                :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.description}"
                             ></textarea>
-                            <p v-if="form.errors.description" class="text-red-500 text-sm mt-1">
+                            <p v-if="form.errors.description" class="text-red-500 text-sm mt-2">
                                 {{ form.errors.description }}
                             </p>
                         </div>
@@ -87,10 +99,11 @@ function submit() {
                         <!-- Submit Button -->
                         <button
                             type="submit"
-                            class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-3 rounded-full shadow-xl inline-flex items-center justify-center gap-2 text-lg disabled:opacity-50"
+                            class="w-full bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white font-semibold py-3 rounded-2xl transition-all duration-200 inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             :disabled="form.processing"
                         >
-                            <font-awesome-icon icon="plus-circle" class="mr-1" /> Create Category
+                            <font-awesome-icon icon="plus-circle" class="w-4 h-4" />
+                            {{ form.processing ? 'Creating Category...' : 'Create Category' }}
                         </button>
                     </form>
                 </div>

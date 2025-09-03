@@ -72,7 +72,6 @@ const updateScrollButtons = () => {
     const el = scrollRowRef.value;
     if (!el) return;
     hasPrev.value = el.scrollLeft > 0;
-    // Adjusted logic: remove -1 for more accurate detection
     hasNext.value = el.scrollLeft + el.clientWidth < el.scrollWidth;
 };
 
@@ -86,7 +85,6 @@ const handleScroll = () => {
     updateScrollButtons();
 };
 
-// Add watcher for books prop
 watch(
     () => props.books,
     () => {
@@ -146,9 +144,13 @@ const unsaveBook = (book) => {
         </div>
 
         <div v-if="books.length > 0" class="relative">
+            <!-- Edge fade hints -->
+            <div aria-hidden="true" class="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent rounded-l-xl"></div>
+            <div aria-hidden="true" class="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent rounded-r-xl"></div>
+
             <button
                 v-if="hasPrev"
-                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                class="nav-btn left-0"
                 aria-label="Previous Books"
                 tabindex="0"
                 @click="() => scrollByAmount(-300)"
@@ -193,7 +195,7 @@ const unsaveBook = (book) => {
                                     <span>{{ book.read_count }}</span>
                                     <span class="text-xs font-normal text-blue-600"
                                         >read{{
-                                            book.read_count === 1 ? "" : "s"
+                                            book.read_count === 1 ? '' : 's'
                                         }}</span
                                     >
                                 </div>
@@ -223,7 +225,7 @@ const unsaveBook = (book) => {
             </div>
             <button
                 v-if="hasNext"
-                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-60 hover:bg-green-100 text-green-700 font-bold py-2 px-2 text-lg rounded-full shadow focus:outline-none focus:ring-0 focus:ring-transparent transition-all duration-200"
+                class="nav-btn right-0"
                 aria-label="Next Books"
                 tabindex="0"
                 @click="() => scrollByAmount(300)"
@@ -269,4 +271,19 @@ const unsaveBook = (book) => {
         padding-right: 2.5rem;
     }
 }
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.85);
+    color: #047857; /* green-700 */
+    font-weight: 700;
+    padding: 0.5rem;
+    border-radius: 9999px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.nav-btn:hover { background: #ecfdf5; box-shadow: 0 6px 16px rgba(0,0,0,0.12); transform: translateY(-50%) scale(1.05); }
+.nav-btn:focus-visible { outline: 3px solid rgba(16, 185, 129, 0.6); outline-offset: 2px; }
 </style>

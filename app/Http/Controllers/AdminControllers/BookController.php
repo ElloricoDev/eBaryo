@@ -17,7 +17,7 @@ class BookController extends Controller
             $query->where('status', $request->status);
         }
         
-        $books = $query->paginate(10);
+        $books = $query->paginate(15);
 
         // Attach read_count, reviews_count, and average_rating to each book
         $books->getCollection()->transform(function ($book) {
@@ -145,5 +145,16 @@ class BookController extends Controller
         $book->save();
         
         return back()->with('message', 'Book status updated successfully.');
+    }
+
+    public function bulkDelete(Request $request) {
+        $validated = $request->validate([
+            'book_ids' => 'required|array',
+            'book_ids.*' => 'exists:books,id'
+        ]);
+
+        Book::whereIn('id', $validated['book_ids'])->delete();
+
+        return redirect()->back()->with('success', 'Selected books have been deleted successfully.');
     }
 }

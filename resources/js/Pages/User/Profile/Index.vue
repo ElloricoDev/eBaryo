@@ -32,9 +32,7 @@ library.add(
 );
 import { onMounted } from "vue";
 
-defineOptions({
-    layout: UserLayout,
-});
+
 
 const { props } = usePage();
 const user = props.user;
@@ -53,144 +51,170 @@ function goBack() {
 
 <template>
     <Head title="My Profile" />
-
-    <div>
-        <button
-            @click="goBack"
-            class="block sm:hidden mb-4 text-green-700 font-bold flex items-center gap-2"
-        >
-            <font-awesome-icon icon="arrow-left" class="text-lg" />
-            Back
-        </button>
-    </div>
-
-    <div
-        class="relative min-h-screen max-w-5xl mx-auto px-2 sm:px-4 py-4 sm:py-6 overflow-x-hidden"
-    >
-        <div
-            class="animate-fade-in bg-white bg-opacity-90 rounded-2xl shadow-xl p-2 sm:p-6 mb-6"
-        >
-            <h1
-                class="text-2xl font-bold text-green-700 mb-6 flex items-center gap-2"
+    <UserLayout>
+        <!-- Back Button for Mobile -->
+        <div class="mb-6">
+            <button
+                @click="goBack"
+                class="block sm:hidden text-green-700 font-bold flex items-center gap-2 hover:text-green-800 transition-colors"
             >
-                <font-awesome-icon icon="user-circle" /> User Profile
-            </h1>
-
-            <div class="flex flex-col items-center mb-6">
-                <img
-                    v-if="user.avatar"
-                    :src="user.avatar"
-                    alt="Avatar"
-                    class="rounded-full border-4 border-green-300 w-24 h-24 object-cover shadow-lg ring-2 ring-green-200"
-                />
-                <img
-                    v-else
-                    src="https://ui-avatars.com/api/?name=N%2FA&background=ddd&color=555"
-                    alt="No Avatar"
-                    class="rounded-full border-4 border-green-300 w-24 h-24 object-cover shadow-lg ring-2 ring-green-200"
-                />
-            </div>
-
-            <div class="space-y-2 text-gray-700">
-                <p>
-                    <span class="font-semibold text-green-700"
-                        ><font-awesome-icon icon="user" /> User Name:</span
-                    >
-                    {{ user.user_name || "N/A" }}
-                </p>
-                <div class="border-t border-green-100 my-2"></div>
-                <p>
-                    <span class="font-semibold text-green-700"
-                        ><font-awesome-icon icon="tag" /> Interests:</span
-                    >
-                    <span v-if="genres.length">{{ genres.join(", ") }}</span>
-                    <span v-else class="text-gray-400"
-                        >No interests selected.</span
-                    >
-                    <Link
-                        :href="route('user.profile.genres.edit')"
-                        class="ml-2 text-green-600 underline hover:text-green-800"
-                        >Edit</Link
-                    >
-                </p>
-                <div class="border-t border-green-100 my-2"></div>
-                <p>
-                    <span class="font-semibold text-green-700"
-                        ><font-awesome-icon icon="user" /> First Name:</span
-                    >
-                    {{ user.first_name || "N/A" }}
-                </p>
-                <p>
-                    <span class="font-semibold text-green-700"
-                        ><font-awesome-icon icon="user" /> Middle Name:</span
-                    >
-                    {{ user.middle_name || "N/A" }}
-                </p>
-                <p>
-                    <span class="font-semibold text-green-700"
-                        ><font-awesome-icon icon="user" /> Last Name:</span
-                    >
-                    {{ user.last_name || "N/A" }}
-                </p>
-                <div class="border-t border-green-100 my-2"></div>
-                <p>
-                    <span class="font-semibold text-green-700"
-                        ><font-awesome-icon icon="phone" /> Contact
-                        Number:</span
-                    >
-                    {{ user.contact_number || "N/A" }}
-                </p>
-                <p>
-                    <span class="font-semibold text-green-700"
-                        ><font-awesome-icon icon="location-dot" />
-                        Address:</span
-                    >
-                    {{ user.address || "N/A" }}
-                </p>
-                <div class="border-t border-green-100 my-2"></div>
-                <p>
-                    <span class="font-semibold text-green-700"
-                        ><font-awesome-icon icon="envelope" /> Email:</span
-                    >
-                    {{ user.email || "N/A" }}
-                </p>
-                <p>
-                    <span class="font-semibold text-green-700"
-                        ><font-awesome-icon icon="circle-check" /> Email
-                        Status:</span
-                    >
-                    <span
-                        v-if="user.email_verified_at"
-                        class="text-green-600 font-semibold"
-                        >Verified</span
-                    >
-                    <span v-else class="text-red-600 font-medium"
-                        >Not Verified</span
-                    >
-                </p>
-                <div class="border-t border-green-100 my-2"></div>
-                <p>
-                    <span class="font-semibold text-green-700"
-                        ><font-awesome-icon icon="graduation-cap" />
-                        Student:</span
-                    >
-                    <span>{{ user.student === "yes" ? "Yes" : "No" }}</span>
-                </p>
-            </div>
-
-            <Link
-                :href="route('user.profile.edit')"
-                class="mt-6 inline-flex items-center justify-center w-full px-4 py-2 bg-green-600 text-white font-semibold rounded-md shadow-sm hover:bg-green-700 focus:bg-green-800 transition animate-pulse-cta focus:outline-none focus:ring-2 focus:ring-green-400"
-            >
-                <font-awesome-icon icon="pen-to-square" class="mr-2" /> Edit
-                Profile
-            </Link>
+                <font-awesome-icon icon="arrow-left" class="text-lg" />
+                Back to Home
+            </button>
         </div>
 
-        <VerifyEmail />
-        <UpdatePasswordForm />
-        <DeleteAccountForm />
-    </div>
+        <!-- Hero Header -->
+        <div class="mb-12 bg-gradient-to-br from-green-50 via-white to-emerald-50 rounded-3xl p-8 border border-green-100 shadow-sm">
+            <div class="text-center max-w-4xl mx-auto">
+                <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4 flex items-center justify-center gap-3">
+                    <font-awesome-icon icon="user-circle" class="text-green-600" />
+                    My Profile
+                </h1>
+                <p class="text-xl text-slate-600 leading-relaxed">
+                    Manage your personal information and account settings
+                </p>
+            </div>
+        </div>
+
+        <!-- Profile Information Card -->
+        <div class="max-w-4xl mx-auto mb-12">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 hover:shadow-md transition-shadow duration-300">
+                <!-- Profile Avatar Section -->
+                <div class="text-center mb-8">
+                    <div class="relative inline-block">
+                        <img
+                            v-if="user.avatar"
+                            :src="user.avatar"
+                            alt="Avatar"
+                            class="w-32 h-32 rounded-full border-4 border-green-300 object-cover shadow-xl ring-4 ring-green-100"
+                        />
+                        <img
+                            v-else
+                            src="https://ui-avatars.com/api/?name=N%2FA&background=ddd&color=555"
+                            alt="No Avatar"
+                            class="w-32 h-32 rounded-full border-4 border-green-300 object-cover shadow-xl ring-4 ring-green-100"
+                        />
+                        <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center shadow-lg">
+                            <font-awesome-icon icon="user" class="text-white text-sm" />
+                        </div>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-4">{{ user.user_name || "User" }}</h2>
+                    <p class="text-slate-600">{{ user.email }}</p>
+                </div>
+
+                <!-- Profile Details Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Personal Information -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                            <font-awesome-icon icon="user" class="text-green-600" />
+                            Personal Information
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="text-green-600 font-semibold min-w-[100px]">User Name:</span>
+                                <span class="text-slate-700">{{ user.user_name || "N/A" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="text-green-600 font-semibold min-w-[100px]">First Name:</span>
+                                <span class="text-slate-700">{{ user.first_name || "N/A" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="text-green-600 font-semibold min-w-[100px]">Middle Name:</span>
+                                <span class="text-slate-700">{{ user.middle_name || "N/A" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="text-green-600 font-semibold min-w-[100px]">Last Name:</span>
+                                <span class="text-slate-700">{{ user.last_name || "N/A" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact & Additional Info -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                            <font-awesome-icon icon="envelope" class="text-green-600" />
+                            Contact & Details
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="text-green-600 font-semibold min-w-[100px]">Contact:</span>
+                                <span class="text-slate-700">{{ user.contact_number || "N/A" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="text-green-600 font-semibold min-w-[100px]">Address:</span>
+                                <span class="text-slate-700">{{ user.address || "N/A" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="text-green-600 font-semibold min-w-[100px]">Email:</span>
+                                <span class="text-slate-700">{{ user.email || "N/A" }}</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                                <span class="text-green-600 font-semibold min-w-[100px]">Student:</span>
+                                <span class="text-slate-700">{{ user.student === "yes" ? "Yes" : "No" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Verification Status -->
+                <div class="mt-8 p-4 rounded-2xl" :class="user.email_verified_at ? 'bg-green-50 border border-green-200' : 'bg-amber-50 border border-amber-200'">
+                    <div class="flex items-center gap-3">
+                        <font-awesome-icon icon="circle-check" :class="user.email_verified_at ? 'text-green-600' : 'text-amber-600'" />
+                        <span class="font-semibold" :class="user.email_verified_at ? 'text-green-800' : 'text-amber-800'">
+                            Email Status: {{ user.email_verified_at ? "Verified" : "Not Verified" }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Interests Section -->
+                <div class="mt-8 p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border border-purple-200">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <font-awesome-icon icon="tag" class="text-purple-600" />
+                        Reading Interests
+                    </h3>
+                    <div class="flex items-center justify-between">
+                        <div class="flex flex-wrap gap-2">
+                            <span v-if="genres.length" class="text-slate-700">{{ genres.join(", ") }}</span>
+                            <span v-else class="text-slate-500 italic">No interests selected yet.</span>
+                        </div>
+                        <Link
+                            :href="route('user.profile.genres.edit')"
+                            class="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-all duration-200 hover:shadow-md"
+                        >
+                            Edit Interests
+                        </Link>
+                    </div>
+                </div>
+
+                <!-- Edit Profile Button -->
+                <div class="mt-8 text-center">
+                    <Link
+                        :href="route('user.profile.edit')"
+                        class="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-green-200"
+                    >
+                        <font-awesome-icon icon="pen-to-square" />
+                        Edit Profile
+                    </Link>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Components -->
+        <div class="max-w-4xl mx-auto space-y-6">
+            <VerifyEmail />
+            <UpdatePasswordForm />
+            <DeleteAccountForm />
+        </div>
+    </UserLayout>
 </template>
 
 <style scoped>

@@ -34,77 +34,68 @@ const submit = async () => {
 </script>
 
 <template>
-    <div
-        class="relative animate-fade-in bg-white bg-opacity-90 border-2 border-green-600 rounded-2xl shadow-xl mt-6 mb-6 overflow-hidden"
-    >
-        <div
-            class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-green-50 to-white animate-gradient-move"
-        ></div>
-        <div
-            class="bg-green-600 text-white px-4 py-3 rounded-t-2xl flex items-center gap-2 font-medium"
-        >
-            <font-awesome-icon icon="user-xmark" /> Delete Account
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 hover:shadow-md transition-shadow duration-300">
+        <!-- Header -->
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center">
+                <font-awesome-icon icon="user-xmark" class="text-white text-xl" />
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-slate-800">Delete Account</h3>
+                <p class="text-slate-600 text-sm">This action is permanent and cannot be undone</p>
+            </div>
         </div>
-        <div class="border-t border-green-100"></div>
-        <div class="p-6">
-            <p class="text-gray-700 mb-4">
-                This action is permanent. Please enter your password to confirm.
-            </p>
-            <form @submit.prevent="submit" class="space-y-4">
-                <div class="relative">
-                    <input
-                        type="password"
-                        v-model="form.password"
-                        id="delete_password"
-                        class="peer w-full border border-green-300 rounded px-3 py-2 bg-transparent focus:border-green-600 focus:ring-2 focus:ring-green-200 transition placeholder-transparent"
-                        placeholder="Password"
-                    />
-                    <label
-                        for="delete_password"
-                        class="absolute left-3 top-2 text-green-700 font-medium pointer-events-none transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 bg-white px-1"
-                    >
-                        <font-awesome-icon icon="key" /> Password
-                    </label>
-                    <div
-                        v-if="form.errors.password"
-                        class="text-red-500 text-sm mt-1"
-                    >
-                        {{ form.errors.password }}
-                    </div>
-                </div>
 
-                <button
-                    type="submit"
-                    class="bg-red-600 hover:bg-red-700 focus:bg-red-800 text-white w-full py-2 px-4 rounded shadow-sm font-semibold flex items-center justify-center gap-2 animate-pulse-cta focus:outline-none focus:ring-2 focus:ring-red-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                    :disabled="form.processing"
-                >
-                    <font-awesome-icon icon="trash" />
-                    <span v-if="form.processing">
-                        <svg
-                            class="inline w-4 h-4 animate-spin mr-1"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <circle
-                                class="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                stroke-width="4"
-                            ></circle>
-                            <path
-                                class="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8v8z"
-                            ></path>
-                        </svg>
-                        Deleting...
-                    </span>
-                    <span v-else>Delete Account</span>
-                </button>
-            </form>
+        <!-- Warning Message -->
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-800">
+            <div class="flex items-center gap-3">
+                <font-awesome-icon icon="exclamation-triangle" class="text-red-600" />
+                <div>
+                    <div class="font-semibold">⚠️ Irreversible Action</div>
+                    <div class="text-sm">Deleting your account will permanently remove all your data, including reading history, saved books, and feedback.</div>
+                </div>
+            </div>
         </div>
+
+        <!-- Delete Form -->
+        <form @submit.prevent="submit" class="space-y-6">
+            <!-- Password Confirmation -->
+            <div class="space-y-2">
+                <label for="delete_password" class="block text-sm font-semibold text-slate-700">
+                    <font-awesome-icon icon="key" class="mr-2 text-red-600" />
+                    Confirm with Password
+                </label>
+                <input
+                    v-model="form.password"
+                    type="password"
+                    id="delete_password"
+                    class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 bg-transparent focus:border-red-500 focus:ring-4 focus:ring-red-100 transition-all duration-200 placeholder-slate-400"
+                    placeholder="Enter your password to confirm"
+                />
+                <div v-if="form.errors.password" class="text-red-500 text-sm">
+                    {{ form.errors.password }}
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+                type="submit"
+                :disabled="form.processing"
+                class="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white py-4 px-6 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <span v-if="!form.processing" class="flex items-center justify-center gap-3">
+                    <font-awesome-icon icon="trash" />
+                    Delete My Account
+                </span>
+                <span v-else class="flex items-center justify-center gap-3">
+                    <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                    </svg>
+                    Deleting...
+                </span>
+            </button>
+        </form>
     </div>
 </template>
 

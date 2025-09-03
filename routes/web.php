@@ -10,14 +10,33 @@ use App\Http\Controllers\UserControllers\BookController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\BookReviewController;
 use App\Http\Controllers\UserControllers\GenreController;
-use App\Models\Testimonial;
+use App\Models\Feedback;
 
 Route::get('/', function () {
-    $testimonials = Testimonial::where('approved', true)->orderByDesc('created_at')->limit(6)->get();
+    $feedbacks = Feedback::with('user')
+        ->where('type', 'testimonial')
+        ->where('approved', true)
+        ->orderByDesc('created_at')
+        ->limit(6)
+        ->get();
+
+    // Map to the structure expected by Welcome.vue
+    $testimonials = $feedbacks->map(function ($fb) {
+        return [
+            'id' => $fb->id,
+            'content' => $fb->message,
+            'author_name' => optional($fb->user)->user_name ?? 'User',
+            'avatar' => optional($fb->user)->avatar,
+            'role' => null,
+        ];
+    });
+
     return Inertia::render('Welcome', [
         'testimonials' => $testimonials,
     ]);
 })->name('welcome')->middleware('guest');
+
+Route::get('/books/{book}/reviews', [BookReviewController::class, 'index'])->name('books.reviews.index');
 
 Route::middleware('auth', 'user')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -43,20 +62,19 @@ Route::middleware('auth', 'user')->group(function () {
     Route::post('/books/{id}/save', [BookController::class, 'saveBook'])->name('books.save');
     Route::post('/books/{id}/unsave', [BookController::class, 'unsaveBook'])->name('books.unsave');
 
+
     Route::get('/user/genres/select', [GenreController::class, 'select'])->name('user.genres.select');
     Route::post('/user/genres/select', [GenreController::class, 'store'])->name('user.genres.store');
     Route::post('/user/genres/skip', [GenreController::class, 'skip'])->name('user.genres.skip');
     
     Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
-    Route::get('/my-feedback', [FeedbackController::class, 'myFeedback'])->name('feedback.my');
 
 
     
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Book Reviews
-    Route::get('/books/{book}/reviews', [BookReviewController::class, 'index'])->name('books.reviews.index');
+    // Book Reviews (creating/updating/deleting requires verified email)
     Route::post('/books/{book}/reviews', [BookReviewController::class, 'store'])->name('books.reviews.store');
     Route::delete('/reviews/{id}', [BookReviewController::class, 'destroy'])->name('reviews.destroy');
 
@@ -67,7 +85,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Book Reading
     Route::get('/books/{id}/read/epub', [BookController::class, 'epubReader'])->name('books.epubReader');
     Route::get('/books/{id}/read/pdf', [BookController::class, 'pdfReader'])->name('books.pdfReader');
-    Route::get('/user/profile/genres', [GenreController::class, 'edit'])->name('user.profile.genres.edit');
+    Route::get('/user/profile/genres/edit', [GenreController::class, 'edit'])->name('user.profile.genres.edit');
     Route::post('/user/profile/genres', [GenreController::class, 'update'])->name('user.profile.genres.update');
 });
 

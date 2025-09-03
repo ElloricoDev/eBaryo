@@ -23,89 +23,118 @@ defineOptions({
 
 <template>
     <Head title="Forgot Password" />
-    <div class="flex flex-col items-center justify-center">
-        <div
-            class="w-[350px] bg-white border-2 border-green-600 rounded-2xl shadow-md p-6 mt-2 transition duration-200 hover:shadow-lg hover:border-green-700 animate-slide-up"
-        >
-            <h1 class="text-center text-green-700 text-2xl font-semibold mb-6">
-                <font-awesome-icon icon="envelope" class="mr-2" /> Forgot
-                Password
-            </h1>
+        <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-green-50 relative overflow-hidden">
+            <!-- Background Image -->
+            <div class="absolute inset-0 z-0">
+                <img 
+                    src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                    alt="Library books background" 
+                    class="w-full h-full object-cover opacity-40"
+                />
+            </div>
+            
+            <div class="max-w-md w-full space-y-8 relative z-10">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                    <div class="text-center mb-8">
+                        <img src="/favicon1.png" alt="eBaryo logo" class="w-12 h-12 mx-auto mb-4" />
+                        <h1 class="text-3xl font-bold text-slate-800">
+                            Forgot your password?
+                        </h1>
+                        <p class="text-slate-600 mt-2">
+                            No worries, we'll send you reset instructions
+                        </p>
+                    </div>
 
-            <form
-                @submit.prevent="form.post(route('password.email'))"
-                class="space-y-5"
-            >
-                <div class="relative">
-                    <input
-                        v-model="form.email"
-                        type="email"
-                        id="email"
-                        required
-                        autofocus
-                        class="w-full border rounded-md px-3 py-3 focus:outline-none focus:ring-2 focus:ring-green-300 peer bg-transparent placeholder-transparent"
-                        :class="{ 'border-red-500': form.errors.email }"
-                        placeholder="Email"
-                        aria-label="Email"
-                    />
-                    <label
-                        for="email"
-                        class="absolute left-3 top-2.5 text-green-700 font-medium pointer-events-none transition-all duration-200 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-green-600 peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-green-700 peer-focus:font-semibold bg-white px-1"
-                        :class="{
-                            '-top-4 text-xs text-green-600 font-semibold':
-                                form.email,
-                        }"
+                    <form
+                        @submit.prevent="form.post(route('password.email'))"
+                        class="space-y-6"
                     >
-                        <font-awesome-icon icon="envelope" /> Email
-                    </label>
-                    <div
-                        v-if="form.errors.email"
-                        class="text-sm text-red-600 mt-1"
-                    >
-                        {{ form.errors.email }}
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
+                                Email address
+                            </label>
+                            <input
+                                v-model="form.email"
+                                type="email"
+                                id="email"
+                                required
+                                autofocus
+                                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                                :class="{ 'border-red-500 focus:ring-red-500': form.errors.email }"
+                                placeholder="Enter your email"
+                                aria-label="Email"
+                            />
+                            <div
+                                v-if="form.errors.email"
+                                class="text-sm text-red-600 mt-1"
+                            >
+                                {{ form.errors.email }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <button
+                                type="submit"
+                                class="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                :disabled="form.processing"
+                            >
+                                <span v-if="!form.processing">
+                                    Send reset link
+                                </span>
+                                <span v-else class="flex items-center justify-center">
+                                    <svg
+                                        class="animate-spin h-5 w-5 mr-2"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            class="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="4"
+                                        ></circle>
+                                        <path
+                                            class="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                        ></path>
+                                    </svg>
+                                    Sending...
+                                </span>
+                            </button>
+                        </div>
+
+                        <div
+                            v-if="$page.props.status"
+                            class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg"
+                        >
+                            {{ $page.props.status }}
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-6 space-y-3">
+                        <Link
+                            :href="route('login')"
+                            class="text-green-600 hover:text-green-700 font-medium hover:underline block"
+                        >
+                            Back to sign in
+                        </Link>
+                        <p class="text-slate-600">
+                            Don't have an account?
+                            <Link
+                                :href="route('register')"
+                                class="text-green-600 hover:text-green-700 font-medium hover:underline"
+                            >
+                                Sign up
+                            </Link>
+                        </p>
                     </div>
                 </div>
-
-                <div>
-                    <button
-                        type="submit"
-                        class="w-full bg-green-600 text-white py-2 px-4 rounded shadow-sm hover:bg-green-700 transition disabled:opacity-50"
-                        :disabled="form.processing"
-                    >
-                        <font-awesome-icon icon="paper-plane" class="mr-1" />
-                        {{
-                            form.processing
-                                ? "Sending..."
-                                : "Send Password Reset Link"
-                        }}
-                    </button>
-                </div>
-
-                <div
-                    v-if="$page.props.status"
-                    class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded"
-                >
-                    {{ $page.props.status }}
-                </div>
-            </form>
-
-            <div class="text-center mt-6 space-y-2">
-                <Link
-                    :href="route('login')"
-                    class="text-green-700 hover:underline block"
-                >
-                    <font-awesome-icon icon="right-to-bracket" /> Back to Login
-                </Link>
-                <Link
-                    :href="route('register')"
-                    class="text-green-700 hover:underline block"
-                >
-                    <font-awesome-icon icon="user-plus" /> Don't have an
-                    account? Register
-                </Link>
             </div>
         </div>
-    </div>
 </template>
 
 <style scoped>

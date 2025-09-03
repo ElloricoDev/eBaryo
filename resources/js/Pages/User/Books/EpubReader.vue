@@ -170,81 +170,104 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="epub-reader-root">
+        <!-- Enhanced Top Bar -->
         <div class="epub-topbar">
-            <button
-                @click="goBack"
-                class="flex items-center gap-2 font-semibold hover:underline"
-            >
-                <font-awesome-icon icon="arrow-left" />
-                Back
-            </button>
-            <span class="ml-4 text-lg font-bold truncate">{{
-                book.title
-            }}</span>
+            <div class="flex items-center justify-between w-full">
+                <button
+                    @click="goBack"
+                    class="flex items-center gap-2 font-semibold hover:underline transition-all duration-200 hover:scale-105"
+                >
+                    <font-awesome-icon icon="arrow-left" />
+                    Back to Book
+                </button>
+                <span class="text-xl font-bold truncate max-w-md">{{ book.title }}</span>
+                <div class="w-20"></div> <!-- Spacer for centering -->
+            </div>
         </div>
-        <div
-            class="epub-controls card flex flex-wrap items-center justify-center gap-2 mb-4 mt-4 p-3 shadow-lg rounded-lg bg-white/90 backdrop-blur-md"
-        >
-            <button
-                @click="prevPage"
-                :disabled="!canPrev || isLoading"
-                class="icon-btn"
-                aria-label="Previous Page"
-            >
-                <font-awesome-icon icon="chevron-left" />
-            </button>
-            <span class="text-base flex items-center gap-1">
-                Page
-                <input
-                    type="number"
-                    min="1"
-                    :max="totalPages"
-                    v-model="pageInput"
-                    @keyup.enter="goToPageInput"
-                    @blur="goToPageInput"
-                    class="page-input"
+
+        <!-- Enhanced Controls Panel -->
+        <div class="epub-controls card">
+            <!-- Navigation Controls -->
+            <div class="flex items-center gap-3">
+                <button
+                    @click="prevPage"
+                    :disabled="!canPrev || isLoading"
+                    class="control-btn"
+                    aria-label="Previous Page"
+                >
+                    <font-awesome-icon icon="chevron-left" />
+                </button>
+                
+                <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200">
+                    <span class="text-sm font-medium text-slate-700">Page</span>
+                    <input
+                        type="number"
+                        min="1"
+                        :max="totalPages"
+                        v-model="pageInput"
+                        @keyup.enter="goToPageInput"
+                        @blur="goToPageInput"
+                        class="page-input"
+                        :disabled="isLoading"
+                    />
+                    <span class="text-slate-500">/ {{ totalPages }}</span>
+                </div>
+                
+                <button
+                    @click="nextPage"
+                    :disabled="!canNext || isLoading"
+                    class="control-btn"
+                    aria-label="Next Page"
+                >
+                    <font-awesome-icon icon="chevron-right" />
+                </button>
+            </div>
+
+            <!-- Font Controls -->
+            <div class="flex items-center gap-3">
+                <button
+                    @click="zoomOut"
                     :disabled="isLoading"
-                    style="width: 3.5em; text-align: center"
-                />
-                / {{ totalPages }}
-            </span>
-            <button
-                @click="nextPage"
-                :disabled="!canNext || isLoading"
-                class="icon-btn"
-                aria-label="Next Page"
-            >
-                <font-awesome-icon icon="chevron-right" />
-            </button>
-            <button
-                @click="zoomOut"
-                :disabled="isLoading"
-                class="icon-btn"
-                aria-label="Zoom Out"
-            >
-                <font-awesome-icon icon="search-minus" />
-            </button>
-            <span class="text-base">Font: {{ fontSize }}px</span>
-            <button
-                @click="zoomIn"
-                :disabled="isLoading"
-                class="icon-btn"
-                aria-label="Zoom In"
-            >
-                <font-awesome-icon icon="search-plus" />
-            </button>
+                    class="control-btn"
+                    aria-label="Zoom Out"
+                >
+                    <font-awesome-icon icon="search-minus" />
+                </button>
+                
+                <div class="bg-white px-4 py-2 rounded-xl border border-slate-200">
+                    <span class="text-sm font-medium text-slate-700">Font: {{ fontSize }}px</span>
+                </div>
+                
+                <button
+                    @click="zoomIn"
+                    :disabled="isLoading"
+                    class="control-btn"
+                    aria-label="Zoom In"
+                >
+                    <font-awesome-icon icon="search-plus" />
+                </button>
+            </div>
         </div>
+
+        <!-- Loading State -->
         <div
             v-if="isLoading"
-            class="epub-loading flex items-center justify-center w-full h-32"
+            class="epub-loading"
         >
-            <font-awesome-icon
-                icon="spinner"
-                spin
-                class="text-green-600 text-3xl"
-            />
-            <span class="ml-2 text-green-700 font-semibold">Loading...</span>
+            <div class="flex flex-col items-center gap-4">
+                <font-awesome-icon
+                    icon="spinner"
+                    spin
+                    class="text-green-600 text-4xl"
+                />
+                <div class="text-center">
+                    <div class="text-green-700 font-semibold text-lg">Loading Book...</div>
+                    <div class="text-green-600 text-sm">Please wait while we prepare your reading experience</div>
+                </div>
+            </div>
         </div>
+
+        <!-- Reader Viewport -->
         <div ref="viewer" class="epub-viewer"></div>
     </div>
 </template>
@@ -255,75 +278,95 @@ onBeforeUnmount(() => {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background: #f5f5f5;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
+
 .epub-topbar {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1rem 2rem;
-    background: #15803d;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
     color: #fff;
     font-size: 1.1rem;
     border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     z-index: 20;
 }
+
 .card {
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.08);
-    border-radius: 1rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    border-radius: 1.5rem;
     background: rgba(255, 255, 255, 0.95);
-    padding: 0.75rem 1.25rem;
-    margin-bottom: 1rem;
-    margin-top: 1rem;
+    backdrop-filter: blur(10px);
+    padding: 1rem 1.5rem;
+    margin: 1rem 2rem;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    justify-content: space-between;
+    gap: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
-.icon-btn {
-    background: #f3f4f6;
-    border: none;
-    border-radius: 0.5rem;
-    padding: 0.5em 0.7em;
-    font-size: 1.2em;
+
+.control-btn {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.75em 1em;
+    font-size: 1.1em;
     cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #475569;
+    min-width: 44px;
+    min-height: 44px;
 }
-.icon-btn:active {
-    background: #e5e7eb;
+
+.control-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-.icon-btn:disabled {
+
+.control-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.control-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
 }
+
 .page-input {
     border: 1px solid #d1d5db;
-    border-radius: 0.4em;
-    padding: 0.2em 0.4em;
+    border-radius: 0.5rem;
+    padding: 0.25em 0.5em;
     font-size: 1em;
     width: 3.5em;
-    margin: 0 0.2em;
+    text-align: center;
+    background: #fff;
+    transition: all 0.2s ease;
 }
+
+.page-input:focus {
+    outline: none;
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
 .epub-loading {
-    min-height: 4rem;
+    min-height: 8rem;
     color: #16a34a;
     font-size: 1.2em;
-}
-.epub-controls {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: #fff;
-    border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-    z-index: 10;
+    justify-content: center;
 }
+
 .epub-viewer {
     flex: 1 1 0%;
     width: 100%;
@@ -334,5 +377,43 @@ onBeforeUnmount(() => {
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    padding: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card {
+        flex-direction: column;
+        gap: 1rem;
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .epub-topbar {
+        padding: 1rem;
+    }
+    
+    .epub-topbar span {
+        font-size: 1rem;
+        max-width: 200px;
+    }
+}
+
+/* Custom Scrollbar */
+.epub-viewer::-webkit-scrollbar {
+    width: 8px;
+}
+
+.epub-viewer::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.epub-viewer::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.epub-viewer::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 </style>

@@ -1,7 +1,7 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import { usePage } from '@inertiajs/vue3'
-import { Line } from 'vue-chartjs'
+import { Line, Bar, Doughnut } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   Title,
@@ -11,7 +11,9 @@ import {
   CategoryScale,
   LinearScale,
   PointElement,
-  Filler
+  Filler,
+  BarElement,
+  ArcElement
 } from 'chart.js'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faTachometerAlt, faUsers, faBook, faTags, faChartLine, faUser, faComments } from '@fortawesome/free-solid-svg-icons'
@@ -25,7 +27,9 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
-  Filler
+  Filler,
+  BarElement,
+  ArcElement
 )
 
 library.add(faTachometerAlt, faUsers, faBook, faTags, faChartLine, faUser, faComments)
@@ -35,11 +39,11 @@ defineOptions({ layout: AdminLayout })
 const { props } = usePage()
 
 const uploadsChartData = {
-  labels: Array.isArray(props.ebookUploadsByMonth?.labels) ? props.ebookUploadsByMonth.labels : [],
+  labels: Array.isArray(props.ebookUploadsByMonth?.labels) ? props.ebookUploadsByMonth.labels : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   datasets: [
     {
       label: 'Ebook Uploads',
-      data: props.ebookUploadsByMonth?.data || [],
+      data: Array.isArray(props.ebookUploadsByMonth?.data) ? props.ebookUploadsByMonth.data : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       borderColor: '#16a34a',
       backgroundColor: 'rgba(22, 163, 74, 0.1)',
       tension: 0.4,
@@ -53,7 +57,118 @@ const uploadsChartOptions = {
   animation: false,
   plugins: {
     legend: { display: false },
-    title: { display: true, text: 'Ebook Uploads Over Time' }
+    title: { display: true, text: 'Ebook Uploads Over Time (Last 12 Months)' }
+  },
+  scales: {
+    y: { 
+      beginAtZero: true,
+      ticks: {
+        stepSize: 1
+      }
+    },
+    x: {
+      ticks: {
+        maxRotation: 45,
+        minRotation: 0
+      }
+    }
+  },
+  interaction: {
+    intersect: false,
+    mode: 'index'
+  }
+}
+
+// Recent Users Chart Data
+const recentUsersChartData = {
+  labels: props.recentUsers?.map(user => user.user_name) || [],
+  datasets: [{
+    label: 'Recent Signups',
+    data: props.recentUsers?.map((user, index) => index + 1) || [],
+    backgroundColor: 'rgba(22, 163, 74, 0.8)',
+    borderColor: '#16a34a',
+    borderWidth: 1
+  }]
+}
+
+const recentUsersChartOptions = {
+  responsive: true,
+  animation: false,
+  plugins: {
+    legend: { display: false },
+    title: { display: true, text: 'Recent User Signups' }
+  },
+  scales: {
+    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+  }
+}
+
+// Recent Books Chart Data
+const recentBooksChartData = {
+  labels: props.recentBooks?.map(book => book.title.length > 20 ? book.title.substring(0, 20) + '...' : book.title) || [],
+  datasets: [{
+    label: 'Recently Added',
+    data: props.recentBooks?.map((book, index) => index + 1) || [],
+    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+    borderColor: '#3b82f6',
+    borderWidth: 1
+  }]
+}
+
+const recentBooksChartOptions = {
+  responsive: true,
+  animation: false,
+  plugins: {
+    legend: { display: false },
+    title: { display: true, text: 'Recently Added Ebooks' }
+  },
+  scales: {
+    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+  }
+}
+
+// Most Read Books Chart Data
+const mostReadBooksChartData = {
+  labels: props.mostReadBooks?.map(item => item.book?.title?.length > 15 ? item.book.title.substring(0, 15) + '...' : item.book?.title || 'Unknown') || [],
+  datasets: [{
+    label: 'Read Count',
+    data: props.mostReadBooks?.map(item => item.read_count) || [],
+    backgroundColor: 'rgba(168, 85, 247, 0.8)',
+    borderColor: '#a855f7',
+    borderWidth: 1
+  }]
+}
+
+const mostReadBooksChartOptions = {
+  responsive: true,
+  animation: false,
+  plugins: {
+    legend: { display: false },
+    title: { display: true, text: 'Most Read Ebooks' }
+  },
+  scales: {
+    y: { beginAtZero: true }
+  }
+}
+
+// Most Active Users Chart Data
+const mostActiveUsersChartData = {
+  labels: props.mostActiveUsers?.map(item => item.user?.user_name?.length > 15 ? item.user.user_name.substring(0, 15) + '...' : item.user?.user_name || 'Unknown') || [],
+  datasets: [{
+    label: 'Read Count',
+    data: props.mostActiveUsers?.map(item => item.read_count) || [],
+    backgroundColor: 'rgba(239, 68, 68, 0.8)',
+    borderColor: '#ef4444',
+    borderWidth: 1
+  }]
+}
+
+const mostActiveUsersChartOptions = {
+  responsive: true,
+  animation: false,
+  plugins: {
+    legend: { display: false },
+    title: { display: true, text: 'Most Active Users' }
   },
   scales: {
     y: { beginAtZero: true }
@@ -62,178 +177,160 @@ const uploadsChartOptions = {
 </script>
 
 <template>
+
   <Head title="Dashboard" />
-  <div class="p-2">
-    <div class="bg-gradient-to-r from-green-100 to-green-50 rounded-xl shadow mb-8 px-6 py-4 flex items-center gap-3">
-      <span class="bg-green-600 text-white rounded-full p-2 shadow flex items-center justify-center">
-        <font-awesome-icon icon="tachometer-alt" class="w-6 h-6" />
-      </span>
-      <h1 class="text-2xl font-bold text-green-700">Admin Dashboard</h1>
+  <div class="max-w-7xl mx-auto">
+    <!-- Hero Header -->
+    <div class="mb-8">
+      <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <font-awesome-icon icon="tachometer-alt" class="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-slate-800">Admin Dashboard</h1>
+            <p class="text-slate-600 mt-1">Welcome back! Here's what's happening with your library.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
-        <span class="bg-green-100 text-green-600 rounded-full p-3 shadow flex items-center justify-center">
-          <font-awesome-icon icon="users" class="text-xl" />
-        </span>
-        <div>
-          <h5 class="text-green-600 font-semibold mb-1">Total Users</h5>
-          <p class="text-2xl font-bold text-green-700">{{ props.totalUsers }}</p>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all duration-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+            <font-awesome-icon icon="users" class="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <p class="text-slate-600 text-sm font-medium">Total Users</p>
+            <p class="text-2xl font-bold text-slate-800">{{ props.totalUsers }}</p>
+          </div>
         </div>
       </div>
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
-        <span class="bg-green-100 text-green-600 rounded-full p-3 shadow flex items-center justify-center">
-          <font-awesome-icon icon="book" class="text-xl" />
-        </span>
-        <div>
-          <h5 class="text-green-600 font-semibold mb-1">Ebooks Available</h5>
-          <p class="text-2xl font-bold text-green-700">{{ props.totalBooks }}</p>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all duration-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
+            <font-awesome-icon icon="book" class="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <p class="text-slate-600 text-sm font-medium">Ebooks Available</p>
+            <p class="text-2xl font-bold text-slate-800">{{ props.totalBooks }}</p>
+          </div>
         </div>
       </div>
-      <div class="bg-white border-2 border-blue-400 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
-        <span class="bg-blue-100 text-blue-500 rounded-full p-3 shadow flex items-center justify-center">
-          <font-awesome-icon icon="book" class="text-xl" />
-        </span>
-        <div>
-          <h5 class="text-green-600 font-semibold mb-1">New Ebooks This Month</h5>
-          <p class="text-2xl font-bold text-blue-500">{{ props.newBooksThisMonth }}</p>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all duration-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
+            <font-awesome-icon icon="book" class="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <p class="text-slate-600 text-sm font-medium">New This Month</p>
+            <p class="text-2xl font-bold text-slate-800">{{ props.newBooksThisMonth }}</p>
+          </div>
         </div>
       </div>
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
-        <span class="bg-green-100 text-green-600 rounded-full p-3 shadow flex items-center justify-center">
-          <font-awesome-icon icon="tags" class="text-xl" />
-        </span>
-        <div>
-          <h5 class="text-green-600 font-semibold mb-1">Categories</h5>
-          <p class="text-2xl font-bold text-gray-600">{{ props.totalCategories }}</p>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all duration-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-sm">
+            <font-awesome-icon icon="tags" class="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <p class="text-slate-600 text-sm font-medium">Categories</p>
+            <p class="text-2xl font-bold text-slate-800">{{ props.totalCategories }}</p>
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- Additional Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
-        <span class="bg-green-100 text-green-600 rounded-full p-3 shadow flex items-center justify-center">
-          <font-awesome-icon icon="user" class="text-xl" />
-        </span>
-        <div>
-          <h5 class="text-green-600 font-semibold mb-3">Active Readers (30d)</h5>
-          <p class="text-2xl font-bold text-green-700">{{ props.activeReaders }}</p>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all duration-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
+            <font-awesome-icon icon="user" class="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <p class="text-slate-600 text-sm font-medium">Active Readers (30d)</p>
+            <p class="text-2xl font-bold text-slate-800">{{ props.activeReaders }}</p>
+          </div>
         </div>
       </div>
-      <div class="bg-white border-2 border-red-400 rounded-2xl p-5 shadow-md hover:shadow-xl flex items-center gap-4">
-        <span class="bg-red-100 text-red-500 rounded-full p-3 shadow flex items-center justify-center">
-          <font-awesome-icon icon="comments" class="text-xl" />
-        </span>
-        <div>
-          <h5 class="text-green-600 font-semibold mb-3">Feedbacks</h5>
-          <p class="text-2xl font-bold text-red-500">{{ props.feedbacks }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md">
-        <h5 class="text-green-600 font-semibold mb-3 flex items-center gap-2"><font-awesome-icon icon="chart-line" /> Recent User Signups</h5>
-        <div class="overflow-x-auto rounded-lg">
-          <table class="w-full text-sm table-auto">
-            <thead class="bg-green-100 text-left sticky top-0 z-10">
-              <tr>
-                <th class="p-2">Name</th>
-                <th class="p-2">Email</th>
-                <th class="p-2">Joined</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="user in props.recentUsers" :key="user.id" class="border-b even:bg-green-50 hover:bg-green-100">
-                <td class="p-2">{{ user.user_name }}</td>
-                <td class="p-2">{{ user.email }}</td>
-                <td class="p-2">{{ new Date(user.created_at).toLocaleDateString() }}</td>
-              </tr>
-              <tr v-if="!props.recentUsers.length">
-                <td colspan="3" class="p-2 text-center text-gray-400">No recent users.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md">
-        <h5 class="text-green-600 font-semibold mb-3 flex items-center gap-2"><font-awesome-icon icon="book" /> Recently Added Ebooks</h5>
-        <div class="overflow-x-auto rounded-lg">
-          <table class="w-full text-sm table-auto">
-            <thead class="bg-green-100 text-left sticky top-0 z-10">
-              <tr>
-                <th class="p-2">Title</th>
-                <th class="p-2">Author</th>
-                <th class="p-2">Added</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="book in props.recentBooks" :key="book.id" class="border-b even:bg-green-50 hover:bg-green-100">
-                <td class="p-2">{{ book.title }}</td>
-                <td class="p-2">{{ book.author }}</td>
-                <td class="p-2">{{ new Date(book.created_at).toLocaleDateString() }}</td>
-              </tr>
-              <tr v-if="!props.recentBooks.length">
-                <td colspan="3" class="p-2 text-center text-gray-400">No recent books.</td>
-              </tr>
-            </tbody>
-          </table>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all duration-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-sm">
+            <font-awesome-icon icon="comments" class="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <p class="text-slate-600 text-sm font-medium">Total Feedbacks</p>
+            <p class="text-2xl font-bold text-slate-800">{{ props.feedbacks }}</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md">
-        <h5 class="text-green-600 font-semibold mb-3 flex items-center gap-2"><font-awesome-icon icon="chart-line" /> Most Read Ebooks</h5>
-        <div class="overflow-x-auto rounded-lg">
-          <table class="w-full text-sm table-auto">
-            <thead class="bg-green-100 text-left sticky top-0 z-10">
-              <tr>
-                <th class="p-2">Title</th>
-                <th class="p-2">Reads</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in props.mostReadBooks" :key="item.book_id" class="border-b even:bg-green-50 hover:bg-green-100">
-                <td class="p-2">{{ item.book?.title || 'Unknown' }}</td>
-                <td class="p-2">{{ item.read_count }}</td>
-              </tr>
-              <tr v-if="!props.mostReadBooks.length">
-                <td colspan="2" class="p-2 text-center text-gray-400">No data.</td>
-              </tr>
-            </tbody>
-          </table>
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+            <font-awesome-icon icon="chart-line" class="w-5 h-5 text-white" />
+          </div>
+          <h3 class="text-lg font-semibold text-slate-800">Recent User Signups</h3>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <Bar :data="recentUsersChartData" :options="recentUsersChartOptions" height="200" />
         </div>
       </div>
 
-      <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md">
-        <h5 class="text-green-600 font-semibold mb-3 flex items-center gap-2"><font-awesome-icon icon="user" /> Most Active Users</h5>
-        <div class="overflow-x-auto rounded-lg">
-          <table class="w-full text-sm table-auto">
-            <thead class="bg-green-100 text-left sticky top-0 z-10">
-              <tr>
-                <th class="p-2">Name</th>
-                <th class="p-2">Reads</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in props.mostActiveUsers" :key="item.user_id" class="border-b even:bg-green-50 hover:bg-green-100">
-                <td class="p-2">{{ item.user?.user_name || 'Unknown' }}</td>
-                <td class="p-2">{{ item.read_count }}</td>
-              </tr>
-              <tr v-if="!props.mostActiveUsers.length">
-                <td colspan="2" class="p-2 text-center text-gray-400">No data.</td>
-              </tr>
-            </tbody>
-          </table>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+            <font-awesome-icon icon="book" class="w-5 h-5 text-white" />
+          </div>
+          <h3 class="text-lg font-semibold text-slate-800">Recently Added Ebooks</h3>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <Bar :data="recentBooksChartData" :options="recentBooksChartOptions" height="200" />
         </div>
       </div>
     </div>
 
-    <div class="bg-white border-2 border-green-600 rounded-2xl p-5 shadow-md">
-      <h5 class="text-green-600 font-semibold mb-3 flex items-center gap-2"><font-awesome-icon icon="chart-line" /> Ebook Uploads Over Time</h5>
-      <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <font-awesome-icon icon="chart-line" class="w-5 h-5 text-white" />
+          </div>
+          <h3 class="text-lg font-semibold text-slate-800">Most Read Ebooks</h3>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <Bar :data="mostReadBooksChartData" :options="mostReadBooksChartOptions" height="200" />
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center">
+            <font-awesome-icon icon="user" class="w-5 h-5 text-white" />
+          </div>
+          <h3 class="text-lg font-semibold text-slate-800">Most Active Users</h3>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <Bar :data="mostActiveUsersChartData" :options="mostActiveUsersChartOptions" height="200" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Chart -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center">
+          <font-awesome-icon icon="chart-line" class="w-5 h-5 text-white" />
+        </div>
+        <h3 class="text-lg font-semibold text-slate-800">Ebook Uploads Over Time</h3>
+      </div>
+      <div class="bg-slate-50 rounded-xl p-4">
         <Line :data="uploadsChartData" :options="uploadsChartOptions" height="80" />
       </div>
     </div>
