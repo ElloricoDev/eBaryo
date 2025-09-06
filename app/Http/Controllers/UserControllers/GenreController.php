@@ -52,4 +52,4 @@ class GenreController extends Controller
         $request->session()->put('skipped_genre_selection', true);
         return redirect()->route('home');
     }
-} 
+}

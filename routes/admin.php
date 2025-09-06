@@ -56,7 +56,7 @@ Route::middleware('auth', 'admin')->group(function () {
             Route::post('/store', 'store')->name('store');
             Route::patch('/toggle-status/{id}', 'toggleStatus')->name('toggle-status');
             Route::get('/edit/{id}', 'edit')->name('edit');
-            Route::put('/update/{id}', 'update')->name('update');
+            Route::patch('/update/{id}', 'update')->name('update');
             Route::delete('/delete/{id}', 'destroy')->name('destroy');
             Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete');
             Route::get('/{id}', 'show')->name('show');

@@ -14,20 +14,31 @@ class FeedbackController extends Controller
     public function create()
     {
         $categories = Category::all();
-        $feedbacks = Feedback::where('user_id', Auth::id())->orderByDesc('created_at')->get();
-        $newResponses = $feedbacks->where('status', 'responded')->where('notified', false);
+        $userId = Auth::id();
 
-        // Mark as notified
-        if ($newResponses->count() > 0) {
-            Feedback::whereIn('id', $newResponses->pluck('id'))->update(['notified' => true]);
+        // Fetch user feedbacks (ordered) for display
+        $feedbacks = Feedback::where('user_id', $userId)
+            ->orderByDesc('created_at')
+            ->get();
+
+        // Efficiently check and update any new responses without hydrating unnecessary models
+        $newResponsesQuery = Feedback::where('user_id', $userId)
+            ->where('status', 'responded')
+            ->where('notified', false);
+
+        $hadNewResponses = $newResponsesQuery->exists();
+
+        if ($hadNewResponses) {
+            // Mark as notified in bulk
+            $newResponsesQuery->update(['notified' => true]);
             // Broadcast to user (in case of real-time update)
-            event(new FeedbackUpdated(Auth::id(), 'user'));
+            event(new FeedbackUpdated($userId, 'user'));
         }
 
-        return Inertia::render('User/Feedback',[
+        return Inertia::render('User/Feedback', [
             'categories' => $categories,
             'feedbacks' => $feedbacks,
-            'hasNewResponses' => $newResponses->count() > 0,
+            'hasNewResponses' => $hadNewResponses,
         ]);
     }
 

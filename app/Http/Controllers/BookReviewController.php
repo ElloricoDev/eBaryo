@@ -12,18 +12,28 @@ class BookReviewController extends Controller
     // List reviews for a book
     public function index($bookId)
     {
-        $book = Book::with('reviews.user')->findOrFail($bookId);
-        $userReview = null;
-        if (auth()->check()) {
-            $userReview = $book->reviews()->where('user_id', auth()->id())->first();
-        }
+        $book = Book::findOrFail($bookId);
+
+        $reviews = $book->reviews()
+            ->with('user')
+            ->latest()
+            ->get();
+
+        $averageRating = round($book->reviews()->avg('rating'), 2);
+        $reviewCount = $book->reviews()->count();
+
+        $userReview = Auth::check()
+            ? $book->reviews()->where('user_id', Auth::id())->first()
+            : null;
+
         return response()->json([
-            'reviews' => $book->reviews()->with('user')->latest()->get(),
-            'average_rating' => round($book->reviews()->avg('rating'), 2),
-            'review_count' => $book->reviews()->count(),
-            'user_review' => $userReview,
+            'reviews'        => $reviews,
+            'average_rating' => $averageRating,
+            'review_count'   => $reviewCount,
+            'user_review'    => $userReview,
         ]);
     }
+
 
     // Store a new review
     public function store(Request $request, $bookId)

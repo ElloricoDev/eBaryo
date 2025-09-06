@@ -35,10 +35,16 @@ class Book extends Model
 
     public function reviews()
     {
-        return $this->hasMany(\App\Models\BookReview::class);
+        return $this->hasMany(BookReview::class);
     }
 
-    public function readingLogs(){
+    public function readingLogs()
+    {
         return $this->hasMany(ReadingLog::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
     }
 }

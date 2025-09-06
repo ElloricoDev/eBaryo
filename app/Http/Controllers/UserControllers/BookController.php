@@ -18,312 +18,253 @@ class BookController extends Controller
         $categoryId = $request->input('category');
         $q = trim((string) $request->input('q', ''));
         $user = Auth::user();
-        $savedBookIds = $user ? $user->savedBooks()->pluck('book_id')->toArray() : [];
 
-        $baseQuery = Book::with('category')->where('status', 'active');
-        if ($categoryId) {
-            $baseQuery = $baseQuery->where('category_id', $categoryId);
-        }
-        if ($q !== '') {
-            $baseQuery = $baseQuery->where(function($qb) use ($q) {
-                $qb->where('title', 'like', "%{$q}%")
-                   ->orWhere('author', 'like', "%{$q}%")
-                   ->orWhereHas('category', function($qc) use ($q) {
-                       $qc->where('name', 'like', "%{$q}%");
-                   });
+        // Saved books (nullsafe operator in PHP 8+)
+        $savedBookIds = $user?->savedBooks()->pluck('book_id')->toArray() ?? [];
+
+        // Base query with eager loads & aggregates
+        $baseQuery = Book::query()
+            ->with('category')
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews', 'readingLogs')
+            ->active() // custom scope instead of repeating "where status=active"
+            ->when($categoryId, fn($qb) => $qb->where('category_id', $categoryId))
+            ->when($q !== '', function ($qb) use ($q) {
+                $qb->where(function ($q2) use ($q) {
+                    $q2->where('title', 'like', "%{$q}%")
+                        ->orWhere('author', 'like', "%{$q}%")
+                        ->orWhereHas('category', fn($qc) => $qc->where('name', 'like', "%{$q}%"));
+                });
             });
-        }
+
         $books = $baseQuery->latest()->get();
 
         // New Books (last 30 days)
-        $newBooks = Book::with('category')->where('status', 'active')
-            ->when($categoryId, fn($qb) => $qb->where('category_id', $categoryId))
-            ->when($q !== '', function($qb) use ($q) {
-                $qb->where(function($q2) use ($q) {
-                    $q2->where('title', 'like', "%{$q}%")
-                       ->orWhere('author', 'like', "%{$q}%")
-                       ->orWhereHas('category', function($qc) use ($q) {
-                           $qc->where('name', 'like', "%{$q}%");
-                       });
-                });
-            })
-            ->where('created_at', '>=', Carbon::now()->subDays(30))
+        $newBooks = (clone $baseQuery)
+            ->where('created_at', '>=', now()->subDays(30))
             ->orderByDesc('created_at')
             ->get();
 
-        // Hot Books removed
-
-        // Most Read Books (all time)
-        $mostReadBookCounts = ReadingLog::when($categoryId, function($q) use ($categoryId) {
-                $q->whereHas('book', function($b) use ($categoryId) {
-                    $b->where('category_id', $categoryId);
-                });
-            })
-            ->selectRaw('book_id, COUNT(*) as read_count')
-            ->groupBy('book_id')
-            ->pluck('read_count', 'book_id');
-        $mostReadBookIds = $mostReadBookCounts->keys();
-        $mostReadBooks = Book::with('category')->whereIn('id', $mostReadBookIds)
-            ->when($categoryId, fn($qb) => $qb->where('category_id', $categoryId))
-            ->when($q !== '', function($qb) use ($q) {
-                $qb->where(function($q2) use ($q) {
-                    $q2->where('title', 'like', "%{$q}%")
-                       ->orWhere('author', 'like', "%{$q}%")
-                       ->orWhereHas('category', function($qc) use ($q) {
-                           $qc->where('name', 'like', "%{$q}%");
-                       });
-                });
-            })
+        // Most Read Books (all time) — order by readingLogs_count
+        $mostReadBooks = (clone $baseQuery)
+            ->orderByDesc('reading_logs_count')
+            ->take(20) // limit for efficiency
             ->get();
 
-        // Highest Rated Books (at least 1 review)
-        $highestRatedBooks = Book::with('category')->whereHas('reviews')
-            ->when($categoryId, fn($qb) => $qb->where('category_id', $categoryId))
-            ->when($q !== '', function($qb) use ($q) {
-                $qb->where(function($q2) use ($q) {
-                    $q2->where('title', 'like', "%{$q}%")
-                       ->orWhere('author', 'like', "%{$q}%")
-                       ->orWhereHas('category', function($qc) use ($q) {
-                           $qc->where('name', 'like', "%{$q}%");
-                       });
-                });
-            })
-            ->withAvg('reviews', 'rating')
+        // Highest Rated Books (at least 1 review, take only top rating group)
+        $highestRatedBooks = (clone $baseQuery)
+            ->has('reviews')
             ->orderByDesc('reviews_avg_rating')
             ->get();
-        $topRating = $highestRatedBooks->first() ? $highestRatedBooks->first()->reviews_avg_rating : null;
-        if ($topRating !== null) {
-            $highestRatedBooks = $highestRatedBooks->filter(function($book) use ($topRating) {
-                return $book->reviews_avg_rating == $topRating;
-            });
+
+        $topRating = $highestRatedBooks->first()?->reviews_avg_rating;
+        if ($topRating) {
+            $highestRatedBooks = $highestRatedBooks->where('reviews_avg_rating', $topRating);
         }
 
-        // Attach average_rating and reviews_count to all book lists
-        $attachRatings = function($books) {
-            return $books->map(function($book) {
-                $book->average_rating = round($book->reviews()->avg('rating'), 2);
-                $book->reviews_count = $book->reviews()->count();
-                return $book;
-            });
-        };
-        $books = $attachRatings($books);
-        $newBooks = $attachRatings($newBooks);
-        $mostReadBooks = $attachRatings($mostReadBooks);
-        $highestRatedBooks = $attachRatings($highestRatedBooks);
-        $highestRatedBooks = $highestRatedBooks->filter(function($book) {
-            return $book->reviews_count > 0;
-        });
+        // Attach progress for logged-in user
+        $progressMap = $user
+            ? ReadingLog::where('user_id', $user->id)->pluck('last_percent', 'book_id')->toArray()
+            : [];
 
-        // Attach read_count to each book in all lists
-        $attachReadCount = function($books) use ($mostReadBookCounts) {
-            return $books->map(function($book) use ($mostReadBookCounts) {
-                $book->read_count = $mostReadBookCounts[$book->id] ?? 0;
-                return $book;
+        foreach ([$books, $newBooks, $mostReadBooks, $highestRatedBooks] as $list) {
+            $list->each(function ($book) use ($progressMap) {
+                $book->progress = $progressMap[$book->id] ?? null;
             });
-        };
-        $books = $attachReadCount($books);
-        $newBooks = $attachReadCount($newBooks);
-        $mostReadBooks = $attachReadCount($mostReadBooks);
-        $highestRatedBooks = $attachReadCount($highestRatedBooks);
-
-        // Attach user reading progress to all book lists
-        $progressMap = [];
-        if ($user) {
-            $progressMap = ReadingLog::where('user_id', $user->id)
-                ->pluck('last_percent', 'book_id')
-                ->toArray();
         }
-        $attachProgress = function($books) use ($progressMap) {
-            return $books->map(function($book) use ($progressMap) {
-                $book->progress = isset($progressMap[$book->id]) ? $progressMap[$book->id] : null;
-                return $book;
-            });
-        };
-        $books = $attachProgress($books);
-        $newBooks = $attachProgress($newBooks);
-        $mostReadBooks = $attachProgress($mostReadBooks);
-        $highestRatedBooks = $attachProgress($highestRatedBooks);
-
-        $categories = Category::all();
-        $selectedCategory = $categoryId ? Category::find($categoryId) : null;
 
         return inertia('User/Books/Books', [
-            'books' => $books,
-            'saved_books' => $savedBookIds,
-            'newBooks' => $newBooks,
-            'mostReadBooks' => $mostReadBooks,
+            'books'             => $books,
+            'saved_books'       => $savedBookIds,
+            'newBooks'          => $newBooks,
+            'mostReadBooks'     => $mostReadBooks,
             'highestRatedBooks' => $highestRatedBooks,
-            'categories' => $categories,
-            'selectedCategory' => $selectedCategory,
-            'q' => $q,
+            'categories'        => Category::all(),
+            'selectedCategory'  => $categoryId ? Category::find($categoryId) : null,
+            'q'                 => $q,
         ]);
     }
+
 
     public function show($id)
     {
-        $book = Book::with('category')->where('status', 'active')->findOrFail($id);
         $user = Auth::user();
-        $savedBookIds = $user ? $user->savedBooks()->pluck('book_id')->toArray() : [];
-        // Add reading progress
-        $progress = null;
-        if ($user) {
-            $log = ReadingLog::where('user_id', $user->id)->where('book_id', $id)->first();
-            if ($log) {
-                $progress = $log->last_percent;
-            }
-        }
+
+        // Fetch book with aggregates
+        $book = Book::with('category')
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews', 'readingLogs')
+            ->active()
+            ->findOrFail($id);
+
+        // Saved books (use nullsafe operator for cleaner code)
+        $savedBookIds = $user?->savedBooks()->pluck('book_id')->toArray() ?? [];
+
+        // Reading progress (pluck single value instead of fetching whole row)
+        $progress = $user
+            ? ReadingLog::where('user_id', $user->id)
+            ->where('book_id', $id)
+            ->value('last_percent')
+            : null;
+
         $book->progress = $progress;
+
         return inertia('User/Books/BookDetails', [
-            'book' => $book,
-            'saved_books' => $savedBookIds
+            'book'        => $book,
+            'saved_books' => $savedBookIds,
         ]);
     }
+
 
     public function epubReader($id)
     {
-        $book = Book::with('category')->where('status', 'active')->findOrFail($id);
         $user = Auth::user();
-        $lastPercent = null;
-        if ($user) {
-            $log = ReadingLog::where('user_id', $user->id)->where('book_id', $id)->first();
-            if ($log) {
-                $lastPercent = $log->last_percent;
-            }
-        }
-        return inertia('User/Books/EpubReader', [
-            'book' => $book,
-            'lastPercent' => $lastPercent,
-            'url' => $book->ebook_file,
-        ]);
-    }
 
-    public function pdfReader($id)
-    {
-        $book = Book::with('category')->where('status', 'active')->findOrFail($id);
-        $user = Auth::user();
-        $lastPercent = null;
-        if ($user) {
-            $log = ReadingLog::where('user_id', $user->id)->where('book_id', $id)->first();
-            if ($log) {
-                $lastPercent = $log->last_percent;
-            }
-        }
-        return inertia('User/Books/PdfReader', [
-            'book' => $book,
+        // Load book with category (using scopeActive if you add it in Book model)
+        $book = Book::with('category')
+            ->active()
+            ->findOrFail($id);
+
+        // Fetch only the needed column instead of whole row
+        $lastPercent = $user
+            ? ReadingLog::where('user_id', $user->id)
+            ->where('book_id', $id)
+            ->value('last_percent')
+            : null;
+
+        return inertia('User/Books/EpubReader', [
+            'book'        => $book,
             'lastPercent' => $lastPercent,
-            'url' => $book->ebook_file,
+            'url'         => $book->ebook_file,
         ]);
     }
 
     public function saveProgress(Request $request, $id)
     {
         $user = Auth::user();
-        $percent = $request->input('percent');
-        if (!$user) {
-            abort(401);
-        }
+        abort_unless($user, 401);
+
+        $percent = (int) $request->input('percent');
+
         $log = ReadingLog::firstOrNew([
             'user_id' => $user->id,
             'book_id' => $id,
         ]);
+
         $log->read_at = now();
+
+        // Only update if higher than previous progress
         if (is_null($log->last_percent) || $percent > $log->last_percent) {
             $log->last_percent = $percent;
         }
+
         $log->save();
-        return back();
+
+        return back(); // stays compatible with Inertia
     }
+
 
     public function saveBook(Request $request, $id)
     {
         $user = Auth::user();
-        if (!$user) {
-            abort(401, 'Unauthorized');
-        }
-        $book = Book::findOrFail($id);
-        if (!$user->savedBooks()->where('book_id', $book->id)->exists()) {
-            $user->savedBooks()->attach($book->id);
-        }
+        abort_unless($user, 401, 'Unauthorized');
+
+        $book = Book::active()->findOrFail($id);
+
+        // Avoid duplicates with syncWithoutDetaching
+        $user->savedBooks()->syncWithoutDetaching([$book->id]);
+
         return back();
     }
 
     public function unsaveBook(Request $request, $id)
     {
         $user = Auth::user();
-        if (!$user) {
-            abort(401, 'Unauthorized');
-        }
-        $book = Book::findOrFail($id);
+        abort_unless($user, 401, 'Unauthorized');
+
+        $book = Book::active()->findOrFail($id);
+
         $user->savedBooks()->detach($book->id);
+
         return back();
     }
 
     public function savedBooks()
     {
         $user = Auth::user();
-        if (!$user) {
-            abort(401, 'Unauthorized');
-        }
-        $books = $user->savedBooks()->with('category')->where('status', 'active')->get();
-        $savedBookIds = $user->savedBooks()->where('status', 'active')->pluck('book_id')->toArray();
+        abort_unless($user, 401, 'Unauthorized');
 
-        // Attach ratings and read count
-        $bookIds = $books->pluck('id');
-        $reviewCounts = BookReview::whereIn('book_id', $bookIds)
-            ->selectRaw('book_id, COUNT(*) as count, AVG(rating) as avg_rating')
+        // All saved & active books with category
+        $books = $user->savedBooks()
+            ->with('category')
+            ->active()
+            ->get();
+
+        $savedBookIds = $books->pluck('id')->toArray();
+
+        // Aggregate reviews (count + avg) in fewer queries
+        $reviewStats = BookReview::whereIn('book_id', $books->pluck('id'))
+            ->selectRaw('book_id, COUNT(*) as reviews_count, ROUND(AVG(rating), 2) as average_rating')
             ->groupBy('book_id')
-            ->get()
-            ->keyBy('book_id');
-        $readCounts = \App\Models\ReadingLog::whereIn('book_id', $bookIds)
+            ->pluck('reviews_count', 'book_id')
+            ->toArray();
+
+        $avgRatings = BookReview::whereIn('book_id', $books->pluck('id'))
+            ->selectRaw('book_id, ROUND(AVG(rating), 2) as average_rating')
+            ->groupBy('book_id')
+            ->pluck('average_rating', 'book_id')
+            ->toArray();
+
+        // Read counts
+        $readCounts = ReadingLog::whereIn('book_id', $books->pluck('id'))
             ->selectRaw('book_id, COUNT(*) as count')
             ->groupBy('book_id')
-            ->get()
             ->pluck('count', 'book_id');
-        $books->transform(function($book) use ($reviewCounts, $readCounts) {
-            $book->average_rating = isset($reviewCounts[$book->id]) ? round($reviewCounts[$book->id]->avg_rating, 2) : null;
-            $book->reviews_count = isset($reviewCounts[$book->id]) ? $reviewCounts[$book->id]->count : 0;
-            $book->read_count = isset($readCounts[$book->id]) ? $readCounts[$book->id] : 0;
+
+        // Attach stats to each book
+        $books->transform(function ($book) use ($reviewStats, $avgRatings, $readCounts) {
+            $book->reviews_count = $reviewStats[$book->id] ?? 0;
+            $book->average_rating = $avgRatings[$book->id] ?? null;
+            $book->read_count = $readCounts[$book->id] ?? 0;
             return $book;
         });
 
-        // Finished: last_percent >= 1
+        // Finished books: last_percent >= 1
         $finishedBookIds = ReadingLog::where('user_id', $user->id)
             ->where('last_percent', '>=', 1)
             ->pluck('book_id');
+
         $finishedBooks = Book::with('category')
+            ->active()
             ->whereIn('id', $finishedBookIds)
-            ->where('status', 'active')
             ->get();
 
-        // Currently Reading: last_percent > 0 and < 1, but exclude finished books
-        $currentlyReadingLogs = ReadingLog::with('book')
+        // Currently reading: last_percent between 0 and 1
+        $currentlyReadingLogs = ReadingLog::with(['book' => fn($q) => $q->active()])
             ->where('user_id', $user->id)
-            ->where('last_percent', '>', 0)
-            ->where('last_percent', '<', 1)
+            ->whereBetween('last_percent', [0.01, 0.99])
             ->whereNotIn('book_id', $finishedBookIds)
-            ->whereHas('book', function($query) {
-                $query->where('status', 'active');
-            })
             ->orderByDesc('updated_at')
             ->get();
-        $currentlyReadingBooks = $currentlyReadingLogs->map(function($log) {
-            if ($log->book) {
-                $book = $log->book;
-                $book->last_percent = $log->last_percent;
-                $book->progress = $log->last_percent;
-                return $book;
-            }
-        })->filter()->values();
+
+        $currentlyReadingBooks = $currentlyReadingLogs
+            ->map(fn($log) => tap($log->book, function ($book) use ($log) {
+                if ($book) {
+                    $book->last_percent = $log->last_percent;
+                    $book->progress = $log->last_percent;
+                }
+            }))
+            ->filter()
+            ->values();
 
         $categories = Category::all();
+
         return inertia('User/Books/Saved', [
-            'books' => $books,
-            'saved_books' => $savedBookIds,
+            'books'                 => $books,
+            'saved_books'           => $savedBookIds,
             'currentlyReadingBooks' => $currentlyReadingBooks,
-            'finishedBooks' => $finishedBooks,
-            'categories' => $categories,
+            'finishedBooks'         => $finishedBooks,
+            'categories'            => $categories,
         ]);
     }
-
-    
 }

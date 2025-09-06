@@ -66,11 +66,8 @@ Route::middleware('auth', 'user')->group(function () {
     Route::get('/user/genres/select', [GenreController::class, 'select'])->name('user.genres.select');
     Route::post('/user/genres/select', [GenreController::class, 'store'])->name('user.genres.store');
     Route::post('/user/genres/skip', [GenreController::class, 'skip'])->name('user.genres.skip');
-    
+
     Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
-
-
-    
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

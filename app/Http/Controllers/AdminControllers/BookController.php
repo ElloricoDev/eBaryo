@@ -9,14 +9,15 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         $query = Book::with('category');
-        
+
         // Filter by status if provided
         if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
         }
-        
+
         $books = $query->paginate(15);
 
         // Attach read_count, reviews_count, and average_rating to each book
@@ -33,14 +34,16 @@ class BookController extends Controller
         ]);
     }
 
-    public function create() {
+    public function create()
+    {
         $categories = Category::all();
         return inertia('Admin/Books/Create', [
             'categories' => $categories
         ]);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
@@ -70,7 +73,8 @@ class BookController extends Controller
         return redirect()->route('admin.books.index')->with('message', 'Book created successfully.');
     }
 
-    public function show($id) {
+    public function show($id)
+    {
         $book = Book::with('category')->findOrFail($id);
         $book->read_count = $book->readingLogs()->count();
         $book->reviews_count = $book->reviews()->count();
@@ -80,7 +84,8 @@ class BookController extends Controller
         ]);
     }
 
-    public function edit($id) {
+    public function edit($id)
+    {
         $book = Book::findOrFail($id);
         $categories = Category::all();
         return inertia('Admin/Books/Edit', [
@@ -89,7 +94,8 @@ class BookController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         $book = Book::findOrFail($id);
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -133,21 +139,24 @@ class BookController extends Controller
         return redirect()->route('admin.books.index')->with('message', 'Book updated successfully.');
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $book = Book::findOrFail($id);
         $book->delete();
         return redirect()->route('admin.books.index')->with('message', 'Book deleted successfully.');
     }
 
-    public function toggleStatus($id) {
+    public function toggleStatus($id)
+    {
         $book = Book::findOrFail($id);
         $book->status = $book->status === 'active' ? 'inactive' : 'active';
         $book->save();
-        
+
         return back()->with('message', 'Book status updated successfully.');
     }
 
-    public function bulkDelete(Request $request) {
+    public function bulkDelete(Request $request)
+    {
         $validated = $request->validate([
             'book_ids' => 'required|array',
             'book_ids.*' => 'exists:books,id'

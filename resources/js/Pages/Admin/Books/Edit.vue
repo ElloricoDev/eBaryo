@@ -211,7 +211,10 @@ const onEbookChange = (e) => {
 }
 
 const submit = () => {
-  form.post(route('admin.books.update', { id: props.book?.id }), {
+  form.transform((data) => ({
+    ...data,
+    _method: 'PATCH'
+  })).post(route('admin.books.update', { id: props.book?.id }), {
     forceFormData: true,
     preserveScroll: true,
     onSuccess: () => {
