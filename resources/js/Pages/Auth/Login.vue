@@ -70,6 +70,7 @@ const submit = () => {
                             <form @submit.prevent="submit" class="space-y-6">
                                 <div>
                                     <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
+                                        <font-awesome-icon icon="envelope" class="mr-2 text-slate-400" />
                                         Email address
                                     </label>
                                     <input
@@ -91,6 +92,7 @@ const submit = () => {
                                 </div>
                                 <div>
                                     <label for="password" class="block text-sm font-medium text-slate-700 mb-2">
+                                        <font-awesome-icon icon="lock" class="mr-2 text-slate-400" />
                                         Password
                                     </label>
                                     <div class="relative">
@@ -152,7 +154,8 @@ const submit = () => {
                                         class="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         aria-label="Login"
                                     >
-                                        <span v-if="!form.processing">
+                                        <span v-if="!form.processing" class="inline-flex items-center justify-center">
+                                            <font-awesome-icon icon="right-to-bracket" class="mr-2" />
                                             Sign in
                                         </span>
                                         <span v-else class="flex items-center justify-center">

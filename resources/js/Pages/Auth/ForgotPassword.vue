@@ -51,6 +51,7 @@ defineOptions({
                     >
                         <div>
                             <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
+                                <font-awesome-icon icon="envelope" class="mr-2 text-slate-400" />
                                 Email address
                             </label>
                             <input
@@ -78,7 +79,8 @@ defineOptions({
                                 class="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 :disabled="form.processing"
                             >
-                                <span v-if="!form.processing">
+                                <span v-if="!form.processing" class="inline-flex items-center justify-center">
+                                    <font-awesome-icon icon="paper-plane" class="mr-2" />
                                     Send reset link
                                 </span>
                                 <span v-else class="flex items-center justify-center">
@@ -179,11 +181,6 @@ a:focus {
     outline: 2px solid #34d399;
     outline-offset: 2px;
 }
-
-input::placeholder {
-    color: transparent;
-}
-
 label {
     transition: all 0.2s;
 }

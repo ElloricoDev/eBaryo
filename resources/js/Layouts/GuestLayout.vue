@@ -96,32 +96,37 @@ library.add(
 
                 <ul class="hidden md:flex gap-1 items-center">
                     <li>
-                        <button class="text-slate-600 px-4 py-2 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 text-sm font-medium"
+                        <button class="text-slate-600 px-4 py-2 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 text-sm font-medium inline-flex items-center gap-2"
                             @click="smoothScroll('#home')">
+                            <font-awesome-icon icon="house" />
                             Home
                         </button>
                     </li>
                     <li>
                         <button @click="smoothScroll('#about')"
-                            class="text-slate-600 px-4 py-2 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 text-sm font-medium">
+                            class="text-slate-600 px-4 py-2 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 text-sm font-medium inline-flex items-center gap-2">
+                            <font-awesome-icon icon="info-circle" />
                             About
                         </button>
                     </li>
                     <li>
                         <button @click="smoothScroll('#features')"
-                            class="text-slate-600 px-4 py-2 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 text-sm font-medium">
+                            class="text-slate-600 px-4 py-2 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 text-sm font-medium inline-flex items-center gap-2">
+                            <font-awesome-icon icon="star" />
                             Features
                         </button>
                     </li>
                     <li>
                         <button @click="smoothScroll('#testimonials')"
-                            class="text-slate-600 px-4 py-2 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 text-sm font-medium">
+                            class="text-slate-600 px-4 py-2 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 text-sm font-medium inline-flex items-center gap-2">
+                            <font-awesome-icon icon="comment-dots" />
                             Testimonials
                         </button>
                     </li>
                     <li class="ml-4">
-                        <Link class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 text-sm font-medium shadow-sm"
+                        <Link class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 text-sm font-medium shadow-sm inline-flex items-center gap-2"
                             :href="route('login')">
+                        <font-awesome-icon icon="right-to-bracket" />
                         Login
                         </Link>
                     </li>
@@ -155,7 +160,8 @@ library.add(
                                 toggle = false;
                             }
                         "
-                            class="text-slate-600 px-4 py-3 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 w-full text-left font-medium">
+                            class="text-slate-600 px-4 py-3 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 w-full text-left font-medium inline-flex items-center gap-2">
+                            <font-awesome-icon icon="house" />
                             Home
                         </button>
                     </li>
@@ -166,7 +172,8 @@ library.add(
                                 toggle = false;
                             }
                         "
-                            class="text-slate-600 px-4 py-3 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 w-full text-left font-medium">
+                            class="text-slate-600 px-4 py-3 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 w-full text-left font-medium inline-flex items-center gap-2">
+                            <font-awesome-icon icon="info-circle" />
                             About
                         </button>
                     </li>
@@ -177,7 +184,8 @@ library.add(
                                 toggle = false;
                             }
                         "
-                            class="text-slate-600 px-4 py-3 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 w-full text-left font-medium">
+                            class="text-slate-600 px-4 py-3 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 w-full text-left font-medium inline-flex items-center gap-2">
+                            <font-awesome-icon icon="star" />
                             Features
                         </button>
                     </li>
@@ -188,14 +196,16 @@ library.add(
                                 toggle = false;
                             }
                         "
-                            class="text-slate-600 px-4 py-3 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 w-full text-left font-medium">
+                            class="text-slate-600 px-4 py-3 rounded-lg hover:bg-green-50 hover:text-green-700 transition-all duration-200 w-full text-left font-medium inline-flex items-center gap-2">
+                            <font-awesome-icon icon="comment-dots" />
                             Testimonials
                         </button>
                     </li>
                     <li class="mt-4">
                         <Link @click="toggle = false"
-                            class="bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-all duration-200 w-full text-center font-medium block"
+                            class="bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-all duration-200 w-full text-center font-medium block inline-flex items-center justify-center gap-2"
                             :href="route('login')">
+                        <font-awesome-icon icon="right-to-bracket" />
                         Login
                         </Link>
                     </li>

@@ -3,12 +3,15 @@ import GuestLayout from "@/Layouts/GuestLayout.vue";
 import { useForm, Link, Head } from "@inertiajs/vue3";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
+import { ref } from "vue";
 import {
     faUserPlus,
     faPerson,
     faEnvelope,
     faLock,
     faRightToBracket,
+    faEye,
+    faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 
@@ -18,7 +21,9 @@ library.add(
     faEnvelope,
     faLock,
     faRightToBracket,
-    faGoogle
+    faGoogle,
+    faEye,
+    faEyeSlash
 );
 
 const form = useForm({
@@ -27,6 +32,9 @@ const form = useForm({
     password: "",
     password_confirmation: "",
 });
+
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
 
 const submit = () => {
     form.post(route("register"), {
@@ -69,6 +77,7 @@ const submit = () => {
                     <form @submit.prevent="submit" class="space-y-6">
                         <div>
                             <label for="name" class="block text-sm font-medium text-slate-700 mb-2">
+                                <font-awesome-icon icon="person" class="mr-2 text-slate-400" />
                                 Full Name
                             </label>
                             <input
@@ -91,6 +100,7 @@ const submit = () => {
 
                         <div>
                             <label for="email" class="block text-sm font-medium text-slate-700 mb-2">
+                                <font-awesome-icon icon="envelope" class="mr-2 text-slate-400" />
                                 Email address
                             </label>
                             <input
@@ -112,17 +122,29 @@ const submit = () => {
 
                         <div>
                             <label for="password" class="block text-sm font-medium text-slate-700 mb-2">
+                                <font-awesome-icon icon="lock" class="mr-2 text-slate-400" />
                                 Password
                             </label>
-                            <input
-                                id="password"
-                                type="password"
-                                v-model="form.password"
-                                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                                :class="{ 'border-red-500 focus:ring-red-500': form.errors.password }"
-                                placeholder="Create a password"
-                                aria-label="Password"
-                            />
+                            <div class="relative">
+                                <input
+                                    :type="showPassword ? 'text' : 'password'"
+                                    id="password"
+                                    v-model="form.password"
+                                    class="w-full px-4 py-3 pr-12 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                                    :class="{ 'border-red-500 focus:ring-red-500': form.errors.password }"
+                                    placeholder="Create a password"
+                                    aria-label="Password"
+                                />
+                                <button
+                                    type="button"
+                                    @click="showPassword = !showPassword"
+                                    tabindex="-1"
+                                    class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 focus:outline-none"
+                                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                                >
+                                    <font-awesome-icon :icon="showPassword ? 'eye-slash' : 'eye'" />
+                                </button>
+                            </div>
                             <div
                                 v-if="form.errors.password"
                                 class="text-sm text-red-600 mt-1"
@@ -133,16 +155,28 @@ const submit = () => {
 
                         <div>
                             <label for="password_confirmation" class="block text-sm font-medium text-slate-700 mb-2">
+                                <font-awesome-icon icon="lock" class="mr-2 text-slate-400" />
                                 Confirm Password
                             </label>
-                            <input
-                                id="password_confirmation"
-                                type="password"
-                                v-model="form.password_confirmation"
-                                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                                placeholder="Confirm your password"
-                                aria-label="Confirm Password"
-                            />
+                            <div class="relative">
+                                <input
+                                    :type="showConfirmPassword ? 'text' : 'password'"
+                                    id="password_confirmation"
+                                    v-model="form.password_confirmation"
+                                    class="w-full px-4 py-3 pr-12 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                                    placeholder="Confirm your password"
+                                    aria-label="Confirm Password"
+                                />
+                                <button
+                                    type="button"
+                                    @click="showConfirmPassword = !showConfirmPassword"
+                                    tabindex="-1"
+                                    class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 focus:outline-none"
+                                    :aria-label="showConfirmPassword ? 'Hide password' : 'Show password'"
+                                >
+                                    <font-awesome-icon :icon="showConfirmPassword ? 'eye-slash' : 'eye'" />
+                                </button>
+                            </div>
                         </div>
 
                         <div>
@@ -151,7 +185,8 @@ const submit = () => {
                                 class="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 :disabled="form.processing"
                             >
-                                <span v-if="!form.processing">
+                                <span v-if="!form.processing" class="inline-flex items-center justify-center">
+                                    <font-awesome-icon icon="user-plus" class="mr-2" />
                                     Create account
                                 </span>
                                 <span v-else class="flex items-center justify-center">
@@ -254,9 +289,6 @@ button:focus,
 a:focus {
     outline: 2px solid #34d399;
     outline-offset: 2px;
-}
-input::placeholder {
-    color: transparent;
 }
 label {
     transition: all 0.2s;
