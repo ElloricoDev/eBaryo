@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class BookReviewController extends Controller
 {
-    // List reviews for a book
     public function index($bookId)
     {
         $book = Book::findOrFail($bookId);
@@ -35,7 +34,6 @@ class BookReviewController extends Controller
     }
 
 
-    // Store a new review
     public function store(Request $request, $bookId)
     {
         $request->validate([
@@ -43,7 +41,6 @@ class BookReviewController extends Controller
             'review' => 'nullable|string|max:2000',
         ]);
         $book = Book::findOrFail($bookId);
-        // Only one review per user per book
         $review = BookReview::updateOrCreate(
             [
                 'book_id' => $book->id,
@@ -57,7 +54,6 @@ class BookReviewController extends Controller
         return back()->with('success', 'Review submitted!');
     }
 
-    // Optionally: Delete a review
     public function destroy($id)
     {
         $review = BookReview::findOrFail($id);

@@ -13,54 +13,57 @@ class FeedbackController extends Controller
 {
     public function create()
     {
-        $categories = Category::all();
         $userId = Auth::id();
 
-        // Fetch user feedbacks (ordered) for display
+        $categories = Category::select('id', 'name')->get();
+
         $feedbacks = Feedback::where('user_id', $userId)
-            ->orderByDesc('created_at')
+            ->latest()
             ->get();
 
-        // Efficiently check and update any new responses without hydrating unnecessary models
-        $newResponsesQuery = Feedback::where('user_id', $userId)
+        $hadNewResponses = Feedback::where('user_id', $userId)
             ->where('status', 'responded')
-            ->where('notified', false);
+            ->where('notified', false)
+            ->tap(function ($query) use ($userId) {
+                if ($query->exists()) {
+                    $query->update(['notified' => true]);
+                    event(new FeedbackUpdated($userId, 'user'));
+                }
+            })
+            ->exists();
 
-        $hadNewResponses = $newResponsesQuery->exists();
-
-        if ($hadNewResponses) {
-            // Mark as notified in bulk
-            $newResponsesQuery->update(['notified' => true]);
-            // Broadcast to user (in case of real-time update)
-            event(new FeedbackUpdated($userId, 'user'));
-        }
-
-        return Inertia::render('User/Feedback', [
-            'categories' => $categories,
-            'feedbacks' => $feedbacks,
-            'hasNewResponses' => $hadNewResponses,
-        ]);
+        return Inertia::render('User/Feedback', compact(
+            'categories',
+            'feedbacks',
+            'hadNewResponses'
+        ));
     }
+
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'message' => 'required|string|max:2000',
-            'type' => 'nullable|string|in:general,testimonial,bug_report,feature_request,report',
+            'type'    => 'nullable|string|in:general,testimonial,bug_report,feature_request,report',
         ]);
+
         $feedback = Feedback::create([
-            'user_id' => Auth::id(),
-            'message' => $request->message,
-            'status' => 'pending',
-            'type' => $request->input('type', 'general'),
+            'user_id'        => auth()->id(),
+            'message'        => $data['message'],
+            'status'         => 'pending',
+            'type'           => $data['type'] ?? 'general',
             'admin_notified' => false,
         ]);
-        // Broadcast to admin
-        event(new FeedbackUpdated(null, 'admin'));
-        return redirect()->route('feedback.create')->with('success', 'Thank you for your feedback!');
+
+        if ($feedback) {
+            event(new FeedbackUpdated(null, 'admin'));
+        }
+
+        return redirect()
+            ->route('feedback.create')
+            ->with('success', 'Thank you for your feedback!');
     }
 
-    // myFeedback() deprecated: listing merged into Feedback page
 
     public function reportBook(Request $request, $bookId)
     {

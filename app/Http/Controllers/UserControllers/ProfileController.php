@@ -11,13 +11,12 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        $categories = Category::all();
-        $genres = $user->genres()->pluck('name')->toArray();
+        $user = Auth::user()->load('genres:id,name');
+
         return inertia('User/Profile/Index', [
             'user' => $user,
-            'genres' => $genres,
-            'categories' => $categories,
+            'genres' => $user->genres->pluck('name'),
+            'categories' => Category::select('id', 'name')->get(),
         ]);
     }
 
@@ -44,7 +43,6 @@ class ProfileController extends Controller
             'student' => 'required|in:yes,no',
         ]);
 
-        // Handle avatar upload
         if ($request->hasFile('avatar')) {
             $avatarPath = $request->file('avatar')->store('avatars', 'public');
             $validated['avatar'] = '/storage/' . $avatarPath;
