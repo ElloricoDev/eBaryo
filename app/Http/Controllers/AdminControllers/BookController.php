@@ -47,7 +47,6 @@ class BookController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
-            'isbn' => 'nullable|string|unique:books,isbn',
             'published_year' => 'nullable|integer',
             'description' => 'nullable|string',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -100,7 +99,6 @@ class BookController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
-            'isbn' => 'nullable|string|unique:books,isbn,' . $book->id,
             'published_year' => 'nullable|integer',
             'description' => 'nullable|string',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -112,18 +110,15 @@ class BookController extends Controller
         ]);
 
         if ($request->hasFile('cover_image')) {
-            // Delete previous cover image if exists
             if ($book->cover_image && file_exists(public_path(str_replace('/storage/', 'storage/', $book->cover_image)))) {
                 @unlink(public_path(str_replace('/storage/', 'storage/', $book->cover_image)));
             }
             $coverPath = $request->file('cover_image')->store('covers', 'public');
             $validated['cover_image'] = '/storage/' . $coverPath;
         } else {
-            // Remove cover_image from validated data if no new file is uploaded
             unset($validated['cover_image']);
         }
         if ($request->hasFile('ebook_file')) {
-            // Delete previous ebook file if exists
             if ($book->ebook_file && file_exists(public_path(str_replace('/storage/', 'storage/', $book->ebook_file)))) {
                 @unlink(public_path(str_replace('/storage/', 'storage/', $book->ebook_file)));
             }
@@ -132,7 +127,6 @@ class BookController extends Controller
             $ebookPath = $request->file('ebook_file')->storeAs('ebooks', $filename, 'public');
             $validated['ebook_file'] = '/storage/' . $ebookPath;
         } else {
-            // Remove ebook_file from validated data if no new file is uploaded
             unset($validated['ebook_file']);
         }
         $book->update($validated);

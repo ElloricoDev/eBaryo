@@ -43,14 +43,7 @@
             <p v-if="form.errors.author" class="text-red-500 text-sm mt-2">{{ form.errors.author }}</p>
           </div>
 
-          <!-- ISBN -->
-          <div>
-            <label class="block text-slate-700 font-semibold mb-2">ISBN</label>
-            <input v-model="form.isbn" type="text" placeholder="Enter ISBN"
-              class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 transition-colors"
-              :class="{'border-red-500 focus:ring-red-500/20 focus:border-red-500': form.errors.isbn}" />
-            <p v-if="form.errors.isbn" class="text-red-500 text-sm mt-2">{{ form.errors.isbn }}</p>
-          </div>
+          
 
           <!-- Published Year -->
           <div>

@@ -100,10 +100,7 @@ const isEpub = computed(() => fileExt.value === 'epub');
                 <label class="block text-slate-700 font-semibold mb-1">Language</label>
                 <p class="text-slate-600">{{ book.language || 'N/A' }}</p>
               </div>
-              <div>
-                <label class="block text-slate-700 font-semibold mb-1">ISBN</label>
-                <p class="text-slate-600 font-mono">{{ book.isbn || 'N/A' }}</p>
-              </div>
+              
             </div>
             <div class="space-y-4">
               <div>
