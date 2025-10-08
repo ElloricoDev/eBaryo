@@ -49,7 +49,6 @@ class HomeController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        // Hot Books removed
 
         // Most Read Books (all time)
         $mostReadBookCounts = ReadingLog::selectRaw('book_id, COUNT(*) as read_count')

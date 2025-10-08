@@ -27,7 +27,7 @@ class BookController extends Controller
             ->with('category')
             ->withAvg('reviews', 'rating')
             ->withCount('reviews', 'readingLogs')
-            ->active() // custom scope instead of repeating "where status=active"
+            ->active()
             ->when($categoryId, fn($qb) => $qb->where('category_id', $categoryId))
             ->when($q !== '', function ($qb) use ($q) {
                 $qb->where(function ($q2) use ($q) {

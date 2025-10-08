@@ -15,7 +15,7 @@ class SearchController extends Controller
     public function search(Request $request)
     {
         $query = $request->get('query', '');
-        
+
         if (empty($query)) {
             return redirect()->route('dashboard');
         }
@@ -30,7 +30,7 @@ class SearchController extends Controller
             ->orWhere('email', 'LIKE', "%{$query}%")
             ->limit(10)
             ->get();
-        
+
         $results['users'] = $users;
         $totalResults += $users->count();
 
@@ -39,10 +39,9 @@ class SearchController extends Controller
             ->where('title', 'LIKE', "%{$query}%")
             ->orWhere('author', 'LIKE', "%{$query}%")
             ->orWhere('description', 'LIKE', "%{$query}%")
-            ->orWhere('isbn', 'LIKE', "%{$query}%")
             ->limit(10)
             ->get();
-        
+
         $results['books'] = $books;
         $totalResults += $books->count();
 
@@ -51,7 +50,7 @@ class SearchController extends Controller
             ->orWhere('description', 'LIKE', "%{$query}%")
             ->limit(10)
             ->get();
-        
+
         $results['categories'] = $categories;
         $totalResults += $categories->count();
 
@@ -61,7 +60,7 @@ class SearchController extends Controller
             ->orWhere('response', 'LIKE', "%{$query}%")
             ->limit(10)
             ->get();
-        
+
         $results['feedbacks'] = $feedbacks;
         $totalResults += $feedbacks->count();
 

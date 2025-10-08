@@ -15,7 +15,6 @@ import {
     faFile,
     faDownload,
     faUser,
-    faBarcode,
     faCalendar,
     faBuilding,
     faLanguage,
@@ -43,7 +42,6 @@ library.add(
     faFile,
     faDownload,
     faUser,
-    faBarcode,
     faCalendar,
     faBuilding,
     faLanguage,
@@ -61,8 +59,6 @@ const { props } = usePage();
 const book = props.book;
 const savedBookIds = ref(props.saved_books || []);
 const isSaved = computed(() => savedBookIds.value.includes(book.id));
-const showReader = ref(false);
-const readerSection = ref(null);
 const showScrollTop = ref(false);
 const reviews = ref(props.book.reviews || []);
 const averageRating = ref(props.book.average_rating || 0);
@@ -427,13 +423,7 @@ const handleReadClick = () => {
                                     </span>
                                     <span class="text-slate-700">{{ book.author }}</span>
                                 </div>
-                                <div class="flex items-center gap-3">
-                                    <span class="text-green-600 font-semibold flex items-center gap-2">
-                                        <font-awesome-icon icon="barcode" />
-                                        ISBN:
-                                    </span>
-                                    <span class="text-slate-700">{{ book.isbn || "N/A" }}</span>
-                                </div>
+                                
                                 <div class="flex items-center gap-3">
                                     <span class="text-green-600 font-semibold flex items-center gap-2">
                                         <font-awesome-icon icon="calendar" />

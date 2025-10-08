@@ -148,7 +148,8 @@ library.add(
         <nav
             class="bg-white border-r border-slate-200 w-[280px] h-screen p-0 fixed top-0 left-0 z-50 shadow-xl flex flex-col">
             <div class="flex items-center gap-3 px-8 py-8 border-b border-slate-100">
-                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <div
+                    class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
                     <img src="/favicon1.png" alt="Logo" class="w-8 h-8 rounded-lg" />
                 </div>
                 <div>
@@ -161,13 +162,15 @@ library.add(
                     <font-awesome-icon icon="tachometer-alt" class="w-4 h-4" />
                     Dashboard
                 </h5>
-            <ul class="space-y-2 flex-1">
-                <li>
-                    <Link class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50" :class="{
-                        'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-green-700 shadow-sm':
-                            isActive('/dashboard'),
-                        'text-slate-600 hover:text-slate-800': !isActive('/dashboard')
-                    }" :href="route('dashboard')">
+                <ul class="space-y-2 flex-1">
+                    <li>
+                        <Link
+                            class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50"
+                            :class="{
+                                'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-green-700 shadow-sm':
+                                    isActive('/dashboard'),
+                                'text-slate-600 hover:text-slate-800': !isActive('/dashboard')
+                            }" :href="route('dashboard')">
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors" :class="{
                             'bg-green-100 text-green-600': isActive('/dashboard'),
                             'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-600': !isActive('/dashboard')
@@ -175,14 +178,16 @@ library.add(
                             <font-awesome-icon icon="tachometer-alt" class="w-4 h-4" />
                         </div>
                         <span class="font-medium">Dashboard</span>
-                    </Link>
-                </li>
-                <li>
-                    <Link class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50" :class="{
-                        'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-green-700 shadow-sm':
-                            isActive('/admin/users'),
-                        'text-slate-600 hover:text-slate-800': !isActive('/admin/users')
-                    }" :href="route('admin.users.index')">
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50"
+                            :class="{
+                                'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-green-700 shadow-sm':
+                                    isActive('/admin/users'),
+                                'text-slate-600 hover:text-slate-800': !isActive('/admin/users')
+                            }" :href="route('admin.users.index')">
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors" :class="{
                             'bg-green-100 text-green-600': isActive('/admin/users'),
                             'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-600': !isActive('/admin/users')
@@ -190,14 +195,16 @@ library.add(
                             <font-awesome-icon icon="users" class="w-4 h-4" />
                         </div>
                         <span class="font-medium">Users</span>
-                    </Link>
-                </li>
-                <li>
-                    <Link class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50" :class="{
-                        'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-green-700 shadow-sm':
-                            isActive('/admin/books'),
-                        'text-slate-600 hover:text-slate-800': !isActive('/admin/books')
-                    }" :href="route('admin.books.index')">
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50"
+                            :class="{
+                                'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-green-700 shadow-sm':
+                                    isActive('/admin/books'),
+                                'text-slate-600 hover:text-slate-800': !isActive('/admin/books')
+                            }" :href="route('admin.books.index')">
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors" :class="{
                             'bg-green-100 text-green-600': isActive('/admin/books'),
                             'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-600': !isActive('/admin/books')
@@ -205,14 +212,16 @@ library.add(
                             <font-awesome-icon icon="book" class="w-4 h-4" />
                         </div>
                         <span class="font-medium">Books</span>
-                    </Link>
-                </li>
-                <li>
-                    <Link class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50" :class="{
-                        'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-green-700 shadow-sm':
-                            isActive('/admin/category'),
-                        'text-slate-600 hover:text-slate-800': !isActive('/admin/category')
-                    }" :href="route('admin.categories.index')">
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50"
+                            :class="{
+                                'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-green-700 shadow-sm':
+                                    isActive('/admin/category'),
+                                'text-slate-600 hover:text-slate-800': !isActive('/admin/category')
+                            }" :href="route('admin.categories.index')">
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors" :class="{
                             'bg-green-100 text-green-600': isActive('/admin/category'),
                             'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-600': !isActive('/admin/category')
@@ -220,14 +229,16 @@ library.add(
                             <font-awesome-icon icon="tags" class="w-4 h-4" />
                         </div>
                         <span class="font-medium">Categories</span>
-                    </Link>
-                </li>
-                <li>
-                    <Link class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50 relative" :class="{
-                        'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-green-700 shadow-sm':
-                            isActive('/admin/feedback'),
-                        'text-slate-600 hover:text-slate-800': !isActive('/admin/feedback')
-                    }" :href="route('admin.feedback.index')">
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50 relative"
+                            :class="{
+                                'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 text-green-700 shadow-sm':
+                                    isActive('/admin/feedback'),
+                                'text-slate-600 hover:text-slate-800': !isActive('/admin/feedback')
+                            }" :href="route('admin.feedback.index')">
                         <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors" :class="{
                             'bg-green-100 text-green-600': isActive('/admin/feedback'),
                             'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-600': !isActive('/admin/feedback')
@@ -239,38 +250,34 @@ library.add(
                             class="ml-auto inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full shadow-sm">
                             {{ pendingFeedbackCount }}
                         </span>
-                    </Link>
-                </li>
+                        </Link>
+                    </li>
 
-                <li class="mt-8 pt-4 border-t border-slate-100">
-                    <h6 class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-3 px-4">Account</h6>
-                    <Link class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50 text-slate-600 hover:text-slate-800"
-                        :href="route('admin.profile.index')">
-                        <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-600 flex items-center justify-center transition-colors">
+                    <li class="mt-8 pt-4 border-t border-slate-100">
+                        <h6 class="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-3 px-4">Account</h6>
+                        <Link
+                            class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50 text-slate-600 hover:text-slate-800"
+                            :href="route('admin.profile.index')">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-600 flex items-center justify-center transition-colors">
                             <font-awesome-icon icon="user" class="w-4 h-4" />
                         </div>
                         <span class="font-medium">Profile</span>
-                    </Link>
-                </li>
-                <li>
-                    <Link class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50 text-slate-600 hover:text-slate-800"
-                        :href="route('admin.settings.index')">
-                        <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-600 flex items-center justify-center transition-colors">
-                            <font-awesome-icon icon="cog" class="w-4 h-4" />
-                        </div>
-                        <span class="font-medium">Settings</span>
-                    </Link>
-                </li>
-                <li>
-                    <Link class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-red-50 text-red-600 hover:text-red-700"
-                        :href="route('logout')" method="post">
-                        <div class="w-8 h-8 rounded-lg bg-red-100 text-red-500 group-hover:bg-red-200 group-hover:text-red-600 flex items-center justify-center transition-colors">
+                        </Link>
+                    </li>
+
+                    <li>
+                        <Link
+                            class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-red-50 text-red-600 hover:text-red-700"
+                            :href="route('logout')" method="post">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-red-100 text-red-500 group-hover:bg-red-200 group-hover:text-red-600 flex items-center justify-center transition-colors">
                             <font-awesome-icon icon="sign-out-alt" class="w-4 h-4" />
                         </div>
                         <span class="font-medium">Logout</span>
-                    </Link>
-                </li>
-            </ul>
+                        </Link>
+                    </li>
+                </ul>
             </div>
             <div class="px-6 py-4 border-t border-slate-100 text-xs text-slate-400">
                 &copy; {{ new Date().getFullYear() }} eBaryo Admin
@@ -326,7 +333,8 @@ library.add(
                                     <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-2xl hover:from-red-100 hover:to-pink-100 cursor-pointer transition-all duration-200"
                                         @click="handleNotificationClick">
                                         <div class="flex-shrink-0">
-                                            <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                                            <div
+                                                class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
                                                 <font-awesome-icon icon="envelope" class="text-red-600 w-5 h-5" />
                                             </div>
                                         </div>
@@ -336,7 +344,7 @@ library.add(
                                             </p>
                                             <p class="text-xs text-slate-600 mt-1">
                                                 You have {{ pendingFeedbackCount }} pending feedback{{
-                                                pendingFeedbackCount > 1 ? 's' : '' }} to review
+                                                    pendingFeedbackCount > 1 ? 's' : '' }} to review
                                             </p>
                                         </div>
                                         <div class="flex-shrink-0">
@@ -349,7 +357,8 @@ library.add(
                                 </div>
 
                                 <div v-else class="p-6 text-center">
-                                    <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <div
+                                        class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                         <font-awesome-icon icon="bell" class="text-slate-400 w-6 h-6" />
                                     </div>
                                     <p class="text-slate-500 text-sm font-medium">No new notifications</p>

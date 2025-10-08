@@ -6,10 +6,10 @@ import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
-  faArrowLeft, faPlusSquare, faBook, faUser, faBarcode, faCalendar, faBuilding, faLanguage, faTags, faInfoCircle, faAlignLeft, faImage, faFile, faXmark, faEnvelope
+  faArrowLeft, faPlusSquare, faBook, faUser, faCalendar, faBuilding, faLanguage, faTags, faInfoCircle, faAlignLeft, faImage, faFile, faXmark, faEnvelope
 } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faArrowLeft, faPlusSquare, faBook, faUser, faBarcode, faCalendar, faBuilding, faLanguage, faTags, faInfoCircle, faAlignLeft, faImage, faFile, faXmark, faEnvelope)
+library.add(faArrowLeft, faPlusSquare, faBook, faUser,  faCalendar, faBuilding, faLanguage, faTags, faInfoCircle, faAlignLeft, faImage, faFile, faXmark, faEnvelope)
 
 defineOptions({ layout: AdminLayout })
 
@@ -40,8 +40,8 @@ const onCoverChange = (e) => {
 
 const onEbookChange = (e) => {
   const file = e.target.files[0];
-  if (file && file.size > 800 * 1024 * 1024) {
-    Swal.fire({ icon: 'error', title: 'File too large', text: 'The ebook file must be 800MB or less.' });
+  if (file && file.size > 50 * 1024 * 1024) {
+    Swal.fire({ icon: 'error', title: 'File too large', text: 'The ebook file must be 50MB or less.' });
     form.ebook_file = null;
     ebookName.value = '';
     e.target.value = '';
