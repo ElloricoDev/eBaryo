@@ -47,12 +47,15 @@ const confirmDelete = (id) => {
 };
 
 const toggleSelectAll = () => {
+  selectAll.value = !selectAll.value;
+
   if (selectAll.value) {
     selectedUsers.value = users.value.data?.map(user => user.id) || [];
   } else {
     selectedUsers.value = [];
   }
 };
+
 
 const toggleSelectUser = (userId) => {
   const index = selectedUsers.value.indexOf(userId);

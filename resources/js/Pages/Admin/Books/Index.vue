@@ -42,6 +42,7 @@ const filterBooks = () => {
   router.get(route('admin.books.index'), { status: statusFilter.value }, {
     preserveState: false,
     preserveScroll: false,
+    replace: true,
   });
 };
 
@@ -50,8 +51,10 @@ const clearFilters = () => {
   router.get(route('admin.books.index'), {}, {
     preserveState: false,
     preserveScroll: false,
+    replace: true,
   });
 };
+
 
 const toggleStatus = (id) => {
   router.patch(route('admin.books.toggle-status', id), {}, {
@@ -68,13 +71,18 @@ const toggleStatus = (id) => {
   });
 };
 
+
+
 const toggleSelectAll = () => {
+  selectAll.value = !selectAll.value;
+
   if (selectAll.value) {
     selectedBooks.value = books.value.data?.map(book => book.id) || [];
   } else {
     selectedBooks.value = [];
   }
 };
+
 
 const toggleSelectBook = (bookId) => {
   const index = selectedBooks.value.indexOf(bookId);
@@ -296,7 +304,7 @@ const confirmBulkDelete = () => {
     </div>
 
     <!-- Pagination -->
-    <div v-if="books && books.links && books.links.length > 3" class="mt-8 flex items-center justify-between">
+    <div v-if="books && books.links && books.links.length > 1" class="mt-8 flex items-center justify-between">
       <div class="text-sm text-slate-600">
         Showing {{ books.from || 0 }} to {{ books.to || 0 }} of {{ books.total || 0 }} results
       </div>

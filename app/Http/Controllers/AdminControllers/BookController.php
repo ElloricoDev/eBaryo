@@ -18,7 +18,10 @@ class BookController extends Controller
             $query->where('status', $request->status);
         }
 
-        $books = $query->paginate(15);
+        $books = $query->paginate(10);
+
+        // Append query parameters to pagination links
+        $books->appends($request->query());
 
         // Attach read_count, reviews_count, and average_rating to each book
         $books->getCollection()->transform(function ($book) {

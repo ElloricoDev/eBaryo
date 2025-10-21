@@ -59,13 +59,18 @@ function updateType(id, type) {
   router.patch(route("admin.feedback.update-type", id), { type });
 }
 
+
+
 const toggleSelectAll = () => {
+  selectAll.value = !selectAll.value;
+
   if (selectAll.value) {
-    selectedFeedbacks.value = props.feedbacks?.map(feedback => feedback.id) || [];
+    selectedFeedbacks.value = props.feedbacks.map(fb => fb.id);
   } else {
     selectedFeedbacks.value = [];
   }
 };
+
 
 const toggleSelectFeedback = (feedbackId) => {
   const index = selectedFeedbacks.value.indexOf(feedbackId);
