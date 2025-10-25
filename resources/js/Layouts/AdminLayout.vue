@@ -3,6 +3,7 @@ import { usePage, Link, router } from "@inertiajs/vue3";
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
+import Swal from "sweetalert2";
 import {
     faTachometerAlt,
     faUsers,
@@ -126,6 +127,28 @@ const isActive = (path) => {
 };
 
 const pendingNotifications = computed(() => pendingFeedbackCount);
+
+const handleLogout = async () => {
+    const result = await Swal.fire({
+        title: 'Confirm Logout',
+        text: 'Are you sure you want to log out? Any unsaved changes will be lost.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, logout',
+        cancelButtonText: 'Cancel',
+        customClass: {
+            popup: 'rounded-2xl',
+            confirmButton: 'rounded-xl',
+            cancelButton: 'rounded-xl'
+        }
+    });
+
+    if (result.isConfirmed) {
+        router.post(route('logout'));
+    }
+};
 
 library.add(
     faTachometerAlt,
@@ -267,15 +290,15 @@ library.add(
                     </li>
 
                     <li>
-                        <Link
-                            class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-red-50 text-red-600 hover:text-red-700"
-                            :href="route('logout')" method="post">
-                        <div
-                            class="w-8 h-8 rounded-lg bg-red-100 text-red-500 group-hover:bg-red-200 group-hover:text-red-600 flex items-center justify-center transition-colors">
-                            <font-awesome-icon icon="sign-out-alt" class="w-4 h-4" />
-                        </div>
-                        <span class="font-medium">Logout</span>
-                        </Link>
+                        <button
+                            @click="handleLogout"
+                            class="w-full group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-red-50 text-red-600 hover:text-red-700">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-red-100 text-red-500 group-hover:bg-red-200 group-hover:text-red-600 flex items-center justify-center transition-colors">
+                                <font-awesome-icon icon="sign-out-alt" class="w-4 h-4" />
+                            </div>
+                            <span class="font-medium">Logout</span>
+                        </button>
                     </li>
                 </ul>
             </div>
