@@ -68,6 +68,10 @@ Route::middleware('auth', 'user')->group(function () {
     Route::post('/user/genres/skip', [GenreController::class, 'skip'])->name('user.genres.skip');
 
     Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
+
+    // Genre edit routes
+    Route::get('/user/profile/genres/edit', [GenreController::class, 'edit'])->name('user.profile.genres.edit');
+    Route::post('/user/profile/genres', [GenreController::class, 'update'])->name('user.profile.genres.update');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -82,8 +86,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Book Reading
     Route::get('/books/{id}/read/epub', [BookController::class, 'epubReader'])->name('books.epubReader');
     Route::get('/books/{id}/read/pdf', [BookController::class, 'pdfReader'])->name('books.pdfReader');
-    Route::get('/user/profile/genres/edit', [GenreController::class, 'edit'])->name('user.profile.genres.edit');
-    Route::post('/user/profile/genres', [GenreController::class, 'update'])->name('user.profile.genres.update');
 });
 
 

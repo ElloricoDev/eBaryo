@@ -1,36 +1,36 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import { ref, computed, onMounted } from 'vue';
+import { usePage, router } from '@inertiajs/vue3';
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
     faEnvelopeCircleCheck,
-    faKey,
     faPaperPlane,
     faEnvelope,
     faCheckCircle,
     faExclamationTriangle,
     faArrowRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
-library.add(faEnvelopeCircleCheck, faKey, faPaperPlane, faEnvelope, faCheckCircle, faExclamationTriangle, faArrowRotateRight);
+library.add(faEnvelopeCircleCheck, faPaperPlane, faEnvelope, faCheckCircle, faExclamationTriangle, faArrowRotateRight);
 
 const { props } = usePage();
 const user = props.user;
-const isGoogleUser = user.google_id !== null;
-const isVerified = ref(computed(() => !!user.email_verified_at));
-
-const form = ref({
-    password: "",
-});
-
+const isVerified = computed(() => !!user.email_verified_at);
 const submitting = ref(false);
 
+const refreshPage = () => {
+    router.reload({ only: ['user'] });
+};
+
 const submit = () => {
+    if (submitting.value) return;
     submitting.value = true;
-    form.value.post(route("user.profile.sendVerificationEmail"), {
+    
+    router.post(route("verification.send"), {}, {
         preserveScroll: true,
         onSuccess: () => {
+            submitting.value = false;
             Swal.fire({
                 icon: "success",
                 title: "Verification Email Sent",
@@ -38,49 +38,19 @@ const submit = () => {
                 timer: 2000,
                 showConfirmButton: false,
             });
-            form.value.reset();
         },
-        onError: () => {
+        onError: (errors) => {
+            submitting.value = false;
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text:
-                    form.value.errors.password ||
-                    form.value.errors.message ||
-                    "Failed to send verification email.",
+                text: "Failed to send verification email. Please try again later.",
             });
         },
         onFinish: () => {
             submitting.value = false;
         },
     });
-};
-
-const resendCooldown = ref(0);
-
-const resendVerification = async () => {
-    try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Start cooldown
-        resendCooldown.value = 60;
-        const interval = setInterval(() => {
-            resendCooldown.value--;
-            if (resendCooldown.value <= 0) {
-                clearInterval(interval);
-            }
-        }, 1000);
-        
-        // Show success message
-        // You can integrate with your actual verification resend logic here
-    } catch (error) {
-        console.error('Failed to resend verification email:', error);
-    }
-};
-
-const refreshPage = () => {
-    window.location.reload();
 };
 
 onMounted(() => {
@@ -141,11 +111,11 @@ onMounted(() => {
 
                 <div class="flex flex-col sm:flex-row gap-3">
                     <button
-                        @click="resendVerification"
-                        :disabled="resendCooldown > 0"
+                        @click="submit"
+                        :disabled="submitting"
                         class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-6 rounded-2xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <span v-if="resendCooldown === 0" class="flex items-center justify-center gap-2">
+                        <span v-if="!submitting" class="flex items-center justify-center gap-2">
                             <font-awesome-icon icon="paper-plane" />
                             Resend Verification Email
                         </span>
@@ -154,7 +124,7 @@ onMounted(() => {
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
                             </svg>
-                            Resend in {{ resendCooldown }}s
+                            Sending...
                         </span>
                     </button>
 
