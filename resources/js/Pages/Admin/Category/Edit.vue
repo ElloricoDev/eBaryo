@@ -36,7 +36,7 @@ function submit() {
 
 <template>
     <Head title="Edit category" />
-    <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class=" mx-auto px-4">
         <!-- Hero Header -->
         <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -60,7 +60,7 @@ function submit() {
 
         <!-- Form -->
         <div class="flex justify-center">
-            <div class="w-full max-w-2xl">
+            <div class="w-full">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
                     <form @submit.prevent="submit" class="space-y-6">
                         <!-- Name Field -->

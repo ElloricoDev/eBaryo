@@ -25,7 +25,7 @@ const isEpub = computed(() => fileExt.value === 'epub');
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto px-4 py-8">
+  <div class=" mx-auto px-4">
     <!-- Hero Header -->
     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-8">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

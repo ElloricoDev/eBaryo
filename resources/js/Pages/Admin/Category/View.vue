@@ -16,7 +16,7 @@ const category = props.category;
 
 <template>
     <Head :title="`View Category: ${category.name}`" />
-    <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class=" mx-auto px-4 ">
         <!-- Hero Header -->
         <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

@@ -21,7 +21,7 @@ const user = props.user
 <template>
   <Head title="My Profile" />
 
-  <div class="max-w-6xl mx-auto px-4 py-8">
+  <div class=" mx-auto px-4 ">
     <!-- Hero Header -->
     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-8">
       <div class="flex items-center gap-4">

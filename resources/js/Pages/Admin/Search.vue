@@ -24,7 +24,7 @@ const totalResults = props.totalResults || 0
 <template>
   <Head :title="`Search Results for '${query}'`" />
 
-  <div class="max-w-7xl mx-auto px-4 py-8">
+  <div class=" mx-auto px-4 ">
     <!-- Hero Header -->
     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-8">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
