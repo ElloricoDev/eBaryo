@@ -200,32 +200,38 @@ onUnmounted(() => {
     <Head title="Home" />
     <UserLayout>
         <!-- Hero Welcome Section -->
-        <div class="mb-12 bg-gradient-to-br from-green-50 via-white to-slate-50 rounded-3xl p-8 border border-green-100 shadow-sm">
+        <div class="mb-12 bg-gradient-to-br from-green-50 via-white to-slate-50 rounded-3xl p-12 border border-green-100 shadow-sm hover:shadow-md transition-shadow duration-300 animate-slide-down">
             <div class="text-center max-w-4xl mx-auto">
-                <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-4">
-                    Welcome back, <span class="text-green-600">{{ $page.props.auth?.user?.user_name || 'Reader' }}</span>! 📚
+                <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-6">
+                    Welcome back, <span class="text-green-600 animate-gradient-move bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">{{ $page.props.auth?.user?.user_name || 'Reader' }}</span>! 📚
                 </h1>
-                <p class="text-xl text-slate-600 mb-6 leading-relaxed">
+                <p class="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto">
                     Continue your reading journey or discover new stories waiting for you
                 </p>
-                <div class="flex flex-wrap justify-center gap-4">
-                    <div class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-green-200">
-                        <div class="text-2xl font-bold text-green-600">{{ $page.props.saved_books?.length || 0 }}</div>
-                        <div class="text-sm text-slate-600">Saved Books</div>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <div class="bg-white px-8 py-4 rounded-2xl shadow-sm border border-green-200 hover:border-green-300 hover:shadow-md transition-all duration-300">
+                        <div class="text-3xl font-bold text-green-600">{{ $page.props.saved_books?.length || 0 }}</div>
+                        <div class="text-sm text-slate-600 font-medium">Saved Books</div>
                     </div>
-                    <div class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-green-200">
-                        <div class="text-2xl font-bold text-green-600">{{ continueReadingList?.length || 0 }}</div>
-                        <div class="text-sm text-slate-600">In Progress</div>
+                    <div class="bg-white px-8 py-4 rounded-2xl shadow-sm border border-green-200 hover:border-green-300 hover:shadow-md transition-all duration-300">
+                        <div class="text-3xl font-bold text-green-600">{{ continueReadingList?.length || 0 }}</div>
+                        <div class="text-sm text-slate-600 font-medium">In Progress</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Search Results Alert -->
-        <div v-if="hasSearch && totalFilteredResults === 0" class="mb-8 p-6 border border-amber-200 rounded-2xl bg-amber-50 text-amber-800">
-            <div class="flex items-center gap-3">
-                <div class="w-2 h-2 bg-amber-500 rounded-full"></div>
-                <span class="font-medium">No results found for "{{ search }}".</span>
+        <div v-if="hasSearch && totalFilteredResults === 0" 
+            class="mb-8 p-6 border border-amber-200 rounded-2xl bg-amber-50 text-amber-800 animate-fade-in shadow-sm">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                    <font-awesome-icon icon="search" class="text-amber-500 text-lg" />
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold mb-1">No Results Found</h3>
+                    <p class="text-amber-700">We couldn't find any books matching "{{ search }}". Try different keywords or browse our categories.</p>
+                </div>
             </div>
         </div>
 
@@ -341,11 +347,9 @@ onUnmounted(() => {
     0% {
         background-position: 0% 50%;
     }
-
     50% {
         background-position: 100% 50%;
     }
-
     100% {
         background-position: 0% 50%;
     }
@@ -354,14 +358,15 @@ onUnmounted(() => {
 .animate-gradient-move {
     background-size: 200% 200%;
     animation: gradient-move 8s ease-in-out infinite;
+    background-clip: text;
+    -webkit-background-clip: text;
 }
 
 @keyframes slide-down {
     from {
-        transform: translateY(-30px);
+        transform: translateY(-20px);
         opacity: 0;
     }
-
     to {
         transform: translateY(0);
         opacity: 1;
@@ -369,31 +374,32 @@ onUnmounted(() => {
 }
 
 .animate-slide-down {
-    animation: slide-down 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation: slide-down 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 @keyframes fade-in {
     from {
         opacity: 0;
+        transform: scale(0.98);
     }
-
     to {
         opacity: 1;
+        transform: scale(1);
     }
 }
 
 .animate-fade-in {
-    animation: fade-in 1s both;
+    animation: fade-in 0.3s ease-out both;
 }
 
 @keyframes pulse-cta {
-    0%,
-    100% {
+    0%, 100% {
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        transform: scale(1);
     }
-
     50% {
         box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+        transform: scale(1.02);
     }
 }
 
@@ -401,10 +407,29 @@ onUnmounted(() => {
     animation: pulse-cta 2s infinite;
 }
 
+/* Improved focus states */
 a:focus,
 button:focus,
 .focus\:outline-none:focus {
-    outline: 2px solid #34d399;
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.4);
+    border-radius: 0.375rem;
+}
+
+/* Smooth transitions */
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+/* Hover effects */
+.hover\:shadow-lg:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.hover\:scale-105:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
 }
 </style>
