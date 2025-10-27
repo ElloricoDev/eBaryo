@@ -25,7 +25,6 @@ library.add(
 
 const { props } = usePage();
 const book = props.book;
-const lastPercent = props.lastPercent || 0;
 
 const viewer = ref(null);
 const epubBook = ref(null);
@@ -41,7 +40,8 @@ const currentPage = ref(1);
 
 const saveProgress = () => {
     if (!totalPages.value) return;
-    const percent = currentPage.value / totalPages.value;
+    const percent = Math.round((currentPage.value / totalPages.value) * 100);
+    
     router.post(
         route("books.saveProgress", { id: book.id }),
         { percent },
@@ -93,13 +93,16 @@ onMounted(async () => {
             await epubBook.value.locations.generate(1000);
             totalPages.value = epubBook.value.locations.total;
             let startCfi = null;
+            
+            // Convert percentage back to decimal for epub.js
+            const lastPercentDecimal = props.lastPercent ? props.lastPercent / 100 : 0;
+            
             if (
-                lastPercent > 0 &&
-                lastPercent < 1 &&
+                lastPercentDecimal > 0 &&
+                lastPercentDecimal < 1 &&
                 epubBook.value.locations
             ) {
-                startCfi =
-                    epubBook.value.locations.cfiFromPercentage(lastPercent);
+                startCfi = epubBook.value.locations.cfiFromPercentage(lastPercentDecimal);
                 if (
                     !startCfi ||
                     typeof startCfi !== "string" ||
@@ -107,8 +110,8 @@ onMounted(async () => {
                 ) {
                     startCfi = undefined;
                 } else {
-                    currentPage.value =
-                        Math.round(lastPercent * totalPages.value) + 1;
+                    // Calculate the correct page number from the percentage
+                    currentPage.value = Math.round(lastPercentDecimal * totalPages.value) + 1;
                     pageInput.value = currentPage.value;
                 }
             }

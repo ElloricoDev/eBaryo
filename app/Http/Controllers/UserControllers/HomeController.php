@@ -35,7 +35,7 @@ class HomeController extends Controller
             $continueReadingList = ReadingLog::with('book')
                 ->where('user_id', $user->id)
                 ->where('last_percent', '>', 0)
-                ->where('last_percent', '<', 1)
+                ->where('last_percent', '<', 100)
                 ->whereHas('book', function($query) {
                     $query->where('status', 'active');
                 })

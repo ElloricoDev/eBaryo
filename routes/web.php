@@ -85,7 +85,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Book Reading
     Route::get('/books/{id}/read/epub', [BookController::class, 'epubReader'])->name('books.epubReader');
-    Route::get('/books/{id}/read/pdf', [BookController::class, 'pdfReader'])->name('books.pdfReader');
 });
 
 

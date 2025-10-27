@@ -309,7 +309,6 @@ const fileType = computed(() => {
     return book.ebook_file.split(".").pop()?.toLowerCase();
 });
 
-const isPdf = computed(() => fileType.value === "pdf");
 const isEpub = computed(() => fileType.value === "epub");
 
 const goBack = () => {
@@ -317,11 +316,7 @@ const goBack = () => {
 };
 
 const handleReadClick = () => {
-    if (isPdf.value) {
-        router.visit(route("books.pdfReader", { id: book.id }), {
-            preserveScroll: true,
-        });
-    } else if (isEpub.value) {
+    if (isEpub.value) {
         router.visit(route("books.epubReader", { id: book.id }), {
             preserveScroll: true,
         });

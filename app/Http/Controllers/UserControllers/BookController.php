@@ -144,7 +144,7 @@ class BookController extends Controller
         $user = Auth::user();
         abort_unless($user, 401);
 
-        $percent = (int) $request->input('percent');
+        $percent = (float) $request->input('percent');
 
         $log = ReadingLog::firstOrNew([
             'user_id' => $user->id,
@@ -152,12 +152,7 @@ class BookController extends Controller
         ]);
 
         $log->read_at = now();
-
-        // Only update if higher than previous progress
-        if (is_null($log->last_percent) || $percent > $log->last_percent) {
-            $log->last_percent = $percent;
-        }
-
+        $log->last_percent = $percent; // Always save the current position
         $log->save();
 
         return back(); // stays compatible with Inertia
@@ -229,9 +224,9 @@ class BookController extends Controller
             return $book;
         });
 
-        // Finished books: last_percent >= 1
+        // Finished books: last_percent >= 100
         $finishedBookIds = ReadingLog::where('user_id', $user->id)
-            ->where('last_percent', '>=', 1)
+            ->where('last_percent', '>=', 100)
             ->pluck('book_id');
 
         $finishedBooks = Book::with('category')
@@ -239,10 +234,10 @@ class BookController extends Controller
             ->whereIn('id', $finishedBookIds)
             ->get();
 
-        // Currently reading: last_percent between 0 and 1
+        // Currently reading: last_percent between 0 and 100
         $currentlyReadingLogs = ReadingLog::with(['book' => fn($q) => $q->active()])
             ->where('user_id', $user->id)
-            ->whereBetween('last_percent', [0.01, 0.99])
+            ->whereBetween('last_percent', [1, 99])
             ->whereNotIn('book_id', $finishedBookIds)
             ->orderByDesc('updated_at')
             ->get();
